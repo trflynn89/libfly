@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['standardcolor_943',['StandardColor',['../structfly_1_1logger_1_1_color.html#a128f0d308fbbcd45fbdc9dfd1ed7a388',1,'fly::logger::Color']]]
+  ['token_896',['Token',['../classfly_1_1parser_1_1_json_parser.html#acf35b22b5ed16f40e5f9e03935894eb5',1,'fly::parser::JsonParser']]]
 ];

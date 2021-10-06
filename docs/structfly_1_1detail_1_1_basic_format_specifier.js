@@ -1,5 +1,6 @@
 var structfly_1_1detail_1_1_basic_format_specifier =
 [
+    [ "FormatParseContext", "structfly_1_1detail_1_1_basic_format_specifier.html#af68f13622236c27ef751f533ce5f26e9", null ],
     [ "Alignment", "structfly_1_1detail_1_1_basic_format_specifier.html#a0fde353ec2930b1783438ba8ef237427", [
       [ "Default", "structfly_1_1detail_1_1_basic_format_specifier.html#a0fde353ec2930b1783438ba8ef237427a7a1920d61156abc05a60135aefe8bc67", null ],
       [ "Left", "structfly_1_1detail_1_1_basic_format_specifier.html#a0fde353ec2930b1783438ba8ef237427a945d5e233cf7d6240f6b783b36a374ff", null ],
@@ -31,10 +32,12 @@ var structfly_1_1detail_1_1_basic_format_specifier =
       [ "General", "structfly_1_1detail_1_1_basic_format_specifier.html#a03e8436252ced6cbc325b5eb4651e71ba0db377921f4ce762c62526131097968f", null ]
     ] ],
     [ "BasicFormatSpecifier", "structfly_1_1detail_1_1_basic_format_specifier.html#a329c95e36349d45616afa1eb9ff8d5c0", null ],
+    [ "BasicFormatSpecifier", "structfly_1_1detail_1_1_basic_format_specifier.html#a2095eaf795bf46526767e42777c7647b", null ],
+    [ "BasicFormatSpecifier", "structfly_1_1detail_1_1_basic_format_specifier.html#a1cf263898716bae645fb4e46837c7957", null ],
     [ "BasicFormatSpecifier", "structfly_1_1detail_1_1_basic_format_specifier.html#a16cf0f31ae20f7918b3fbf217c8fcaa4", null ],
-    [ "infer_type", "structfly_1_1detail_1_1_basic_format_specifier.html#ade3639ff921d74b84fa1cd147cfb4b55", null ],
     [ "operator=", "structfly_1_1detail_1_1_basic_format_specifier.html#a5654332677842e85d68dc199fc57981a", null ],
-    [ "parse", "structfly_1_1detail_1_1_basic_format_specifier.html#a891890010eb57055aa81ea26799c4778", null ],
+    [ "operator=", "structfly_1_1detail_1_1_basic_format_specifier.html#a093c523e1037925017e36386f22a2ff2", null ],
+    [ "parse", "structfly_1_1detail_1_1_basic_format_specifier.html#ae3bb480774e64f4c3ae934bf1ef349d1", null ],
     [ "precision", "structfly_1_1detail_1_1_basic_format_specifier.html#a5603b73b48db558ed07cd728143950af", null ],
     [ "width", "structfly_1_1detail_1_1_basic_format_specifier.html#a7f28faad248b9614607686a088e3a9ba", null ],
     [ "operator==", "structfly_1_1detail_1_1_basic_format_specifier.html#ac100e4ea2da65e8b67a5087888c25ee0", null ],
@@ -43,6 +46,8 @@ var structfly_1_1detail_1_1_basic_format_specifier =
     [ "m_case", "structfly_1_1detail_1_1_basic_format_specifier.html#afdb07f80606b888499663957ec2dbe83", null ],
     [ "m_fill", "structfly_1_1detail_1_1_basic_format_specifier.html#a8c93f74769b042473ac34da086835a6c", null ],
     [ "m_locale_specific_form", "structfly_1_1detail_1_1_basic_format_specifier.html#a3fab2e3c5438ec2eb956668a2448d3ff", null ],
+    [ "m_parameter_type", "structfly_1_1detail_1_1_basic_format_specifier.html#a6bf5cd70bc2836f969262c22fcfe9521", null ],
+    [ "m_parse_index", "structfly_1_1detail_1_1_basic_format_specifier.html#ac52db395c435bd7072d7ef2603c2f429", null ],
     [ "m_position", "structfly_1_1detail_1_1_basic_format_specifier.html#afb667466317c5620f563cbe0d5505f76", null ],
     [ "m_precision", "structfly_1_1detail_1_1_basic_format_specifier.html#a2c5d5c34833c49056bcbf5bff8108789", null ],
     [ "m_precision_position", "structfly_1_1detail_1_1_basic_format_specifier.html#ae84489d38e95aedf1232b4a17ddd4ed8", null ],

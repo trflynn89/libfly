@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -100,6 +100,10 @@ Public Types</h2></td></tr>
 <tr class="memitem:a73356fcd59e58c2491a481b9ede47899"><td class="memItemLeft" align="right" valign="top"><a id="a73356fcd59e58c2491a481b9ede47899"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>char_type</b> = CharType</td></tr>
 <tr class="separator:a73356fcd59e58c2491a481b9ede47899"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecbb5877b78d97149e93c060e48d229a"><td class="memTemplParams" colspan="2"><a id="aecbb5877b78d97149e93c060e48d229a"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:aecbb5877b78d97149e93c060e48d229a"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>formatter_type</b> = <a class="el" href="structfly_1_1_formatter.html">fly::Formatter</a>&lt; std::remove_cvref_t&lt; T &gt;, CharType &gt;</td></tr>
+<tr class="separator:aecbb5877b78d97149e93c060e48d229a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -110,11 +114,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a0af282bbc50689f70ce235df37132ce2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49353798fb9d534780568664f86b1d89"><td class="memItemLeft" align="right" valign="top">OutputIterator &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_context.html#a49353798fb9d534780568664f86b1d89">out</a> ()</td></tr>
 <tr class="separator:a49353798fb9d534780568664f86b1d89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a301ea614d55cccd0fe5bbc2fc5923654"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structfly_1_1detail_1_1_basic_format_specifier.html">FormatSpecifier</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_context.html#a301ea614d55cccd0fe5bbc2fc5923654">spec</a> ()</td></tr>
-<tr class="separator:a301ea614d55cccd0fe5bbc2fc5923654"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename OutputIterator, typename CharType&gt;<br />
+<div class="textblock"><h3>template&lt;typename OutputIterator, fly::StandardCharacter CharType&gt;<br />
 class fly::detail::BasicFormatContext&lt; OutputIterator, CharType &gt;</h3>
 
 <p>Provides access to the formatting state consisting of the format parameters, replacement fields and the output iterator.</p>
@@ -127,7 +129,7 @@ class fly::detail::BasicFormatContext&lt; OutputIterator, CharType &gt;</h3>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename OutputIterator , typename CharType &gt; </div>
+template&lt;typename OutputIterator , fly::StandardCharacter CharType&gt; </div>
 <div class="memtemplate">
 template&lt;typename... Parameters&gt; </div>
 <table class="mlabels">
@@ -154,7 +156,7 @@ template&lt;typename... Parameters&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -176,7 +178,7 @@ template&lt;typename... Parameters&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename OutputIterator , typename CharType &gt; </div>
+template&lt;typename OutputIterator , fly::StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -212,7 +214,7 @@ template&lt;typename OutputIterator , typename CharType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename OutputIterator , typename CharType &gt; </div>
+template&lt;typename OutputIterator , fly::StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -228,31 +230,6 @@ template&lt;typename OutputIterator , typename CharType &gt; </div>
 </table>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The output iterator into which the formatted value should be written. </dd></dl>
-
-</div>
-</div>
-<a id="a301ea614d55cccd0fe5bbc2fc5923654"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a301ea614d55cccd0fe5bbc2fc5923654">&#9670;&nbsp;</a></span>spec()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename OutputIterator , typename CharType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_basic_format_context.html">fly::detail::BasicFormatContext</a>&lt; OutputIterator, CharType &gt;::spec</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The formatting replacement field currently being used for formatting. </dd></dl>
 
 </div>
 </div>

@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -99,30 +99,38 @@ $(document).ready(function(){initNavTree('classfly_1_1net_1_1_socket_service.htm
 Inheritance diagram for fly::net::SocketService:</div>
 <div class="dyncontent">
 <div class="center"><img src="classfly_1_1net_1_1_socket_service__inherit__graph.png" border="0" usemap="#afly_1_1net_1_1_socket_service_inherit__map" alt="Inheritance graph"/></div>
+<map name="afly_1_1net_1_1_socket_service_inherit__map" id="afly_1_1net_1_1_socket_service_inherit__map">
+<area shape="rect" title=" " alt="" coords="29,95,194,121"/>
+<area shape="rect" title=" " alt="" coords="5,5,217,47"/>
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for fly::net::SocketService:</div>
 <div class="dyncontent">
 <div class="center"><img src="classfly_1_1net_1_1_socket_service__coll__graph.png" border="0" usemap="#afly_1_1net_1_1_socket_service_coll__map" alt="Collaboration graph"/></div>
+<map name="afly_1_1net_1_1_socket_service_coll__map" id="afly_1_1net_1_1_socket_service_coll__map">
+<area shape="rect" title=" " alt="" coords="29,95,194,121"/>
+<area shape="rect" title=" " alt="" coords="5,5,217,47"/>
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a7753e2c618845e1c0b544dc05f6bf214"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_socket_service.html#a7753e2c618845e1c0b544dc05f6bf214">~SocketService</a> () noexcept</td></tr>
 <tr class="separator:a7753e2c618845e1c0b544dc05f6bf214"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b3f34bb93c70f89d2db52dd3abc249b"><td class="memTemplParams" colspan="2">template&lt;typename SocketType &gt; </td></tr>
+<tr class="memitem:a8b3f34bb93c70f89d2db52dd3abc249b"><td class="memTemplParams" colspan="2">template&lt;Socket SocketType&gt; </td></tr>
 <tr class="memitem:a8b3f34bb93c70f89d2db52dd3abc249b"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; SocketType &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_socket_service.html#a8b3f34bb93c70f89d2db52dd3abc249b">create_socket</a> ()</td></tr>
 <tr class="separator:a8b3f34bb93c70f89d2db52dd3abc249b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1cab9b2e843b3a540eec3c0e60379a2d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_socket_service.html#a1cab9b2e843b3a540eec3c0e60379a2d">remove_socket</a> (socket_type handle)</td></tr>
 <tr class="separator:a1cab9b2e843b3a540eec3c0e60379a2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd54b470d746087252885df2b1b5b539"><td class="memTemplParams" colspan="2">template&lt;typename SocketType , typename Callback &gt; </td></tr>
+<tr class="memitem:abd54b470d746087252885df2b1b5b539"><td class="memTemplParams" colspan="2">template&lt;Socket SocketType, typename Callback &gt; </td></tr>
 <tr class="memitem:abd54b470d746087252885df2b1b5b539"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_socket_service.html#abd54b470d746087252885df2b1b5b539">notify_when_writable</a> (const std::shared_ptr&lt; SocketType &gt; &amp;socket, Callback &amp;&amp;callback)</td></tr>
 <tr class="separator:abd54b470d746087252885df2b1b5b539"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a083cb36e6daf62bb8219086e2b70027f"><td class="memTemplParams" colspan="2">template&lt;typename SocketType , typename Callback &gt; </td></tr>
+<tr class="memitem:a083cb36e6daf62bb8219086e2b70027f"><td class="memTemplParams" colspan="2">template&lt;Socket SocketType, typename Callback &gt; </td></tr>
 <tr class="memitem:a083cb36e6daf62bb8219086e2b70027f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_socket_service.html#a083cb36e6daf62bb8219086e2b70027f">notify_when_readable</a> (const std::shared_ptr&lt; SocketType &gt; &amp;socket, Callback &amp;&amp;callback)</td></tr>
 <tr class="separator:a083cb36e6daf62bb8219086e2b70027f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abbb6354bd22e401ba538114e0169ef27"><td class="memTemplParams" colspan="2"><a id="abbb6354bd22e401ba538114e0169ef27"></a>
-template&lt;typename SocketType , typename Callback &gt; </td></tr>
+template&lt;Socket SocketType, typename Callback &gt; </td></tr>
 <tr class="memitem:abbb6354bd22e401ba538114e0169ef27"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>wrap_callback</b> (const std::shared_ptr&lt; SocketType &gt; &amp;socket, Callback &amp;&amp;callback) -&gt; Notification</td></tr>
 <tr class="separator:abbb6354bd22e401ba538114e0169ef27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -214,7 +222,7 @@ Static Public Member Functions</h2></td></tr>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename SocketType &gt; </div>
+template&lt;Socket SocketType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">std::shared_ptr&lt; SocketType &gt; fly::net::SocketService::create_socket</td>
@@ -232,7 +240,7 @@ template&lt;typename SocketType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename SocketType , typename Callback &gt; </div>
+template&lt;Socket SocketType, typename Callback &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void fly::net::SocketService::notify_when_readable </td>
@@ -279,7 +287,7 @@ template&lt;typename SocketType , typename Callback &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename SocketType , typename Callback &gt; </div>
+template&lt;Socket SocketType, typename Callback &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void fly::net::SocketService::notify_when_writable </td>

@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -99,21 +99,26 @@ $(document).ready(function(){initNavTree('classfly_1_1detail_1_1_basic_format_pa
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a4c3bcdde24628b2060868749800dfcbb"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#a4c3bcdde24628b2060868749800dfcbb">BasicFormatParameter</a> () noexcept</td></tr>
 <tr class="separator:a4c3bcdde24628b2060868749800dfcbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8c9e7088530df186199033d6cde18a6"><td class="memTemplParams" colspan="2">template&lt;typename T , fly::disable_if_any&lt; detail::is_like_supported_string&lt; T &gt;, BasicFormatTraits::is_pointer&lt; T &gt;, std::is_arithmetic&lt; T &gt;, BasicFormatTraits::is_default_formatted_enum&lt; T &gt;&gt;  = 0&gt; </td></tr>
-<tr class="memitem:ae8c9e7088530df186199033d6cde18a6"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#ae8c9e7088530df186199033d6cde18a6">BasicFormatParameter</a> (const T &amp;value) noexcept</td></tr>
-<tr class="separator:ae8c9e7088530df186199033d6cde18a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8c9e7088530df186199033d6cde18a6"><td class="memTemplParams" colspan="2">template&lt;typename T , fly::enable_if&lt; fly::detail::is_like_supported_string&lt; T &gt;&gt;  = 0&gt; </td></tr>
-<tr class="memitem:ae8c9e7088530df186199033d6cde18a6"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#ae8c9e7088530df186199033d6cde18a6">BasicFormatParameter</a> (const T &amp;value) noexcept</td></tr>
-<tr class="separator:ae8c9e7088530df186199033d6cde18a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7502847ec864f51445874d59899013ec"><td class="memTemplParams" colspan="2">template&lt;typename T , fly::enable_if&lt; BasicFormatTraits::is_pointer&lt; T &gt;&gt;  = 0&gt; </td></tr>
-<tr class="memitem:a7502847ec864f51445874d59899013ec"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#a7502847ec864f51445874d59899013ec">BasicFormatParameter</a> (T value) noexcept</td></tr>
-<tr class="separator:a7502847ec864f51445874d59899013ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7502847ec864f51445874d59899013ec"><td class="memTemplParams" colspan="2">template&lt;typename T , fly::enable_if&lt; std::is_arithmetic&lt; T &gt;&gt;  = 0&gt; </td></tr>
-<tr class="memitem:a7502847ec864f51445874d59899013ec"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#a7502847ec864f51445874d59899013ec">BasicFormatParameter</a> (T value) noexcept</td></tr>
-<tr class="separator:a7502847ec864f51445874d59899013ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7502847ec864f51445874d59899013ec"><td class="memTemplParams" colspan="2">template&lt;typename T , fly::enable_if&lt; BasicFormatTraits::is_default_formatted_enum&lt; T &gt;&gt;  = 0&gt; </td></tr>
-<tr class="memitem:a7502847ec864f51445874d59899013ec"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#a7502847ec864f51445874d59899013ec">BasicFormatParameter</a> (T value) noexcept</td></tr>
-<tr class="separator:a7502847ec864f51445874d59899013ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa253566c524a2a7be8c46e837f797cbd"><td class="memTemplParams" colspan="2">template&lt;fly::FormattableUserDefined T&gt; </td></tr>
+<tr class="memitem:aa253566c524a2a7be8c46e837f797cbd"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#aa253566c524a2a7be8c46e837f797cbd">BasicFormatParameter</a> (const T &amp;value) noexcept</td></tr>
+<tr class="separator:aa253566c524a2a7be8c46e837f797cbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa253566c524a2a7be8c46e837f797cbd"><td class="memTemplParams" colspan="2">template&lt;fly::FormattableString T&gt; </td></tr>
+<tr class="memitem:aa253566c524a2a7be8c46e837f797cbd"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#aa253566c524a2a7be8c46e837f797cbd">BasicFormatParameter</a> (const T &amp;value) noexcept</td></tr>
+<tr class="separator:aa253566c524a2a7be8c46e837f797cbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12213dc97ee3847866e6f940971a35a9"><td class="memTemplParams" colspan="2">template&lt;fly::FormattablePointer T&gt; </td></tr>
+<tr class="memitem:a12213dc97ee3847866e6f940971a35a9"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#a12213dc97ee3847866e6f940971a35a9">BasicFormatParameter</a> (T value) noexcept</td></tr>
+<tr class="separator:a12213dc97ee3847866e6f940971a35a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12213dc97ee3847866e6f940971a35a9"><td class="memTemplParams" colspan="2">template&lt;fly::FormattableIntegral T&gt; </td></tr>
+<tr class="memitem:a12213dc97ee3847866e6f940971a35a9"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#a12213dc97ee3847866e6f940971a35a9">BasicFormatParameter</a> (T value) noexcept</td></tr>
+<tr class="separator:a12213dc97ee3847866e6f940971a35a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12213dc97ee3847866e6f940971a35a9"><td class="memTemplParams" colspan="2">template&lt;fly::FormattableFloatingPoint T&gt; </td></tr>
+<tr class="memitem:a12213dc97ee3847866e6f940971a35a9"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#a12213dc97ee3847866e6f940971a35a9">BasicFormatParameter</a> (T value) noexcept</td></tr>
+<tr class="separator:a12213dc97ee3847866e6f940971a35a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12213dc97ee3847866e6f940971a35a9"><td class="memTemplParams" colspan="2">template&lt;fly::FormattableBoolean T&gt; </td></tr>
+<tr class="memitem:a12213dc97ee3847866e6f940971a35a9"><td class="memTemplItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#a12213dc97ee3847866e6f940971a35a9">BasicFormatParameter</a> (T value) noexcept</td></tr>
+<tr class="separator:a12213dc97ee3847866e6f940971a35a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98e92291b11c807e5936348425bea5cb"><td class="memItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#a98e92291b11c807e5936348425bea5cb">format</a> (<a class="el" href="classfly_1_1detail_1_1_basic_format_parse_context.html">BasicFormatParseContext</a>&lt; typename FormatContext::char_type &gt; &amp;parse_context, FormatContext &amp;context, <a class="el" href="structfly_1_1detail_1_1_basic_format_specifier.html">BasicFormatSpecifier</a>&lt; char_type &gt; &amp;&amp;specifier) const</td></tr>
+<tr class="separator:a98e92291b11c807e5936348425bea5cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2902edc8be422a91e8f30f2c1d53a502"><td class="memTemplParams" colspan="2">template&lt;typename Visitor &gt; </td></tr>
 <tr class="memitem:a2902edc8be422a91e8f30f2c1d53a502"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#a2902edc8be422a91e8f30f2c1d53a502">visit</a> (Visitor &amp;&amp;visitor) const</td></tr>
 <tr class="separator:a2902edc8be422a91e8f30f2c1d53a502"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -129,7 +134,7 @@ class fly::detail::BasicFormatParameter&lt; FormatContext &gt;</h3>
 <dl class="section version"><dt>Version</dt><dd>April 4, 2021 </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4c3bcdde24628b2060868749800dfcbb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c3bcdde24628b2060868749800dfcbb">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[1/6]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c3bcdde24628b2060868749800dfcbb">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[1/7]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -145,7 +150,7 @@ template&lt;typename FormatContext &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -153,15 +158,15 @@ template&lt;typename FormatContext &gt; </div>
 
 </div>
 </div>
-<a id="ae8c9e7088530df186199033d6cde18a6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae8c9e7088530df186199033d6cde18a6">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[2/6]</span></h2>
+<a id="aa253566c524a2a7be8c46e837f797cbd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa253566c524a2a7be8c46e837f797cbd">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[2/7]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename FormatContext &gt; </div>
 <div class="memtemplate">
-template&lt;typename T , fly::enable_if&lt; fly::detail::is_like_supported_string&lt; T &gt;&gt; &gt; </div>
+template&lt;fly::FormattableString T&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -176,7 +181,7 @@ template&lt;typename T , fly::enable_if&lt; fly::detail::is_like_supported_strin
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">explicit</span><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -196,15 +201,15 @@ template&lt;typename T , fly::enable_if&lt; fly::detail::is_like_supported_strin
 
 </div>
 </div>
-<a id="ae8c9e7088530df186199033d6cde18a6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae8c9e7088530df186199033d6cde18a6">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[3/6]</span></h2>
+<a id="aa253566c524a2a7be8c46e837f797cbd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa253566c524a2a7be8c46e837f797cbd">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[3/7]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename FormatContext &gt; </div>
 <div class="memtemplate">
-template&lt;typename T , fly::enable_if&lt; fly::detail::is_like_supported_string&lt; T &gt;&gt;  = 0&gt; </div>
+template&lt;fly::FormattableString T&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -239,15 +244,15 @@ template&lt;typename T , fly::enable_if&lt; fly::detail::is_like_supported_strin
 
 </div>
 </div>
-<a id="a7502847ec864f51445874d59899013ec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7502847ec864f51445874d59899013ec">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[4/6]</span></h2>
+<a id="a12213dc97ee3847866e6f940971a35a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12213dc97ee3847866e6f940971a35a9">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[4/7]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename FormatContext &gt; </div>
 <div class="memtemplate">
-template&lt;typename T , fly::enable_if&lt; BasicFormatTraits::is_default_formatted_enum&lt; T &gt;&gt; &gt; </div>
+template&lt;fly::FormattableBoolean T&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -262,7 +267,7 @@ template&lt;typename T , fly::enable_if&lt; BasicFormatTraits::is_default_format
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">explicit</span><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -282,15 +287,15 @@ template&lt;typename T , fly::enable_if&lt; BasicFormatTraits::is_default_format
 
 </div>
 </div>
-<a id="a7502847ec864f51445874d59899013ec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7502847ec864f51445874d59899013ec">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[5/6]</span></h2>
+<a id="a12213dc97ee3847866e6f940971a35a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12213dc97ee3847866e6f940971a35a9">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[5/7]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename FormatContext &gt; </div>
 <div class="memtemplate">
-template&lt;typename T , fly::enable_if&lt; std::is_arithmetic&lt; T &gt;&gt;  = 0&gt; </div>
+template&lt;fly::FormattableIntegral T&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -309,31 +314,31 @@ template&lt;typename T , fly::enable_if&lt; std::is_arithmetic&lt; T &gt;&gt;  =
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Constructor. Initialize the format parameter to store an arithmetic value.</p>
+<p>Constructor. Initialize the format parameter to store an integral value.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>The arithmetic type.</td></tr>
+    <tr><td class="paramname">T</td><td>The integral type.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">value</td><td>The arithmetic value. </td></tr>
+    <tr><td class="paramname">value</td><td>The integral value. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a7502847ec864f51445874d59899013ec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7502847ec864f51445874d59899013ec">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[6/6]</span></h2>
+<a id="a12213dc97ee3847866e6f940971a35a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12213dc97ee3847866e6f940971a35a9">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[6/7]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename FormatContext &gt; </div>
 <div class="memtemplate">
-template&lt;typename T , fly::enable_if&lt; BasicFormatTraits::is_default_formatted_enum&lt; T &gt;&gt;  = 0&gt; </div>
+template&lt;fly::FormattableFloatingPoint T&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -352,16 +357,59 @@ template&lt;typename T , fly::enable_if&lt; BasicFormatTraits::is_default_format
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Constructor. Initialize the format parameter to store a default-formatted enumeration value.</p>
+<p>Constructor. Initialize the format parameter to store a floating-point value.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>The default-formatted enumeration type.</td></tr>
+    <tr><td class="paramname">T</td><td>The floating-point type.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">value</td><td>The default-formatted enumeration value. </td></tr>
+    <tr><td class="paramname">value</td><td>The floating-point value. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a12213dc97ee3847866e6f940971a35a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12213dc97ee3847866e6f940971a35a9">&#9670;&nbsp;</a></span>BasicFormatParameter() <span class="overload">[7/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename FormatContext &gt; </div>
+<div class="memtemplate">
+template&lt;fly::FormattableBoolean T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr <a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html">fly::detail::BasicFormatParameter</a>&lt; FormatContext &gt;::<a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html">BasicFormatParameter</a> </td>
+          <td>(</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Constructor. Initialize the format parameter to store a boolean value.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The boolean type.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>The boolean value. </td></tr>
   </table>
   </dd>
 </dl>
@@ -369,6 +417,59 @@ template&lt;typename T , fly::enable_if&lt; BasicFormatTraits::is_default_format
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a98e92291b11c807e5936348425bea5cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98e92291b11c807e5936348425bea5cb">&#9670;&nbsp;</a></span>format()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename FormatContext &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr void <a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html">fly::detail::BasicFormatParameter</a>&lt; FormatContext &gt;::format </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classfly_1_1detail_1_1_basic_format_parse_context.html">BasicFormatParseContext</a>&lt; typename FormatContext::char_type &gt; &amp;&#160;</td>
+          <td class="paramname"><em>parse_context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FormatContext &amp;&#160;</td>
+          <td class="paramname"><em>context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structfly_1_1detail_1_1_basic_format_specifier.html">BasicFormatSpecifier</a>&lt; char_type &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>specifier</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Apply the type-erased formatting function to the stored format parameter.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parse_context</td><td>The context holding the format parsing state. </td></tr>
+    <tr><td class="paramname">context</td><td>The context holding the formatting state. </td></tr>
+    <tr><td class="paramname">specifier</td><td>The replacement field to be replaced. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a1bc01813c4007e6752b3feadf3d30370"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1bc01813c4007e6752b3feadf3d30370">&#9670;&nbsp;</a></span>operator bool()</h2>
 
@@ -417,7 +518,7 @@ template&lt;typename Visitor &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">constexpr</span></span>  </td>
+<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">

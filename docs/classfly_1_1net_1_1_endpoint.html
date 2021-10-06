@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -85,9 +85,9 @@ $(document).ready(function(){initNavTree('classfly_1_1net_1_1_endpoint.html','')
 
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="classfly_1_1net_1_1_endpoint-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">fly::net::Endpoint&lt; IPAddressType &gt; Class Template Reference</div>  </div>
@@ -96,6 +96,12 @@ $(document).ready(function(){initNavTree('classfly_1_1net_1_1_endpoint.html','')
 
 <p><code>#include &lt;<a class="el" href="endpoint_8hpp_source.html">endpoint.hpp</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a87c12e8e2cd33780996e7c63ac12315c"><td class="memItemLeft" align="right" valign="top"><a id="a87c12e8e2cd33780996e7c63ac12315c"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>address_type</b> = IPAddressType</td></tr>
+<tr class="separator:a87c12e8e2cd33780996e7c63ac12315c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a12520777f1358afe4cb1d7891e1a9313"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_endpoint.html#a12520777f1358afe4cb1d7891e1a9313">Endpoint</a> ()=default</td></tr>
@@ -116,41 +122,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6c5c7363b8e57cbc205c218a24f1336c"><td class="memItemLeft" align="right" valign="top"><a id="a6c5c7363b8e57cbc205c218a24f1336c"></a>
 <a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a> &amp;&amp;)=default</td></tr>
 <tr class="separator:a6c5c7363b8e57cbc205c218a24f1336c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6cbcdcdac60afcec7b73ac8f8e557b26"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_endpoint.html#a6cbcdcdac60afcec7b73ac8f8e557b26">to_string</a> () const</td></tr>
-<tr class="separator:a6cbcdcdac60afcec7b73ac8f8e557b26"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a87367676ac91dc835ce890ddc270d5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_endpoint.html#a3a87367676ac91dc835ce890ddc270d5">set_address</a> (const IPAddressType &amp;<a class="el" href="classfly_1_1net_1_1_endpoint.html#aed2240f975c5b333611d8b1e2237f89e">address</a>)</td></tr>
-<tr class="separator:a3a87367676ac91dc835ce890ddc270d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae2fce5f658d6a72924fa0a0bb09a4ee3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_endpoint.html#ae2fce5f658d6a72924fa0a0bb09a4ee3">set_address</a> (IPAddressType &amp;&amp;<a class="el" href="classfly_1_1net_1_1_endpoint.html#aed2240f975c5b333611d8b1e2237f89e">address</a>)</td></tr>
-<tr class="separator:ae2fce5f658d6a72924fa0a0bb09a4ee3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed2240f975c5b333611d8b1e2237f89e"><td class="memItemLeft" align="right" valign="top">constexpr const IPAddressType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_endpoint.html#aed2240f975c5b333611d8b1e2237f89e">address</a> () const</td></tr>
 <tr class="separator:aed2240f975c5b333611d8b1e2237f89e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4efbb0c51e899655118db364ef553d67"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_endpoint.html#a4efbb0c51e899655118db364ef553d67">set_port</a> (port_type <a class="el" href="classfly_1_1net_1_1_endpoint.html#a59144aa20cc79f39adc8508b0027f0b2">port</a>)</td></tr>
-<tr class="separator:a4efbb0c51e899655118db364ef553d67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59144aa20cc79f39adc8508b0027f0b2"><td class="memItemLeft" align="right" valign="top">constexpr port_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_endpoint.html#a59144aa20cc79f39adc8508b0027f0b2">port</a> () const</td></tr>
 <tr class="separator:a59144aa20cc79f39adc8508b0027f0b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a245ee0beff6aaef977c1124bb5e3e546"><td class="memItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_endpoint.html#a245ee0beff6aaef977c1124bb5e3e546">operator==</a> (const <a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a> &amp;endpoint) const</td></tr>
-<tr class="separator:a245ee0beff6aaef977c1124bb5e3e546"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27fc8af63786d7cafcf10705ff1b3ef9"><td class="memItemLeft" align="right" valign="top"><a id="a27fc8af63786d7cafcf10705ff1b3ef9"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (const <a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a> &amp;endpoint) const</td></tr>
-<tr class="separator:a27fc8af63786d7cafcf10705ff1b3ef9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08ec6d66b2c5825a6dc04d96cce89f00"><td class="memItemLeft" align="right" valign="top"><a id="a08ec6d66b2c5825a6dc04d96cce89f00"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;</b> (const <a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a> &amp;endpoint) const</td></tr>
-<tr class="separator:a08ec6d66b2c5825a6dc04d96cce89f00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1806dd0fae157fe86e42bc506663027"><td class="memItemLeft" align="right" valign="top"><a id="ad1806dd0fae157fe86e42bc506663027"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;=</b> (const <a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a> &amp;endpoint) const</td></tr>
-<tr class="separator:ad1806dd0fae157fe86e42bc506663027"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add2b2120363c64bc409293d1b3019ab1"><td class="memItemLeft" align="right" valign="top"><a id="add2b2120363c64bc409293d1b3019ab1"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&gt;</b> (const <a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a> &amp;endpoint) const</td></tr>
-<tr class="separator:add2b2120363c64bc409293d1b3019ab1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72fb16dc96f07e8183db6a3c8744be2a"><td class="memItemLeft" align="right" valign="top"><a id="a72fb16dc96f07e8183db6a3c8744be2a"></a>
-constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator&gt;=</b> (const <a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a> &amp;endpoint) const</td></tr>
-<tr class="separator:a72fb16dc96f07e8183db6a3c8744be2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a757c3e3ce970fa9e4b3c75ef5905457b"><td class="memItemLeft" align="right" valign="top"><a id="a757c3e3ce970fa9e4b3c75ef5905457b"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> () const</td></tr>
-<tr class="separator:a757c3e3ce970fa9e4b3c75ef5905457b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae26ce9eefc11902245c11a8a89fc6649"><td class="memItemLeft" align="right" valign="top"><a id="ae26ce9eefc11902245c11a8a89fc6649"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> () const</td></tr>
-<tr class="separator:ae26ce9eefc11902245c11a8a89fc6649"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cd66fbf342443048ec11f60815bb5bb"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_endpoint.html#a1cd66fbf342443048ec11f60815bb5bb">operator&lt;=&gt;</a> (const <a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a> &amp;) const =default</td></tr>
+<tr class="separator:a1cd66fbf342443048ec11f60815bb5bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -160,14 +137,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a4af3b2dfc5f62cdf3ce22e17b2ec5a2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ce88e48acff6980556aa53d04f86154"><td class="memItemLeft" align="right" valign="top">static constexpr std::optional&lt; <a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_endpoint.html#a1ce88e48acff6980556aa53d04f86154">from_string</a> (std::string_view endpoint)</td></tr>
 <tr class="separator:a1ce88e48acff6980556aa53d04f86154"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a164055bb9430d4695ac92e7323bdb4e6"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_endpoint.html#a164055bb9430d4695ac92e7323bdb4e6">operator&lt;&lt;</a> (std::ostream &amp;stream, const <a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a> &amp;endpoint)</td></tr>
-<tr class="separator:a164055bb9430d4695ac92e7323bdb4e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename IPAddressType&gt;<br />
+<div class="textblock"><h3>template&lt;IPAddress IPAddressType&gt;<br />
 class fly::net::Endpoint&lt; IPAddressType &gt;</h3>
 
 <p>Class to store a version-independent IP address and port, and to provide convenient access to its data as required by various network APIs.</p>
@@ -180,7 +152,7 @@ class fly::net::Endpoint&lt; IPAddressType &gt;</h3>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
+template&lt;IPAddress IPAddressType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -208,7 +180,7 @@ template&lt;typename IPAddressType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
+template&lt;IPAddress IPAddressType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -254,7 +226,7 @@ template&lt;typename IPAddressType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
+template&lt;IPAddress IPAddressType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -301,7 +273,7 @@ template&lt;typename IPAddressType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
+template&lt;IPAddress IPAddressType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -326,7 +298,7 @@ template&lt;typename IPAddressType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
+template&lt;IPAddress IPAddressType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -363,7 +335,7 @@ template&lt;typename IPAddressType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
+template&lt;IPAddress IPAddressType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -388,7 +360,7 @@ template&lt;typename IPAddressType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
+template&lt;IPAddress IPAddressType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -407,32 +379,32 @@ template&lt;typename IPAddressType &gt; </div>
 
 </div>
 </div>
-<a id="a245ee0beff6aaef977c1124bb5e3e546"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a245ee0beff6aaef977c1124bb5e3e546">&#9670;&nbsp;</a></span>operator==()</h2>
+<a id="a1cd66fbf342443048ec11f60815bb5bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1cd66fbf342443048ec11f60815bb5bb">&#9670;&nbsp;</a></span>operator&lt;=&gt;()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
+template&lt;IPAddress IPAddressType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr bool <a class="el" href="classfly_1_1net_1_1_endpoint.html">fly::net::Endpoint</a>&lt; IPAddressType &gt;::operator== </td>
+          <td class="memname">auto <a class="el" href="classfly_1_1net_1_1_endpoint.html">fly::net::Endpoint</a>&lt; IPAddressType &gt;::operator&lt;=&gt; </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a>&lt; IPAddressType &gt; &amp;&#160;</td>
-          <td class="paramname"><em>endpoint</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
+<span class="mlabels"><span class="mlabel">default</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Comparison operators. Only Clang and GCC fully support the three-way comparison operator, so these must be manually defined on other platforms. </p>
+<p>Three-way-comparison operator. Defaulted to perform the comparison on the underlying IP address and port. </p>
 
 </div>
 </div>
@@ -442,7 +414,7 @@ template&lt;typename IPAddressType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
+template&lt;IPAddress IPAddressType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -458,155 +430,6 @@ template&lt;typename IPAddressType &gt; </div>
 </table>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The endoint's IP port. </dd></dl>
-
-</div>
-</div>
-<a id="a3a87367676ac91dc835ce890ddc270d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a87367676ac91dc835ce890ddc270d5">&#9670;&nbsp;</a></span>set_address() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classfly_1_1net_1_1_endpoint.html">fly::net::Endpoint</a>&lt; IPAddressType &gt;::set_address </td>
-          <td>(</td>
-          <td class="paramtype">const IPAddressType &amp;&#160;</td>
-          <td class="paramname"><em>address</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Set the endpoint's IP address.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">address</td><td>The endoint's new IP address. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ae2fce5f658d6a72924fa0a0bb09a4ee3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2fce5f658d6a72924fa0a0bb09a4ee3">&#9670;&nbsp;</a></span>set_address() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classfly_1_1net_1_1_endpoint.html">fly::net::Endpoint</a>&lt; IPAddressType &gt;::set_address </td>
-          <td>(</td>
-          <td class="paramtype">IPAddressType &amp;&amp;&#160;</td>
-          <td class="paramname"><em>address</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Set the endpoint's IP address.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">address</td><td>The endoint's new IP address. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a4efbb0c51e899655118db364ef553d67"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4efbb0c51e899655118db364ef553d67">&#9670;&nbsp;</a></span>set_port()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classfly_1_1net_1_1_endpoint.html">fly::net::Endpoint</a>&lt; IPAddressType &gt;::set_port </td>
-          <td>(</td>
-          <td class="paramtype">port_type&#160;</td>
-          <td class="paramname"><em>port</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Set the endpoint's port.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">port</td><td>The endoint's new port. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a6cbcdcdac60afcec7b73ac8f8e557b26"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6cbcdcdac60afcec7b73ac8f8e557b26">&#9670;&nbsp;</a></span>to_string()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string <a class="el" href="classfly_1_1net_1_1_endpoint.html">fly::net::Endpoint</a>&lt; IPAddressType &gt;::to_string </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The endpoint converted to a string. </dd></dl>
-
-</div>
-</div>
-<h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a id="a164055bb9430d4695ac92e7323bdb4e6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a164055bb9430d4695ac92e7323bdb4e6">&#9670;&nbsp;</a></span>operator&lt;&lt;</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename IPAddressType &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
-          <td>(</td>
-          <td class="paramtype">std::ostream &amp;&#160;</td>
-          <td class="paramname"><em>stream</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classfly_1_1net_1_1_endpoint.html">Endpoint</a>&lt; IPAddressType &gt; &amp;&#160;</td>
-          <td class="paramname"><em>endpoint</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Stream an endpoint as a string.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">stream</td><td>A reference to the output stream. </td></tr>
-    <tr><td class="paramname">endpoint</td><td>The endpoint to stream.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to the output stream. </dd></dl>
 
 </div>
 </div>

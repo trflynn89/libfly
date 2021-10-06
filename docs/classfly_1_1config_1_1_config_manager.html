@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -99,19 +99,23 @@ $(document).ready(function(){initNavTree('classfly_1_1config_1_1_config_manager.
 Inheritance diagram for fly::config::ConfigManager:</div>
 <div class="dyncontent">
 <div class="center"><img src="classfly_1_1config_1_1_config_manager__inherit__graph.png" border="0" usemap="#afly_1_1config_1_1_config_manager_inherit__map" alt="Inheritance graph"/></div>
+<map name="afly_1_1config_1_1_config_manager_inherit__map" id="afly_1_1config_1_1_config_manager_inherit__map">
+<area shape="rect" title=" " alt="" coords="19,95,210,121"/>
+<area shape="rect" title=" " alt="" coords="5,5,224,47"/>
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for fly::config::ConfigManager:</div>
 <div class="dyncontent">
 <div class="center"><img src="classfly_1_1config_1_1_config_manager__coll__graph.png" border="0" usemap="#afly_1_1config_1_1_config_manager_coll__map" alt="Collaboration graph"/></div>
+<map name="afly_1_1config_1_1_config_manager_coll__map" id="afly_1_1config_1_1_config_manager_coll__map">
+<area shape="rect" title=" " alt="" coords="19,95,210,121"/>
+<area shape="rect" title=" " alt="" coords="5,5,224,47"/>
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a3d2622f15b76ef41b8be807096d1d6de"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1config_1_1_config_manager.html#a3d2622f15b76ef41b8be807096d1d6de">ConfigFileType</a> : std::uint8_t { <b>Ini</b>
-, <b>Json</b>
- }</td></tr>
-<tr class="separator:a3d2622f15b76ef41b8be807096d1d6de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad23ee083847f03655a84688d75f6a0c2"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1config_1_1_config_manager.html#ad23ee083847f03655a84688d75f6a0c2">ConfigMap</a> = std::map&lt; std::string, std::weak_ptr&lt; <a class="el" href="classfly_1_1config_1_1_config.html">Config</a> &gt; &gt;</td></tr>
 <tr class="separator:ad23ee083847f03655a84688d75f6a0c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -127,7 +131,7 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ac43705a67c4301be4a114fcfa16dca35"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classfly_1_1config_1_1_config_manager.html">ConfigManager</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1config_1_1_config_manager.html#ac43705a67c4301be4a114fcfa16dca35">create</a> (std::shared_ptr&lt; <a class="el" href="classfly_1_1task_1_1_sequenced_task_runner.html">fly::task::SequencedTaskRunner</a> &gt; task_runner, <a class="el" href="classfly_1_1config_1_1_config_manager.html#a3d2622f15b76ef41b8be807096d1d6de">ConfigFileType</a> file_type, std::filesystem::path path)</td></tr>
+<tr class="memitem:ac43705a67c4301be4a114fcfa16dca35"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classfly_1_1config_1_1_config_manager.html">ConfigManager</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1config_1_1_config_manager.html#ac43705a67c4301be4a114fcfa16dca35">create</a> (std::shared_ptr&lt; <a class="el" href="classfly_1_1task_1_1_sequenced_task_runner.html">fly::task::SequencedTaskRunner</a> &gt; task_runner, ConfigFileType file_type, std::filesystem::path path)</td></tr>
 <tr class="separator:ac43705a67c4301be4a114fcfa16dca35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -147,30 +151,6 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Map of configuration group names to configuration objects. </p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Enumeration Documentation</h2>
-<a id="a3d2622f15b76ef41b8be807096d1d6de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d2622f15b76ef41b8be807096d1d6de">&#9670;&nbsp;</a></span>ConfigFileType</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="classfly_1_1config_1_1_config_manager.html#a3d2622f15b76ef41b8be807096d1d6de">fly::config::ConfigManager::ConfigFileType</a> : std::uint8_t</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Enumerated list of supported configuration file formats. </p>
 
 </div>
 </div>
@@ -212,7 +192,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classfly_1_1config_1_1_config_manager.html#a3d2622f15b76ef41b8be807096d1d6de">ConfigFileType</a>&#160;</td>
+          <td class="paramtype">ConfigFileType&#160;</td>
           <td class="paramname"><em>file_type</em>, </td>
         </tr>
         <tr>

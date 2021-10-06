@@ -1,8 +1,0 @@
-digraph "Graphical Class Hierarchy"
-{
- // LATEX_PDF_SIZE
-  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
-  node [fontname="Helvetica",fontsize="10",shape=record];
-  rankdir="LR";
-  Node0 [label="fly::Formatter\< T,\l CharType, fly::enable\l_if\< detail::BasicFormatTraits\l::is_pointer\< T \> \> \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structfly_1_1_formatter_3_01_t_00_01_char_type_00_01fly_1_1enable__if_3_01detail_1_1_basic_forma90d926c13691e82172abe465283e0866.html",tooltip=" "];
-}

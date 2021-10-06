@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>libfly: fly::detail::BasicFormatString&lt; StringType, ParameterTypes &gt; Class Template Reference</title>
+<title>libfly: fly::detail::BasicFormatString&lt; CharType, ParameterTypes &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -88,7 +88,7 @@ $(document).ready(function(){initNavTree('classfly_1_1detail_1_1_basic_format_st
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classfly_1_1detail_1_1_basic_format_string-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">fly::detail::BasicFormatString&lt; StringType, ParameterTypes &gt; Class Template Reference</div>  </div>
+<div class="title">fly::detail::BasicFormatString&lt; CharType, ParameterTypes &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -96,44 +96,36 @@ $(document).ready(function(){initNavTree('classfly_1_1detail_1_1_basic_format_st
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1d624cc17fa53b3d5da387cbd3a279c5"><td class="memTemplParams" colspan="2">template&lt;std::size_t N&gt; </td></tr>
-<tr class="memitem:a1d624cc17fa53b3d5da387cbd3a279c5"><td class="memTemplItemLeft" align="right" valign="top">FLY_CONSTEVAL&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_string.html#a1d624cc17fa53b3d5da387cbd3a279c5">BasicFormatString</a> (const char_type(&amp;format)[N]) noexcept</td></tr>
-<tr class="separator:a1d624cc17fa53b3d5da387cbd3a279c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d3e420b3cadf1c0f6bc2e67643c14ae"><td class="memItemLeft" align="right" valign="top"><a id="a6d3e420b3cadf1c0f6bc2e67643c14ae"></a>
+<tr class="memitem:a8f1054e0b16cfe1d5c32420bb3349baa"><td class="memTemplParams" colspan="2">template&lt;std::size_t N&gt; </td></tr>
+<tr class="memitem:a8f1054e0b16cfe1d5c32420bb3349baa"><td class="memTemplItemLeft" align="right" valign="top">FLY_CONSTEVAL&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">BasicFormatString</a> (const CharType(&amp;format)[N]) noexcept</td></tr>
+<tr class="separator:a8f1054e0b16cfe1d5c32420bb3349baa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac64bfd803feff2cd4324d405e691db99"><td class="memItemLeft" align="right" valign="top"><a id="ac64bfd803feff2cd4324d405e691db99"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>BasicFormatString</b> (<a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;&amp;)=default</td></tr>
-<tr class="separator:a6d3e420b3cadf1c0f6bc2e67643c14ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bb7f41efe1ea5165c8261efa8a264c5"><td class="memItemLeft" align="right" valign="top"><a id="a5bb7f41efe1ea5165c8261efa8a264c5"></a>
+<tr class="separator:ac64bfd803feff2cd4324d405e691db99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aceb8df70ac30cc9772c4ac2589622157"><td class="memItemLeft" align="right" valign="top"><a id="aceb8df70ac30cc9772c4ac2589622157"></a>
 <a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;&amp;)=default</td></tr>
-<tr class="separator:a5bb7f41efe1ea5165c8261efa8a264c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a940dc23a367876f3b944fea7fc855010"><td class="memItemLeft" align="right" valign="top">constexpr view_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_string.html#a940dc23a367876f3b944fea7fc855010">view</a> () const</td></tr>
-<tr class="separator:a940dc23a367876f3b944fea7fc855010"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a721c51c50b264effca08ab0727af7eef"><td class="memItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_string.html#a721c51c50b264effca08ab0727af7eef">has_error</a> () const</td></tr>
-<tr class="separator:a721c51c50b264effca08ab0727af7eef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b1b2a2f31fc1a42588157985d0366bc"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_string.html#a1b1b2a2f31fc1a42588157985d0366bc">error</a> () const</td></tr>
-<tr class="separator:a1b1b2a2f31fc1a42588157985d0366bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf424d3e57e4a8e69027c9b7d3cc431e"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="structfly_1_1detail_1_1_basic_format_specifier.html">FormatSpecifier</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_string.html#abf424d3e57e4a8e69027c9b7d3cc431e">next_specifier</a> ()</td></tr>
-<tr class="separator:abf424d3e57e4a8e69027c9b7d3cc431e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3004a7d86607fef6a2ed8a9544a6a6ac"><td class="memTemplParams" colspan="2"><a id="a3004a7d86607fef6a2ed8a9544a6a6ac"></a>
-template&lt;size_t N&gt; </td></tr>
-<tr class="memitem:a3004a7d86607fef6a2ed8a9544a6a6ac"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>parameter_type</b> (size_t index) -&gt; std::optional&lt; ParameterType &gt;</td></tr>
-<tr class="separator:a3004a7d86607fef6a2ed8a9544a6a6ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:aceb8df70ac30cc9772c4ac2589622157"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fc0d551707f90fb26d4010cad71921d"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="classfly_1_1detail_1_1_basic_format_parse_context.html">FormatParseContext</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_string.html#a6fc0d551707f90fb26d4010cad71921d">context</a> ()</td></tr>
+<tr class="separator:a6fc0d551707f90fb26d4010cad71921d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af67af867e81f8ebe346941d51a95a7c8"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="structfly_1_1detail_1_1_basic_format_specifier.html">FormatSpecifier</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_format_string.html#af67af867e81f8ebe346941d51a95a7c8">next_specifier</a> ()</td></tr>
+<tr class="separator:af67af867e81f8ebe346941d51a95a7c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename StringType, typename... ParameterTypes&gt;<br />
-class fly::detail::BasicFormatString&lt; StringType, ParameterTypes &gt;</h3>
+<div class="textblock"><h3>template&lt;fly::StandardCharacter CharType, typename... ParameterTypes&gt;<br />
+class fly::detail::BasicFormatString&lt; CharType, ParameterTypes &gt;</h3>
 
 <p>A container to hold and parse a format string at compile time.</p>
 <p>This class depends on C++20 immediate functions (consteval), which are not yet supported by all compilers. With compilers that do support immediate functions, if a format string is invalid (either due to syntax or the foratting parameter types), a compile error will be raised with a brief message indicating the error. For other compilers, that error message will be stored in the instance and callers should check if an error was encountered.</p>
 <dl class="section author"><dt>Author</dt><dd>Timothy Flynn (<a href="#" onclick="location.href='mai'+'lto:'+'trf'+'ly'+'nn8'+'9@'+'pm.'+'me'; return false;">trfly<span style="display: none;">.nosp@m.</span>nn89<span style="display: none;">.nosp@m.</span>@pm.m<span style="display: none;">.nosp@m.</span>e</a>) </dd></dl>
 <dl class="section version"><dt>Version</dt><dd>January 3, 2021 </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a1d624cc17fa53b3d5da387cbd3a279c5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d624cc17fa53b3d5da387cbd3a279c5">&#9670;&nbsp;</a></span>BasicFormatString()</h2>
+<a id="a8f1054e0b16cfe1d5c32420bb3349baa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8f1054e0b16cfe1d5c32420bb3349baa">&#9670;&nbsp;</a></span>BasicFormatString()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType , typename... ParameterTypes&gt; </div>
+template&lt;fly::StandardCharacter CharType, typename... ParameterTypes&gt; </div>
 <div class="memtemplate">
 template&lt;std::size_t N&gt; </div>
 <table class="mlabels">
@@ -141,9 +133,9 @@ template&lt;std::size_t N&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">FLY_CONSTEVAL <a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">fly::detail::BasicFormatString</a>&lt; StringType, ParameterTypes &gt;::<a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> </td>
+          <td class="memname">FLY_CONSTEVAL <a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">fly::detail::BasicFormatString</a>&lt; CharType, ParameterTypes &gt;::<a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> </td>
           <td>(</td>
-          <td class="paramtype">const char_type(&amp;)&#160;</td>
+          <td class="paramtype">const CharType(&amp;)&#160;</td>
           <td class="paramname"><em>format</em>[N]</td><td>)</td>
           <td></td>
         </tr>
@@ -159,37 +151,19 @@ template&lt;std::size_t N&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a1b1b2a2f31fc1a42588157985d0366bc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1b1b2a2f31fc1a42588157985d0366bc">&#9670;&nbsp;</a></span>error()</h2>
+<a id="a6fc0d551707f90fb26d4010cad71921d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fc0d551707f90fb26d4010cad71921d">&#9670;&nbsp;</a></span>context()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType , typename... ParameterTypes&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string <a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">fly::detail::BasicFormatString</a>&lt; StringType, ParameterTypes &gt;::error</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>If the compiler does not support immediate functions, returns any error that was encountered while parsing the format string.</p>
-<dl class="section return"><dt>Returns</dt><dd>The error (if any) that was encountered while parsing the format string. </dd></dl>
-
-</div>
-</div>
-<a id="a721c51c50b264effca08ab0727af7eef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a721c51c50b264effca08ab0727af7eef">&#9670;&nbsp;</a></span>has_error()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename StringType , typename... ParameterTypes&gt; </div>
+template&lt;fly::StandardCharacter CharType, typename... ParameterTypes&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr bool <a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">fly::detail::BasicFormatString</a>&lt; StringType, ParameterTypes &gt;::has_error</td>
+          <td class="memname">constexpr <a class="el" href="classfly_1_1detail_1_1_basic_format_parse_context.html">BasicFormatParseContext</a>&lt; CharType &gt; &amp; <a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">fly::detail::BasicFormatString</a>&lt; CharType, ParameterTypes &gt;::context</td>
         </tr>
       </table>
   </td>
@@ -198,50 +172,24 @@ template&lt;typename StringType , typename... ParameterTypes&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>If the compiler does not support immediate functions, returns whether an error was encountered while parsing the format string.</p>
-<dl class="section return"><dt>Returns</dt><dd>True if an error was encountered while parsing. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the format parsing context. </dd></dl>
 
 </div>
 </div>
-<a id="abf424d3e57e4a8e69027c9b7d3cc431e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf424d3e57e4a8e69027c9b7d3cc431e">&#9670;&nbsp;</a></span>next_specifier()</h2>
+<a id="af67af867e81f8ebe346941d51a95a7c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af67af867e81f8ebe346941d51a95a7c8">&#9670;&nbsp;</a></span>next_specifier()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType , typename... ParameterTypes&gt; </div>
+template&lt;fly::StandardCharacter CharType, typename... ParameterTypes&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">fly::detail::BasicFormatString</a>&lt; StringType, ParameterTypes &gt;::next_specifier</td>
+          <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">fly::detail::BasicFormatString</a>&lt; CharType, ParameterTypes &gt;::next_specifier</td>
         </tr>
       </table>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>If available, the next parsed replacement field. Otherwise, an uninitialized value. </dd></dl>
-
-</div>
-</div>
-<a id="a940dc23a367876f3b944fea7fc855010"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a940dc23a367876f3b944fea7fc855010">&#9670;&nbsp;</a></span>view()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename StringType , typename... ParameterTypes&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">constexpr auto <a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">fly::detail::BasicFormatString</a>&lt; StringType, ParameterTypes &gt;::view</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">constexpr</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>A string view into the format string. </dd></dl>
 
 </div>
 </div>

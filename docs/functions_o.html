@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -90,28 +90,43 @@ $(document).ready(function(){initNavTree('functions_o.html',''); initResizable()
 <li>offset()
 : <a class="el" href="classfly_1_1_out_of_range_json_exception.html#a2269dfdf2654343b15fd7887fe4b9700">fly::OutOfRangeJsonException</a>
 </li>
+<li>on_error()
+: <a class="el" href="classfly_1_1detail_1_1_basic_format_parse_context.html#a71a7dac3b45fb78bd0278b87f6926ab0">fly::detail::BasicFormatParseContext&lt; CharType &gt;</a>
+</li>
 <li>operator bool()
 : <a class="el" href="classfly_1_1detail_1_1_basic_format_parameter.html#a1bc01813c4007e6752b3feadf3d30370">fly::detail::BasicFormatParameter&lt; FormatContext &gt;</a>
 </li>
-<li>operator JsonTraits::null_type()
-: <a class="el" href="classfly_1_1_json.html#a18734ce1daf1f1a5aa422c40e4e1c829">fly::Json</a>
+<li>operator json_array_type()
+: <a class="el" href="classfly_1_1_json.html#a61e004eba8d249abd7b747f615cfda18">fly::Json</a>
+</li>
+<li>operator json_null_type()
+: <a class="el" href="classfly_1_1_json.html#a4e47fe18ae3ad447de8ebef3ea721594">fly::Json</a>
+</li>
+<li>operator json_object_type()
+: <a class="el" href="classfly_1_1_json.html#a44d6939146691fe0f797753233eb8f92">fly::Json</a>
+</li>
+<li>operator json_string_type()
+: <a class="el" href="classfly_1_1_json.html#ac9062787ed09eab3c6c3a81e7d4abef0">fly::Json</a>
 </li>
 <li>operator std::array&lt; T, N &gt;()
 : <a class="el" href="classfly_1_1_json.html#ac7e00468572b30980a4a8909b783ccf9">fly::Json</a>
 </li>
 <li>operator T()
-: <a class="el" href="classfly_1_1_json.html#a6de63be69fd45d4bbbd8416dd0d7890a">fly::Json</a>
+: <a class="el" href="classfly_1_1_json.html#a042972d586c6c4bca75435c20bdb88a5">fly::Json</a>
 </li>
 <li>operator!=()
 : <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#a44b03b6614ce63639c9ab23fbd620c59">fly::detail::JsonIterator&lt; JsonType &gt;</a>
 , <a class="el" href="classfly_1_1_json.html#ab17204d4937ef6cf10f4ff1acca019e7">fly::Json</a>
 </li>
+<li>operator()()
+: <a class="el" href="structstd_1_1hash_3_01fly_1_1_json_01_4.html#a82dcd736baaab894c9305ac52f18029f">std::hash&lt; fly::Json &gt;</a>
+</li>
 <li>operator*()
 : <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#a540cb59bc1c1bafe1742f78c0a8e7f1b">fly::detail::JsonIterator&lt; JsonType &gt;</a>
 , <a class="el" href="classfly_1_1detail_1_1_json_reverse_iterator.html#a78e1d56211e0543ef4d34a28268dc1d4">fly::detail::JsonReverseIterator&lt; JsonIterator &gt;</a>
 </li>
-<li>operator+()
-: <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#a70950aa9b86f0c34611ec274692a49c2">fly::detail::JsonIterator&lt; JsonType &gt;</a>
+<li>operator+
+: <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#ae31a19467299236ce54c39c80b86eacc">fly::detail::JsonIterator&lt; JsonType &gt;</a>
 , <a class="el" href="classfly_1_1detail_1_1_json_reverse_iterator.html#a6c9dd64d2950daea490b3a93296db3d7">fly::detail::JsonReverseIterator&lt; JsonIterator &gt;</a>
 </li>
 <li>operator++()
@@ -123,7 +138,7 @@ $(document).ready(function(){initNavTree('functions_o.html',''); initResizable()
 , <a class="el" href="classfly_1_1detail_1_1_json_reverse_iterator.html#a22a3fe0c5d8e4168a45653ddd21959f6">fly::detail::JsonReverseIterator&lt; JsonIterator &gt;</a>
 </li>
 <li>operator-()
-: <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#ab1217377cffd249ce3e7001f5964a935">fly::detail::JsonIterator&lt; JsonType &gt;</a>
+: <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#ac38e18c9784f44e2db05cb1634670f39">fly::detail::JsonIterator&lt; JsonType &gt;</a>
 , <a class="el" href="classfly_1_1detail_1_1_json_reverse_iterator.html#a01da541f55fb9cfc941fdee1a62f41d7">fly::detail::JsonReverseIterator&lt; JsonIterator &gt;</a>
 </li>
 <li>operator--()
@@ -141,21 +156,20 @@ $(document).ready(function(){initNavTree('functions_o.html',''); initResizable()
 <li>operator&lt;
 : <a class="el" href="structfly_1_1coders_1_1_huffman_code.html#a326b978d11f6e1a9be3bb950b0c8bc9b">fly::coders::HuffmanCode</a>
 , <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#ab4536da83b165129d14d010f7b2ba6d8">fly::detail::JsonIterator&lt; JsonType &gt;</a>
+, <a class="el" href="classfly_1_1_json.html#a0ffc0151d6d394452fe7354a47c39e84">fly::Json</a>
 </li>
 <li>operator&lt;&lt;
-: <a class="el" href="classfly_1_1_json.html#adbda1b88b7eeb47dc1f9d5da311ab02f">fly::Json</a>
-, <a class="el" href="classfly_1_1logger_1_1detail_1_1_styler_proxy.html#a870fd5f78216e112cc9936726d58a0db">fly::logger::detail::StylerProxy</a>
+: <a class="el" href="classfly_1_1logger_1_1detail_1_1_styler_proxy.html#a870fd5f78216e112cc9936726d58a0db">fly::logger::detail::StylerProxy</a>
 , <a class="el" href="classfly_1_1logger_1_1_styler.html#a0a6b2719b3f9b08f2e8c6d1c164c26c4">fly::logger::Styler</a>
-, <a class="el" href="classfly_1_1net_1_1_endpoint.html#a164055bb9430d4695ac92e7323bdb4e6">fly::net::Endpoint&lt; IPAddressType &gt;</a>
-, <a class="el" href="classfly_1_1net_1_1_i_pv4_address.html#a00789cdedfcb49e168ea33bcf1c9c306">fly::net::IPv4Address</a>
-, <a class="el" href="classfly_1_1net_1_1_i_pv6_address.html#aed28771602b04994160ee9851f9f264f">fly::net::IPv6Address</a>
-, <a class="el" href="classfly_1_1path_1_1_path_monitor.html#a4c8194c6115995c1a9cc39752cdb325a">fly::path::PathMonitor</a>
 </li>
 <li>operator&lt;=()
 : <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#a2a843aa69761f9a9146c7199dbc68080">fly::detail::JsonIterator&lt; JsonType &gt;</a>
+, <a class="el" href="classfly_1_1_json.html#a1b3d9d7bc97b572ffcc13161101d2ef1">fly::Json</a>
 </li>
 <li>operator&lt;=&gt;()
-: <a class="el" href="classfly_1_1net_1_1_i_pv4_address.html#af5347a689fdd3cfbad112d2f0c640f47">fly::net::IPv4Address</a>
+: <a class="el" href="classfly_1_1net_1_1_endpoint.html#a1cd66fbf342443048ec11f60815bb5bb">fly::net::Endpoint&lt; IPAddressType &gt;</a>
+, <a class="el" href="classfly_1_1net_1_1_i_pv4_address.html#af5347a689fdd3cfbad112d2f0c640f47">fly::net::IPv4Address</a>
+, <a class="el" href="classfly_1_1net_1_1_i_pv6_address.html#acb4286521a2ec32704f40f71fdd58b57">fly::net::IPv6Address</a>
 </li>
 <li>operator=()
 : <a class="el" href="structfly_1_1coders_1_1_huffman_code.html#a41dec587fe98a17082cbcf4508c6c1df">fly::coders::HuffmanCode</a>
@@ -172,19 +186,19 @@ $(document).ready(function(){initNavTree('functions_o.html',''); initResizable()
 : <a class="el" href="structfly_1_1detail_1_1_basic_format_specifier.html#ac100e4ea2da65e8b67a5087888c25ee0">fly::detail::BasicFormatSpecifier&lt; CharType &gt;</a>
 , <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#a087985c3536259c3d25649c155d9ef6b">fly::detail::JsonIterator&lt; JsonType &gt;</a>
 , <a class="el" href="classfly_1_1_json.html#a3dbe745b24800b24ff6e0a21ff9f02cc">fly::Json</a>
-, <a class="el" href="classfly_1_1net_1_1_endpoint.html#a245ee0beff6aaef977c1124bb5e3e546">fly::net::Endpoint&lt; IPAddressType &gt;</a>
-, <a class="el" href="classfly_1_1net_1_1_i_pv6_address.html#a14bfd79d77083c6ce28b42a0ae4ec640">fly::net::IPv6Address</a>
 </li>
 <li>operator&gt;()
 : <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#a4606ef6ae8049d53d05c67cc1e1426d4">fly::detail::JsonIterator&lt; JsonType &gt;</a>
+, <a class="el" href="classfly_1_1_json.html#a8caeea567996fc663d4d3b620fa85a5a">fly::Json</a>
 </li>
 <li>operator&gt;=()
 : <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#a392b568ebd3659a33e2eee89ff716bc2">fly::detail::JsonIterator&lt; JsonType &gt;</a>
+, <a class="el" href="classfly_1_1_json.html#a5a09cebbb999668ee7055cd0bfbfaacf">fly::Json</a>
 </li>
 <li>operator[]()
 : <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#a4192d3078f8af40a6c42482f7a17c191">fly::detail::JsonIterator&lt; JsonType &gt;</a>
 , <a class="el" href="classfly_1_1detail_1_1_json_reverse_iterator.html#aa65904f6a9854fc4eab9eccb02e79e93">fly::detail::JsonReverseIterator&lt; JsonIterator &gt;</a>
-, <a class="el" href="classfly_1_1_json.html#a0520e59b498f1376091804c796cd8e90">fly::Json</a>
+, <a class="el" href="classfly_1_1_json.html#ad53e6822ebb30f8faef543b074aeca2a">fly::Json</a>
 </li>
 <li>out()
 : <a class="el" href="classfly_1_1detail_1_1_basic_format_context.html#a49353798fb9d534780568664f86b1d89">fly::detail::BasicFormatContext&lt; OutputIterator, CharType &gt;</a>

@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -90,8 +90,8 @@ $(document).ready(function(){initNavTree('bit__stream_8hpp_source.html',''); ini
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &quot;fly/types/bit_stream/bit_stream_types.hpp&quot;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;fly/types/bit_stream/detail/bit_stream_traits.hpp&quot;</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &quot;fly/types/bit_stream/detail/concepts.hpp&quot;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;fly/types/bit_stream/types.hpp&quot;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;limits&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;streambuf&gt;</span></div>
@@ -106,7 +106,7 @@ $(document).ready(function(){initNavTree('bit__stream_8hpp_source.html',''); ini
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">protected</span>:</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="classfly_1_1detail_1_1_bit_stream.html#a7e1e91c217c6d8d59e90bd6a1e0aac12">BitStream</a>(std::streambuf *stream_buffer, byte_type starting_position) noexcept;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> DataType&gt;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">template</span> &lt;detail::BitStreamInteger DataType&gt;</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    DataType <a class="code" href="classfly_1_1detail_1_1_bit_stream.html#a66874d07d3cc560f82dde53e2924bf25">bit_mask</a>(<span class="keyword">const</span> DataType bits);</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    std::streambuf *m_stream_buffer;</div>
@@ -116,20 +116,16 @@ $(document).ready(function(){initNavTree('bit__stream_8hpp_source.html',''); ini
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;};</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> DataType&gt;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="keyword">template</span> &lt;detail::BitStreamInteger DataType&gt;</div>
 <div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_bit_stream.html#a66874d07d3cc560f82dde53e2924bf25">   71</a></span>&#160;<span class="keyword">inline</span> DataType <a class="code" href="classfly_1_1detail_1_1_bit_stream.html#a66874d07d3cc560f82dde53e2924bf25">BitStream::bit_mask</a>(<span class="keyword">const</span> DataType bits)</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;{</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    static_assert(</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        BitStreamTraits::is_unsigned_integer_v&lt;DataType&gt;,</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <span class="stringliteral">&quot;DataType must be an unsigned integer type&quot;</span>);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">auto</span> s_filled = std::numeric_limits&lt;DataType&gt;::max();</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">auto</span> s_digits = std::numeric_limits&lt;DataType&gt;::digits;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">return</span> (bits == 0) ? 0 : s_filled &gt;&gt; (s_digits - bits);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;}</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;} <span class="comment">// namespace fly::detail</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">auto</span> s_filled = std::numeric_limits&lt;DataType&gt;::max();</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">auto</span> s_digits = std::numeric_limits&lt;DataType&gt;::digits;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordflow">return</span> (bits == 0) ? 0 : s_filled &gt;&gt; (s_digits - bits);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;}</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;} <span class="comment">// namespace fly::detail</span></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_bit_stream_html"><div class="ttname"><a href="classfly_1_1detail_1_1_bit_stream.html">fly::detail::BitStream</a></div><div class="ttdef"><b>Definition:</b> bit_stream.hpp:34</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_bit_stream_html_a66874d07d3cc560f82dde53e2924bf25"><div class="ttname"><a href="classfly_1_1detail_1_1_bit_stream.html#a66874d07d3cc560f82dde53e2924bf25">fly::detail::BitStream::bit_mask</a></div><div class="ttdeci">DataType bit_mask(const DataType bits)</div><div class="ttdef"><b>Definition:</b> bit_stream.hpp:71</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_bit_stream_html_a7e1e91c217c6d8d59e90bd6a1e0aac12"><div class="ttname"><a href="classfly_1_1detail_1_1_bit_stream.html#a7e1e91c217c6d8d59e90bd6a1e0aac12">fly::detail::BitStream::BitStream</a></div><div class="ttdeci">BitStream(std::streambuf *stream_buffer, byte_type starting_position) noexcept</div><div class="ttdef"><b>Definition:</b> bit_stream.cpp:6</div></div>

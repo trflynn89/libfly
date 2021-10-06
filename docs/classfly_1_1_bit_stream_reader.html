@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -97,11 +97,19 @@ $(document).ready(function(){initNavTree('classfly_1_1_bit_stream_reader.html','
 Inheritance diagram for fly::BitStreamReader:</div>
 <div class="dyncontent">
 <div class="center"><img src="classfly_1_1_bit_stream_reader__inherit__graph.png" border="0" usemap="#afly_1_1_bit_stream_reader_inherit__map" alt="Inheritance graph"/></div>
+<map name="afly_1_1_bit_stream_reader_inherit__map" id="afly_1_1_bit_stream_reader_inherit__map">
+<area shape="rect" title=" " alt="" coords="5,80,161,107"/>
+<area shape="rect" href="classfly_1_1detail_1_1_bit_stream.html" title=" " alt="" coords="6,5,161,32"/>
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for fly::BitStreamReader:</div>
 <div class="dyncontent">
 <div class="center"><img src="classfly_1_1_bit_stream_reader__coll__graph.png" border="0" usemap="#afly_1_1_bit_stream_reader_coll__map" alt="Collaboration graph"/></div>
+<map name="afly_1_1_bit_stream_reader_coll__map" id="afly_1_1_bit_stream_reader_coll__map">
+<area shape="rect" title=" " alt="" coords="5,80,161,107"/>
+<area shape="rect" href="classfly_1_1detail_1_1_bit_stream.html" title=" " alt="" coords="6,5,161,32"/>
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -112,10 +120,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a1131f84ee9372f967a3f5b3ea725fba7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeda8cd118fadf808f960faf13acaa632"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_bit_stream_reader.html#aeda8cd118fadf808f960faf13acaa632">read_byte</a> (byte_type &amp;byte)</td></tr>
 <tr class="separator:aeda8cd118fadf808f960faf13acaa632"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9006c73c0109014483d0333cbe91e639"><td class="memTemplParams" colspan="2">template&lt;typename DataType &gt; </td></tr>
+<tr class="memitem:a9006c73c0109014483d0333cbe91e639"><td class="memTemplParams" colspan="2">template&lt;detail::BitStreamInteger DataType&gt; </td></tr>
 <tr class="memitem:a9006c73c0109014483d0333cbe91e639"><td class="memTemplItemLeft" align="right" valign="top">byte_type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_bit_stream_reader.html#a9006c73c0109014483d0333cbe91e639">read_bits</a> (DataType &amp;bits, byte_type size)</td></tr>
 <tr class="separator:a9006c73c0109014483d0333cbe91e639"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa204853b1f929ce7a72c993f68805466"><td class="memTemplParams" colspan="2">template&lt;typename DataType &gt; </td></tr>
+<tr class="memitem:aa204853b1f929ce7a72c993f68805466"><td class="memTemplParams" colspan="2">template&lt;detail::BitStreamInteger DataType&gt; </td></tr>
 <tr class="memitem:aa204853b1f929ce7a72c993f68805466"><td class="memTemplItemLeft" align="right" valign="top">byte_type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_bit_stream_reader.html#aa204853b1f929ce7a72c993f68805466">peek_bits</a> (DataType &amp;bits, byte_type size)</td></tr>
 <tr class="separator:aa204853b1f929ce7a72c993f68805466"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7913ca8928506ce76bd312ef4a491be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_bit_stream_reader.html#ac7913ca8928506ce76bd312ef4a491be">discard_bits</a> (byte_type size)</td></tr>
@@ -133,7 +141,7 @@ Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_methods_classfly_1_1detail_1_1_bit_stream"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classfly_1_1detail_1_1_bit_stream')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classfly_1_1detail_1_1_bit_stream.html">fly::detail::BitStream</a></td></tr>
 <tr class="memitem:a7e1e91c217c6d8d59e90bd6a1e0aac12 inherit pro_methods_classfly_1_1detail_1_1_bit_stream"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_bit_stream.html#a7e1e91c217c6d8d59e90bd6a1e0aac12">BitStream</a> (std::streambuf *stream_buffer, byte_type starting_position) noexcept</td></tr>
 <tr class="separator:a7e1e91c217c6d8d59e90bd6a1e0aac12 inherit pro_methods_classfly_1_1detail_1_1_bit_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a66874d07d3cc560f82dde53e2924bf25 inherit pro_methods_classfly_1_1detail_1_1_bit_stream"><td class="memTemplParams" colspan="2">template&lt;typename DataType &gt; </td></tr>
+<tr class="memitem:a66874d07d3cc560f82dde53e2924bf25 inherit pro_methods_classfly_1_1detail_1_1_bit_stream"><td class="memTemplParams" colspan="2">template&lt;detail::BitStreamInteger DataType&gt; </td></tr>
 <tr class="memitem:a66874d07d3cc560f82dde53e2924bf25 inherit pro_methods_classfly_1_1detail_1_1_bit_stream"><td class="memTemplItemLeft" align="right" valign="top">DataType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_bit_stream.html#a66874d07d3cc560f82dde53e2924bf25">bit_mask</a> (const DataType bits)</td></tr>
 <tr class="separator:a66874d07d3cc560f82dde53e2924bf25 inherit pro_methods_classfly_1_1detail_1_1_bit_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classfly_1_1detail_1_1_bit_stream"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classfly_1_1detail_1_1_bit_stream')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classfly_1_1detail_1_1_bit_stream.html">fly::detail::BitStream</a></td></tr>
@@ -263,7 +271,7 @@ byte_type&#160;</td><td class="memItemRight" valign="bottom"><b>m_position</b> {
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DataType &gt; </div>
+template&lt;detail::BitStreamInteger DataType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">byte_type fly::BitStreamReader::peek_bits </td>
@@ -303,7 +311,7 @@ template&lt;typename DataType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DataType &gt; </div>
+template&lt;detail::BitStreamInteger DataType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">byte_type fly::BitStreamReader::read_bits </td>

@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -92,7 +92,6 @@ $(document).ready(function(){initNavTree('classfly_1_1path_1_1_path_monitor.html
 <a href="#pro-types">Protected Types</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="classfly_1_1path_1_1_path_monitor-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">fly::path::PathMonitor Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
@@ -104,11 +103,20 @@ $(document).ready(function(){initNavTree('classfly_1_1path_1_1_path_monitor.html
 Inheritance diagram for fly::path::PathMonitor:</div>
 <div class="dyncontent">
 <div class="center"><img src="classfly_1_1path_1_1_path_monitor__inherit__graph.png" border="0" usemap="#afly_1_1path_1_1_path_monitor_inherit__map" alt="Inheritance graph"/></div>
+<map name="afly_1_1path_1_1_path_monitor_inherit__map" id="afly_1_1path_1_1_path_monitor_inherit__map">
+<area shape="rect" title=" " alt="" coords="25,95,185,121"/>
+<area shape="rect" href="classfly_1_1path_1_1_path_monitor_impl.html" title=" " alt="" coords="10,169,199,196"/>
+<area shape="rect" title=" " alt="" coords="5,5,204,47"/>
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for fly::path::PathMonitor:</div>
 <div class="dyncontent">
 <div class="center"><img src="classfly_1_1path_1_1_path_monitor__coll__graph.png" border="0" usemap="#afly_1_1path_1_1_path_monitor_coll__map" alt="Collaboration graph"/></div>
+<map name="afly_1_1path_1_1_path_monitor_coll__map" id="afly_1_1path_1_1_path_monitor_coll__map">
+<area shape="rect" title=" " alt="" coords="25,95,185,121"/>
+<area shape="rect" title=" " alt="" coords="5,5,204,47"/>
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -118,13 +126,7 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a79e80e5155c0314bb993abb1cbc66a42"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1path_1_1_path_monitor.html#a79e80e5155c0314bb993abb1cbc66a42">PathEvent</a> : std::uint8_t { <b>None</b>
-, <b>Created</b>
-, <b>Deleted</b>
-, <b>Changed</b>
- }</td></tr>
-<tr class="separator:a79e80e5155c0314bb993abb1cbc66a42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01457ab659d1c0dd9dbfe05a7d06a989"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1path_1_1_path_monitor.html#a01457ab659d1c0dd9dbfe05a7d06a989">PathEventCallback</a> = std::function&lt; void(std::filesystem::path, <a class="el" href="classfly_1_1path_1_1_path_monitor.html#a79e80e5155c0314bb993abb1cbc66a42">PathEvent</a>)&gt;</td></tr>
+<tr class="memitem:a01457ab659d1c0dd9dbfe05a7d06a989"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1path_1_1_path_monitor.html#a01457ab659d1c0dd9dbfe05a7d06a989">PathEventCallback</a> = std::function&lt; void(std::filesystem::path, PathEvent)&gt;</td></tr>
 <tr class="separator:a01457ab659d1c0dd9dbfe05a7d06a989"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -171,11 +173,6 @@ std::mutex&#160;</td><td class="memItemRight" valign="bottom"><b>m_mutex</b></td
 <tr class="memitem:a0e77b3dd8f7a32baff8b7b8e48156145"><td class="memItemLeft" align="right" valign="top"><a id="a0e77b3dd8f7a32baff8b7b8e48156145"></a>
 <a class="el" href="classfly_1_1path_1_1_path_monitor.html#a92eed7daf6400d62a8a06c0d376040a5">PathInfoMap</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_path_info</b></td></tr>
 <tr class="separator:a0e77b3dd8f7a32baff8b7b8e48156145"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a4c8194c6115995c1a9cc39752cdb325a"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1path_1_1_path_monitor.html#a4c8194c6115995c1a9cc39752cdb325a">operator&lt;&lt;</a> (std::ostream &amp;stream, <a class="el" href="classfly_1_1path_1_1_path_monitor.html#a79e80e5155c0314bb993abb1cbc66a42">PathEvent</a> event)</td></tr>
-<tr class="separator:a4c8194c6115995c1a9cc39752cdb325a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Virtual interface to monitor a local path. Provides monitoring of either all files or user-specified files under a path for addition, deletion, or change. This interface is platform independent - OS dependent implementations should inherit from this class.</p>
@@ -189,7 +186,7 @@ Friends</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="classfly_1_1path_1_1_path_monitor.html#a01457ab659d1c0dd9dbfe05a7d06a989">fly::path::PathMonitor::PathEventCallback</a> =  std::function&lt;void(std::filesystem::path, <a class="el" href="classfly_1_1path_1_1_path_monitor.html#a79e80e5155c0314bb993abb1cbc66a42">PathEvent</a>)&gt;</td>
+          <td class="memname">using <a class="el" href="classfly_1_1path_1_1_path_monitor.html#a01457ab659d1c0dd9dbfe05a7d06a989">fly::path::PathMonitor::PathEventCallback</a> =  std::function&lt;void(std::filesystem::path, PathEvent)&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -217,30 +214,6 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Map of monitored paths to their path information. </p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Enumeration Documentation</h2>
-<a id="a79e80e5155c0314bb993abb1cbc66a42"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a79e80e5155c0314bb993abb1cbc66a42">&#9670;&nbsp;</a></span>PathEvent</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="classfly_1_1path_1_1_path_monitor.html#a79e80e5155c0314bb993abb1cbc66a42">fly::path::PathMonitor::PathEvent</a> : std::uint8_t</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Enumerated list of path events. </p>
 
 </div>
 </div>
@@ -602,44 +575,6 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the directory was removed. </dd></dl>
-
-</div>
-</div>
-<h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a id="a4c8194c6115995c1a9cc39752cdb325a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c8194c6115995c1a9cc39752cdb325a">&#9670;&nbsp;</a></span>operator&lt;&lt;</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
-          <td>(</td>
-          <td class="paramtype">std::ostream &amp;&#160;</td>
-          <td class="paramname"><em>stream</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classfly_1_1path_1_1_path_monitor.html#a79e80e5155c0314bb993abb1cbc66a42">PathMonitor::PathEvent</a>&#160;</td>
-          <td class="paramname"><em>event</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Stream the name of a PathEvent instance. </p>
 
 </div>
 </div>

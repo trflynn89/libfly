@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -141,7 +141,7 @@ $(document).ready(function(){initNavTree('nix_2path__monitor__impl_8hpp_source.h
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordtype">void</span> handle_event(<span class="keyword">const</span> inotify_event *event) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <a class="code" href="classfly_1_1path_1_1_path_monitor.html#a79e80e5155c0314bb993abb1cbc66a42">PathMonitor::PathEvent</a> convert_to_event(std::uint32_t mask) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    PathEvent convert_to_event(std::uint32_t mask) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="comment">// Notes from INOTIFY(7) man page:</span></div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="comment">//</span></div>
@@ -154,13 +154,12 @@ $(document).ready(function(){initNavTree('nix_2path__monitor__impl_8hpp_source.h
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;};</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;} <span class="comment">// namespace fly::path</span></div>
-<div class="ttc" id="aclassfly_1_1path_1_1_path_monitor_html_a79e80e5155c0314bb993abb1cbc66a42"><div class="ttname"><a href="classfly_1_1path_1_1_path_monitor.html#a79e80e5155c0314bb993abb1cbc66a42">fly::path::PathMonitor::PathEvent</a></div><div class="ttdeci">PathEvent</div><div class="ttdef"><b>Definition:</b> path_monitor.hpp:34</div></div>
 <div class="ttc" id="aclassfly_1_1path_1_1_path_monitor_impl_html_a2d48d5eade4a16e240d038fd627d4e67"><div class="ttname"><a href="classfly_1_1path_1_1_path_monitor_impl.html#a2d48d5eade4a16e240d038fd627d4e67">fly::path::PathMonitorImpl::PathMonitorImpl</a></div><div class="ttdeci">PathMonitorImpl(std::shared_ptr&lt; fly::task::SequencedTaskRunner &gt; task_runner, std::shared_ptr&lt; PathConfig &gt; config) noexcept</div></div>
 <div class="ttc" id="aclassfly_1_1path_1_1_path_monitor_impl_html_a3e535e73e6e519ceff1146dbd7406923"><div class="ttname"><a href="classfly_1_1path_1_1_path_monitor_impl.html#a3e535e73e6e519ceff1146dbd7406923">fly::path::PathMonitorImpl::create_path_info</a></div><div class="ttdeci">std::unique_ptr&lt; PathMonitor::PathInfo &gt; create_path_info(const std::filesystem::path &amp;path) const override</div></div>
 <div class="ttc" id="aclassfly_1_1path_1_1_path_monitor_impl_html_a53bb45636a4c29e49c68849e0060dff8"><div class="ttname"><a href="classfly_1_1path_1_1_path_monitor_impl.html#a53bb45636a4c29e49c68849e0060dff8">fly::path::PathMonitorImpl::~PathMonitorImpl</a></div><div class="ttdeci">~PathMonitorImpl() override</div></div>
 <div class="ttc" id="aclassfly_1_1path_1_1_path_monitor_impl_html_aa2d32a2e3710601d2cf37d10984c7618"><div class="ttname"><a href="classfly_1_1path_1_1_path_monitor_impl.html#aa2d32a2e3710601d2cf37d10984c7618">fly::path::PathMonitorImpl::poll</a></div><div class="ttdeci">void poll(std::chrono::milliseconds timeout) override</div></div>
 <div class="ttc" id="aclassfly_1_1path_1_1_path_monitor_impl_html_af3bd61e96958535cad799e5617c3e981"><div class="ttname"><a href="classfly_1_1path_1_1_path_monitor_impl.html#af3bd61e96958535cad799e5617c3e981">fly::path::PathMonitorImpl::is_valid</a></div><div class="ttdeci">bool is_valid() const override</div></div>
-<div class="ttc" id="astructfly_1_1path_1_1_path_monitor_1_1_path_info_html"><div class="ttname"><a href="structfly_1_1path_1_1_path_monitor_1_1_path_info.html">fly::path::PathMonitor::PathInfo</a></div><div class="ttdef"><b>Definition:</b> path_monitor.hpp:116</div></div>
+<div class="ttc" id="astructfly_1_1path_1_1_path_monitor_1_1_path_info_html"><div class="ttname"><a href="structfly_1_1path_1_1_path_monitor_1_1_path_info.html">fly::path::PathMonitor::PathInfo</a></div><div class="ttdef"><b>Definition:</b> path_monitor.hpp:118</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

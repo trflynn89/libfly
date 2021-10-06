@@ -1,5 +1,7 @@
 var classfly_1_1net_1_1detail_1_1_base_socket =
 [
+    [ "address_type", "classfly_1_1net_1_1detail_1_1_base_socket.html#aea93cbb0c6cb2c341ab028cfc2f60dd9", null ],
+    [ "endpoint_type", "classfly_1_1net_1_1detail_1_1_base_socket.html#a96c9a56a0581bd01ae550d4fa36cb0ab", null ],
     [ "BaseSocket", "classfly_1_1net_1_1detail_1_1_base_socket.html#a789448975dbbbdd98dc1adf6a8e91699", null ],
     [ "BaseSocket", "classfly_1_1net_1_1detail_1_1_base_socket.html#a36773dfe386a10bac0ef32030fdcf424", null ],
     [ "BaseSocket", "classfly_1_1net_1_1detail_1_1_base_socket.html#a00a064300d6c70bdc8395faff794ffde", null ],

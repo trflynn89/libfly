@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>libfly: fly::Formatter&lt; T, CharType, SFINAE &gt; Struct Template Reference</title>
+<title>libfly: fly::Formatter&lt; T, CharType &gt; Struct Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -85,12 +85,12 @@ $(document).ready(function(){initNavTree('structfly_1_1_formatter.html',''); ini
 
 <div class="header">
   <div class="headertitle">
-<div class="title">fly::Formatter&lt; T, CharType, SFINAE &gt; Struct Template Reference</div>  </div>
+<div class="title">fly::Formatter&lt; T, CharType &gt; Struct Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename T, typename CharType = char, typename SFINAE = bool&gt;<br />
-struct fly::Formatter&lt; T, CharType, SFINAE &gt;</h3>
+<div class="textblock"><h3>template&lt;typename T, StandardCharacter CharType = char&gt;<br />
+struct fly::Formatter&lt; T, CharType &gt;</h3>
 
 <p>Class to define formatting rules for a given type. Enabled specializations must define the following member template function: </p><pre class="fragment">template &lt;typename FormatContext&gt;
 void format(const T &amp;value, FormatContext &amp;context);
@@ -98,7 +98,7 @@ void format(const T &amp;value, FormatContext &amp;context);
 <dl class="section author"><dt>Author</dt><dd>Timothy Flynn (<a href="#" onclick="location.href='mai'+'lto:'+'trf'+'ly'+'nn8'+'9@'+'pm.'+'me'; return false;">trfly<span style="display: none;">.nosp@m.</span>nn89<span style="display: none;">.nosp@m.</span>@pm.m<span style="display: none;">.nosp@m.</span>e</a>) </dd></dl>
 <dl class="section version"><dt>Version</dt><dd>April 4, 2021 </dd></dl>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
-<li>fly/types/string/<a class="el" href="string__formatters_8hpp_source.html">string_formatters.hpp</a></li>
+<li>fly/types/string/<a class="el" href="formatters_8hpp_source.html">formatters.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

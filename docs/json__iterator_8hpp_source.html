@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -90,9 +90,9 @@ $(document).ready(function(){initNavTree('json__iterator_8hpp_source.html',''); 
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &quot;fly/traits/traits.hpp&quot;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;fly/types/json/json_exception.hpp&quot;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;fly/types/json/json_traits.hpp&quot;</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &quot;fly/concepts/concepts.hpp&quot;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;fly/types/json/concepts.hpp&quot;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;fly/types/json/json_exception.hpp&quot;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/string.hpp&quot;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;cmath&gt;</span></div>
@@ -114,20 +114,20 @@ $(document).ready(function(){initNavTree('json__iterator_8hpp_source.html',''); 
 <div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html">   57</a></span>&#160;<span class="keyword">class </span><a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a></div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;{</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    static_assert(</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        std::is_same_v&lt;<a class="code" href="classfly_1_1_json.html">Json</a>, <span class="keyword">typename</span> std::remove_const_t&lt;JsonType&gt;&gt;,</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        fly::SameAs&lt;Json, JsonType&gt;,</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="stringliteral">&quot;JsonIterator must only be declared for a Json type&quot;</span>);</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">static</span> constexpr <span class="keywordtype">bool</span> is_const_iterator = std::is_const_v&lt;JsonType&gt;;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">using</span> object_iterator_type = std::conditional_t&lt;</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        is_const_iterator,</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        JsonTraits::object_type::const_iterator,</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        JsonTraits::object_type::iterator&gt;;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        json_object_type::const_iterator,</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        json_object_type::iterator&gt;;</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keyword">using</span> array_iterator_type = std::conditional_t&lt;</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        is_const_iterator,</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        JsonTraits::array_type::const_iterator,</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        JsonTraits::array_type::iterator&gt;;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        json_array_type::const_iterator,</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        json_array_type::iterator&gt;;</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keyword">using</span> iterator_type = std::variant&lt;object_iterator_type, array_iterator_type&gt;;</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
@@ -202,7 +202,7 @@ $(document).ready(function(){initNavTree('json__iterator_8hpp_source.html',''); 
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160; </div>
 <div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    difference_type <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ab1217377cffd249ce3e7001f5964a935">operator-</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160; </div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    <span class="keyword">const</span> <span class="keyword">typename</span> JsonTraits::object_type::key_type &amp;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a6903b16341639854d7ddb260a0fd8642">key</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    <span class="keyword">const</span> <span class="keyword">typename</span> json_object_type::key_type &amp;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a12cfbfa3fb9173a8f2a3bbf767ec95ad">key</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160; </div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    reference <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a592c960a88fd7e22918c659a75620886">value</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160; </div>
@@ -212,10 +212,10 @@ $(document).ready(function(){initNavTree('json__iterator_8hpp_source.html',''); 
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    <span class="keyword">friend</span> <a class="code" href="classfly_1_1_json.html">fly::Json</a>;</div>
 <div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160; </div>
 <div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Ts&gt;</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    <span class="keyword">inline</span> <span class="keyword">static</span> constexpr <span class="keywordtype">bool</span> is_object_iterator = all_same_v&lt;object_iterator_type, Ts...&gt;;</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">inline</span> <span class="keywordtype">bool</span> is_object_iterator = fly::SameAsAll&lt;object_iterator_type, Ts...&gt;;</div>
 <div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160; </div>
 <div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Ts&gt;</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    <span class="keyword">inline</span> <span class="keyword">static</span> constexpr <span class="keywordtype">bool</span> is_array_iterator = all_same_v&lt;array_iterator_type, Ts...&gt;;</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">inline</span> <span class="keywordtype">bool</span> is_array_iterator = fly::SameAsAll&lt;array_iterator_type, Ts...&gt;;</div>
 <div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160; </div>
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    <span class="keywordtype">void</span> validate_iterator() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160; </div>
@@ -235,444 +235,443 @@ $(document).ready(function(){initNavTree('json__iterator_8hpp_source.html',''); 
 <div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
 <div class="line"><a name="l00491"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a28cf0ecc2606268413833cde209d0e0c">  491</a></span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ac5438d332bf5baff4c925f0ba7e49149">JsonIterator&lt;JsonType&gt;::JsonIterator</a>(pointer json, <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#aa83ef1ae58c7e7e23177753822ae3f20">Position</a> position) noexcept(<span class="keyword">false</span>) : m_json(json)</div>
 <div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;{</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    <span class="keyword">auto</span> visitor =</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;        [<span class="keyword">this</span>, &amp;position](<span class="keyword">auto</span> &amp;value) noexcept(JsonTraits::is_iterable_v&lt;decltype(value)&gt;)</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;    {</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;        <span class="keywordflow">if</span> constexpr (JsonTraits::is_iterable_v&lt;decltype(value)&gt;)</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;        {</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;            <span class="keywordflow">switch</span> (position)</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;            {</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;                <span class="keywordflow">case</span> Position::Begin:</div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;                    m_iterator = value.begin();</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;                    <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;                <span class="keywordflow">case</span> Position::End:</div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;                    m_iterator = value.end();</div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;                    <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;            }</div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;        }</div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;        {</div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_iterator_exception.html">JsonIteratorException</a>(*m_json, <span class="stringliteral">&quot;JSON type invalid for iteration&quot;</span>);</div>
-<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;        }</div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;    };</div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160; </div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;    <span class="keywordflow">if</span> (m_json != <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;    {</div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;        std::visit(std::move(visitor), m_json-&gt;m_value);</div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;    }</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;}</div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160; </div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00522"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a2012cf97d478bb903e822d89be1bdc34">  522</a></span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ac5438d332bf5baff4c925f0ba7e49149">JsonIterator&lt;JsonType&gt;::JsonIterator</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">NonConstJsonIterator</a> &amp;iterator) noexcept :</div>
-<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;    m_json(iterator.m_json)</div>
-<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;{</div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it) noexcept</div>
-<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;    {</div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;        m_iterator = it;</div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;    };</div>
-<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160; </div>
-<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;    std::visit(std::move(visitor), iterator.m_iterator);</div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;}</div>
-<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160; </div>
-<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator&lt;JsonType&gt;</a> &amp;</div>
-<div class="line"><a name="l00536"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#ae1ff5ce14e6a3fdc7d933909daca193c">  536</a></span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ae1ff5ce14e6a3fdc7d933909daca193c">JsonIterator&lt;JsonType&gt;::operator=</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">NonConstJsonIterator</a> &amp;iterator) noexcept</div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;{</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;    m_json = iterator.m_json;</div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160; </div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it) noexcept</div>
-<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;    {</div>
-<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;        m_iterator = it;</div>
-<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;    };</div>
-<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160; </div>
-<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    std::visit(std::move(visitor), iterator.m_iterator);</div>
-<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;}</div>
-<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160; </div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00551"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a540cb59bc1c1bafe1742f78c0a8e7f1b">  551</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a540cb59bc1c1bafe1742f78c0a8e7f1b">JsonIterator&lt;JsonType&gt;::operator*</a>() const -&gt; reference</div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;{</div>
-<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;    validate_iterator();</div>
-<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160; </div>
-<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it) -&gt; reference</div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;    {</div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;        this-&gt;validate_dereference(it);</div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160; </div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;        <span class="keywordflow">if</span> constexpr (is_object_iterator&lt;decltype(it)&gt;)</div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;        {</div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;            <span class="keywordflow">return</span> it-&gt;second;</div>
-<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;        }</div>
-<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (is_array_iterator&lt;decltype(it)&gt;)</div>
-<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;        {</div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;            <span class="keywordflow">return</span> *it;</div>
-<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;        }</div>
-<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;    };</div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160; </div>
-<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator);</div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;}</div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160; </div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00574"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#ad805d8453ccc641165b9d91981b0d7b5">  574</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ad805d8453ccc641165b9d91981b0d7b5">JsonIterator&lt;JsonType&gt;::operator-&gt;</a>() const -&gt; pointer</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;{</div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;    validate_iterator();</div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160; </div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it) -&gt; pointer</div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;    {</div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;        this-&gt;validate_dereference(it);</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160; </div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;        <span class="keywordflow">if</span> constexpr (is_object_iterator&lt;decltype(it)&gt;)</div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;        {</div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;            <span class="keywordflow">return</span> &amp;(it-&gt;second);</div>
-<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;        }</div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (is_array_iterator&lt;decltype(it)&gt;)</div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;        {</div>
-<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;            <span class="keywordflow">return</span> &amp;(*it);</div>
-<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;        }</div>
-<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;    };</div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160; </div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator);</div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;}</div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160; </div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00597"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a4192d3078f8af40a6c42482f7a17c191">  597</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a4192d3078f8af40a6c42482f7a17c191">JsonIterator&lt;JsonType&gt;::operator[]</a>(difference_type offset) <span class="keyword">const</span> -&gt; reference</div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;{</div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;    validate_iterator();</div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160; </div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;    <span class="keyword">auto</span> visitor = [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it) -&gt; reference</div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;    {</div>
-<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;        <span class="keywordflow">if</span> constexpr (is_array_iterator&lt;decltype(it)&gt;)</div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;        {</div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;            validate_offset(it, offset);</div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160; </div>
-<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;            <span class="keyword">auto</span> next = std::next(it, offset);</div>
-<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;            validate_dereference(next);</div>
-<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160; </div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;            <span class="keywordflow">return</span> *next;</div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;        }</div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;        {</div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_iterator_exception.html">JsonIteratorException</a>(*m_json, <span class="stringliteral">&quot;JSON type invalid for offset operator&quot;</span>);</div>
-<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;        }</div>
-<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;    };</div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160; </div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator);</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;}</div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160; </div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00623"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a087985c3536259c3d25649c155d9ef6b">  623</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a087985c3536259c3d25649c155d9ef6b">JsonIterator&lt;JsonType&gt;::operator==</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;    validate_iterator(iterator);</div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;    <span class="keywordflow">return</span> m_iterator == iterator.m_iterator;</div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;}</div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160; </div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00631"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a44b03b6614ce63639c9ab23fbd620c59">  631</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a44b03b6614ce63639c9ab23fbd620c59">JsonIterator&lt;JsonType&gt;::operator!=</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;    <span class="keywordflow">return</span> !(*<span class="keyword">this</span> == iterator);</div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;}</div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160; </div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00638"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#ab4536da83b165129d14d010f7b2ba6d8">  638</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ab4536da83b165129d14d010f7b2ba6d8">JsonIterator&lt;JsonType&gt;::operator&lt;</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;    validate_iterator(iterator);</div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160; </div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it1, <span class="keyword">const</span> <span class="keyword">auto</span> &amp;it2) -&gt; <span class="keywordtype">bool</span></div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;    {</div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;        <span class="keywordflow">if</span> constexpr (is_array_iterator&lt;decltype(it1), decltype(it2)&gt;)</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;        {</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;            <span class="keywordflow">return</span> it1 &lt; it2;</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;        }</div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;        {</div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_iterator_exception.html">JsonIteratorException</a>(*m_json, <span class="stringliteral">&quot;JSON type invalid for comparison operator&quot;</span>);</div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;        }</div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;    };</div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160; </div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator, iterator.m_iterator);</div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;}</div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160; </div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00659"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a2a843aa69761f9a9146c7199dbc68080">  659</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a2a843aa69761f9a9146c7199dbc68080">JsonIterator&lt;JsonType&gt;::operator&lt;=</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;    <span class="keywordflow">return</span> !(iterator &lt; *<span class="keyword">this</span>);</div>
-<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;}</div>
-<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160; </div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00666"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a4606ef6ae8049d53d05c67cc1e1426d4">  666</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a4606ef6ae8049d53d05c67cc1e1426d4">JsonIterator&lt;JsonType&gt;::operator&gt;</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;    <span class="keywordflow">return</span> !(*<span class="keyword">this</span> &lt;= iterator);</div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;}</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160; </div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00673"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a392b568ebd3659a33e2eee89ff716bc2">  673</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a392b568ebd3659a33e2eee89ff716bc2">JsonIterator&lt;JsonType&gt;::operator&gt;=</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;    <span class="keywordflow">return</span> !(*<span class="keyword">this</span> &lt; iterator);</div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;}</div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160; </div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00680"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a2b9cf3b8ea96bcf2581227ff2134a1fa">  680</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a5f7a73153dfccd41e77274beb64d941b">JsonIterator&lt;JsonType&gt;::operator++</a>(<span class="keywordtype">int</span>) -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a></div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;{</div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;    <span class="keyword">auto</span> result = *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;    ++(*this);</div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160; </div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;}</div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160; </div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00690"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a5f7a73153dfccd41e77274beb64d941b">  690</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a5f7a73153dfccd41e77274beb64d941b">JsonIterator&lt;JsonType&gt;::operator++</a>() -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;{</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;    validate_iterator();</div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160; </div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">auto</span> &amp;it) -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;    {</div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;        validate_offset(it, 1);</div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;        std::advance(it, 1);</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160; </div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;    };</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160; </div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator);</div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;}</div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160; </div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00707"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a324393e3033554326388b3b04f5232fa">  707</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#aa773be7a8f49f59eefbc76d293c45425">JsonIterator&lt;JsonType&gt;::operator--</a>(<span class="keywordtype">int</span>) -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a></div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;{</div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;    <span class="keyword">auto</span> result = *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;    --(*this);</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160; </div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;}</div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160; </div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00717"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#aa773be7a8f49f59eefbc76d293c45425">  717</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#aa773be7a8f49f59eefbc76d293c45425">JsonIterator&lt;JsonType&gt;::operator--</a>() -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;</div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;{</div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;    validate_iterator();</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160; </div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">auto</span> &amp;it) -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;    {</div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;        validate_offset(it, -1);</div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;        std::advance(it, -1);</div>
-<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160; </div>
-<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;    };</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160; </div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator);</div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;}</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160; </div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00734"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a4e430053c075d19db5e9d7eb3a5fdfb3">  734</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a4e430053c075d19db5e9d7eb3a5fdfb3">JsonIterator&lt;JsonType&gt;::operator+=</a>(difference_type offset) -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;{</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;    validate_iterator();</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160; </div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>, &amp;offset](<span class="keyword">auto</span> &amp;it)</div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;    {</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;        <span class="keywordflow">if</span> constexpr (is_array_iterator&lt;decltype(it)&gt;)</div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;        {</div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;            validate_offset(it, offset);</div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;            std::advance(it, offset);</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;        }</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;        {</div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_iterator_exception.html">JsonIteratorException</a>(*m_json, <span class="stringliteral">&quot;JSON type invalid for iterator offset&quot;</span>);</div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;        }</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    };</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160; </div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    std::visit(std::move(visitor), m_iterator);</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;}</div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160; </div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00757"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#ac0f19f8ffe31d7775a93325c2d5f0448">  757</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ac0f19f8ffe31d7775a93325c2d5f0448">JsonIterator&lt;JsonType&gt;::operator-=</a>(difference_type offset) -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;{</div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;    <span class="keywordflow">return</span> *<span class="keyword">this</span> += -offset;</div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;}</div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160; </div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00764"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a70950aa9b86f0c34611ec274692a49c2">  764</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a70950aa9b86f0c34611ec274692a49c2">JsonIterator&lt;JsonType&gt;::operator+</a>(difference_type offset) <span class="keyword">const</span> -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a></div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;{</div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;    <span class="keyword">auto</span> result = *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;    result += offset;</div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160; </div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;}</div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160; </div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator&lt;JsonType&gt;</a> operator+(</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;    <span class="keyword">typename</span> JsonIterator&lt;JsonType&gt;::difference_type offset,</div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;    <span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator&lt;JsonType&gt;</a> &amp;iterator)</div>
-<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;{</div>
-<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;    <span class="keyword">auto</span> result = iterator;</div>
-<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;    result += offset;</div>
-<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160; </div>
-<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;}</div>
-<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160; </div>
-<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00786"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#ab1217377cffd249ce3e7001f5964a935">  786</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ab1217377cffd249ce3e7001f5964a935">JsonIterator&lt;JsonType&gt;::operator-</a>(difference_type offset) <span class="keyword">const</span> -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a></div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;{</div>
-<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    <span class="keyword">auto</span> result = *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;    result -= offset;</div>
-<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160; </div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;}</div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160; </div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00796"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#ac38e18c9784f44e2db05cb1634670f39">  796</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ab1217377cffd249ce3e7001f5964a935">JsonIterator&lt;JsonType&gt;::operator-</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator) <span class="keyword">const</span> -&gt; difference_type</div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;{</div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;    validate_iterator(iterator);</div>
-<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160; </div>
-<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it1, <span class="keyword">const</span> <span class="keyword">auto</span> &amp;it2) -&gt; difference_type</div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;    {</div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;        <span class="keywordflow">if</span> constexpr (is_array_iterator&lt;decltype(it1), decltype(it2)&gt;)</div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;        {</div>
-<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;            <span class="keywordflow">return</span> std::distance(it2, it1);</div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;        }</div>
-<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;        {</div>
-<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_iterator_exception.html">JsonIteratorException</a>(*m_json, <span class="stringliteral">&quot;JSON type invalid for iterator difference&quot;</span>);</div>
-<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;        }</div>
-<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;    };</div>
-<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160; </div>
-<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator, iterator.m_iterator);</div>
-<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;}</div>
-<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160; </div>
-<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00817"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a6903b16341639854d7ddb260a0fd8642">  817</a></span>&#160;<span class="keyword">const</span> <span class="keyword">typename</span> JsonTraits::object_type::key_type &amp;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a6903b16341639854d7ddb260a0fd8642">JsonIterator&lt;JsonType&gt;::key</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;    validate_iterator();</div>
-<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160; </div>
-<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it) -&gt; <span class="keyword">const</span> <span class="keyword">typename</span> JsonTraits::object_type::key_type &amp;</div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;    {</div>
-<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;        <span class="keywordflow">if</span> constexpr (is_object_iterator&lt;decltype(it)&gt;)</div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;        {</div>
-<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;            validate_dereference(it);</div>
-<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;            <span class="keywordflow">return</span> it-&gt;first;</div>
-<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;        }</div>
-<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;        {</div>
-<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_iterator_exception.html">JsonIteratorException</a>(*m_json, <span class="stringliteral">&quot;JSON type is not keyed&quot;</span>);</div>
-<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;        }</div>
-<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;    };</div>
-<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160; </div>
-<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator);</div>
-<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;}</div>
-<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160; </div>
-<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00839"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a592c960a88fd7e22918c659a75620886">  839</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a592c960a88fd7e22918c659a75620886">JsonIterator&lt;JsonType&gt;::value</a>() const -&gt; reference</div>
-<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;{</div>
-<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;    <span class="keywordflow">return</span> *(*this);</div>
-<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;}</div>
-<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160; </div>
-<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;<span class="keywordtype">void</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator&lt;JsonType&gt;::validate_iterator</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;    <span class="keywordflow">if</span> (m_json == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;    {</div>
-<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_null_json_exception.html">NullJsonException</a>();</div>
-<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;    }</div>
-<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;}</div>
-<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160; </div>
-<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;<span class="keywordtype">void</span> JsonIterator&lt;JsonType&gt;::validate_iterator(<span class="keyword">const</span> JsonIterator &amp;iterator)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;    validate_iterator();</div>
-<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;    iterator.validate_iterator();</div>
-<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160; </div>
-<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;    <span class="keywordflow">if</span> (m_json != iterator.m_json)</div>
-<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;    {</div>
-<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;        <span class="keywordflow">throw</span> BadJsonComparisonException(*m_json, *iterator.m_json);</div>
-<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;    }</div>
-<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;}</div>
-<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160; </div>
-<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;<span class="keywordtype">void</span> JsonIterator&lt;JsonType&gt;::validate_offset(<span class="keyword">const</span> T &amp;it, difference_type offset)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;<span class="keyword"></span> </div>
-<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;    difference_type distance = 0;</div>
-<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160; </div>
-<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;    <span class="keywordflow">if</span> (offset &gt;= 0)</div>
-<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;    {</div>
-<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;        <span class="keyword">const</span> JsonIterator end = m_json-&gt;end();</div>
-<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;        distance = std::distance(it, std::get&lt;T&gt;(end.m_iterator));</div>
-<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;    }</div>
-<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;    {</div>
-<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;        <span class="keyword">const</span> JsonIterator begin = m_json-&gt;begin();</div>
-<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;        distance = std::distance(std::get&lt;T&gt;(begin.m_iterator), it);</div>
-<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;    }</div>
-<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160; </div>
-<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;    <span class="keywordflow">if</span> (std::abs(offset) &gt; distance)</div>
-<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;    {</div>
-<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;        <span class="keywordflow">throw</span> OutOfRangeJsonException(*m_json, offset);</div>
-<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;    }</div>
-<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;}</div>
-<div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160; </div>
-<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
-<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;<span class="keywordtype">void</span> JsonIterator&lt;JsonType&gt;::validate_dereference(<span class="keyword">const</span> T &amp;it)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;    <span class="keyword">const</span> JsonIterator end = m_json-&gt;end();</div>
-<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160; </div>
-<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;    <span class="keywordflow">if</span> (it == std::get&lt;T&gt;(end.m_iterator))</div>
-<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;    {</div>
-<div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;        <span class="keywordflow">throw</span> NullJsonException(*m_json);</div>
-<div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;    }</div>
-<div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;}</div>
-<div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160; </div>
-<div class="line"><a name="l00905"></a><span class="lineno">  905</span>&#160;} <span class="comment">// namespace fly::detail</span></div>
-<div class="ttc" id="aclassfly_1_1_json_html"><div class="ttname"><a href="classfly_1_1_json.html">fly::Json</a></div><div class="ttdef"><b>Definition:</b> json.hpp:158</div></div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>, &amp;position](<span class="keyword">auto</span> &amp;value) noexcept(JsonIterable&lt;decltype(value)&gt;)</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    {</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;        <span class="keywordflow">if</span> constexpr (JsonIterable&lt;decltype(value)&gt;)</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;        {</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;            <span class="keywordflow">switch</span> (position)</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;            {</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;                <span class="keywordflow">case</span> Position::Begin:</div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;                    m_iterator = value.begin();</div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;                    <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;                <span class="keywordflow">case</span> Position::End:</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;                    m_iterator = value.end();</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;                    <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;            }</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;        }</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;        {</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_iterator_exception.html">JsonIteratorException</a>(*m_json, <span class="stringliteral">&quot;JSON type invalid for iteration&quot;</span>);</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;        }</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;    };</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160; </div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;    <span class="keywordflow">if</span> (m_json != <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;    {</div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;        std::visit(std::move(visitor), m_json-&gt;m_value);</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;    }</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;}</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160; </div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00521"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a2012cf97d478bb903e822d89be1bdc34">  521</a></span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ac5438d332bf5baff4c925f0ba7e49149">JsonIterator&lt;JsonType&gt;::JsonIterator</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">NonConstJsonIterator</a> &amp;iterator) noexcept :</div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;    m_json(iterator.m_json)</div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;{</div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it) noexcept</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;    {</div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;        m_iterator = it;</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;    };</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160; </div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;    std::visit(std::move(visitor), iterator.m_iterator);</div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;}</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160; </div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator&lt;JsonType&gt;</a> &amp;</div>
+<div class="line"><a name="l00535"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#ae1ff5ce14e6a3fdc7d933909daca193c">  535</a></span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ae1ff5ce14e6a3fdc7d933909daca193c">JsonIterator&lt;JsonType&gt;::operator=</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">NonConstJsonIterator</a> &amp;iterator) noexcept</div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;{</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;    m_json = iterator.m_json;</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160; </div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it) noexcept</div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;    {</div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;        m_iterator = it;</div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;    };</div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160; </div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;    std::visit(std::move(visitor), iterator.m_iterator);</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;}</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160; </div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00550"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a540cb59bc1c1bafe1742f78c0a8e7f1b">  550</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a540cb59bc1c1bafe1742f78c0a8e7f1b">JsonIterator&lt;JsonType&gt;::operator*</a>() const -&gt; reference</div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;{</div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;    validate_iterator();</div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160; </div>
+<div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it) -&gt; reference</div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;    {</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;        this-&gt;validate_dereference(it);</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160; </div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;        <span class="keywordflow">if</span> constexpr (is_object_iterator&lt;decltype(it)&gt;)</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;        {</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;            <span class="keywordflow">return</span> it-&gt;second;</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;        }</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (is_array_iterator&lt;decltype(it)&gt;)</div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;        {</div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;            <span class="keywordflow">return</span> *it;</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;        }</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;    };</div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160; </div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator);</div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;}</div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160; </div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00573"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#ad805d8453ccc641165b9d91981b0d7b5">  573</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ad805d8453ccc641165b9d91981b0d7b5">JsonIterator&lt;JsonType&gt;::operator-&gt;</a>() const -&gt; pointer</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;{</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;    validate_iterator();</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160; </div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it) -&gt; pointer</div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;    {</div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;        this-&gt;validate_dereference(it);</div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160; </div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;        <span class="keywordflow">if</span> constexpr (is_object_iterator&lt;decltype(it)&gt;)</div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;        {</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;            <span class="keywordflow">return</span> &amp;(it-&gt;second);</div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;        }</div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (is_array_iterator&lt;decltype(it)&gt;)</div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;        {</div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;            <span class="keywordflow">return</span> &amp;(*it);</div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;        }</div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;    };</div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160; </div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator);</div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;}</div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160; </div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00596"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a4192d3078f8af40a6c42482f7a17c191">  596</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a4192d3078f8af40a6c42482f7a17c191">JsonIterator&lt;JsonType&gt;::operator[]</a>(difference_type offset) <span class="keyword">const</span> -&gt; reference</div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;{</div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;    validate_iterator();</div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160; </div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;    <span class="keyword">auto</span> visitor = [&amp;](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it) -&gt; reference</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;    {</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;        <span class="keywordflow">if</span> constexpr (is_array_iterator&lt;decltype(it)&gt;)</div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;        {</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;            validate_offset(it, offset);</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160; </div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;            <span class="keyword">auto</span> next = std::next(it, offset);</div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;            validate_dereference(next);</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160; </div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;            <span class="keywordflow">return</span> *next;</div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;        }</div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;        {</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_iterator_exception.html">JsonIteratorException</a>(*m_json, <span class="stringliteral">&quot;JSON type invalid for offset operator&quot;</span>);</div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;        }</div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;    };</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160; </div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator);</div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;}</div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160; </div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00622"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a087985c3536259c3d25649c155d9ef6b">  622</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a087985c3536259c3d25649c155d9ef6b">JsonIterator&lt;JsonType&gt;::operator==</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;    validate_iterator(iterator);</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;    <span class="keywordflow">return</span> m_iterator == iterator.m_iterator;</div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;}</div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160; </div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00630"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a44b03b6614ce63639c9ab23fbd620c59">  630</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a44b03b6614ce63639c9ab23fbd620c59">JsonIterator&lt;JsonType&gt;::operator!=</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;    <span class="keywordflow">return</span> !(*<span class="keyword">this</span> == iterator);</div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;}</div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160; </div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00637"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#ab4536da83b165129d14d010f7b2ba6d8">  637</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ab4536da83b165129d14d010f7b2ba6d8">JsonIterator&lt;JsonType&gt;::operator&lt;</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;    validate_iterator(iterator);</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160; </div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it1, <span class="keyword">const</span> <span class="keyword">auto</span> &amp;it2) -&gt; <span class="keywordtype">bool</span></div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;    {</div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;        <span class="keywordflow">if</span> constexpr (is_array_iterator&lt;decltype(it1), decltype(it2)&gt;)</div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;        {</div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;            <span class="keywordflow">return</span> it1 &lt; it2;</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;        }</div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;        {</div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_iterator_exception.html">JsonIteratorException</a>(*m_json, <span class="stringliteral">&quot;JSON type invalid for comparison operator&quot;</span>);</div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;        }</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;    };</div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160; </div>
+<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator, iterator.m_iterator);</div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;}</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160; </div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00658"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a2a843aa69761f9a9146c7199dbc68080">  658</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a2a843aa69761f9a9146c7199dbc68080">JsonIterator&lt;JsonType&gt;::operator&lt;=</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;    <span class="keywordflow">return</span> !(iterator &lt; *<span class="keyword">this</span>);</div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;}</div>
+<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160; </div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00665"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a4606ef6ae8049d53d05c67cc1e1426d4">  665</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a4606ef6ae8049d53d05c67cc1e1426d4">JsonIterator&lt;JsonType&gt;::operator&gt;</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;    <span class="keywordflow">return</span> !(*<span class="keyword">this</span> &lt;= iterator);</div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;}</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160; </div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00672"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a392b568ebd3659a33e2eee89ff716bc2">  672</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a392b568ebd3659a33e2eee89ff716bc2">JsonIterator&lt;JsonType&gt;::operator&gt;=</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;    <span class="keywordflow">return</span> !(*<span class="keyword">this</span> &lt; iterator);</div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;}</div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160; </div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00679"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a2b9cf3b8ea96bcf2581227ff2134a1fa">  679</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a5f7a73153dfccd41e77274beb64d941b">JsonIterator&lt;JsonType&gt;::operator++</a>(<span class="keywordtype">int</span>) -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a></div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;{</div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;    <span class="keyword">auto</span> result = *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;    ++(*this);</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160; </div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;}</div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160; </div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00689"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a5f7a73153dfccd41e77274beb64d941b">  689</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a5f7a73153dfccd41e77274beb64d941b">JsonIterator&lt;JsonType&gt;::operator++</a>() -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;{</div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;    validate_iterator();</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160; </div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">auto</span> &amp;it) -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;    {</div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;        validate_offset(it, 1);</div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;        std::advance(it, 1);</div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160; </div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;    };</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160; </div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator);</div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;}</div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160; </div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00706"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a324393e3033554326388b3b04f5232fa">  706</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#aa773be7a8f49f59eefbc76d293c45425">JsonIterator&lt;JsonType&gt;::operator--</a>(<span class="keywordtype">int</span>) -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a></div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;{</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;    <span class="keyword">auto</span> result = *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;    --(*this);</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160; </div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;}</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160; </div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00716"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#aa773be7a8f49f59eefbc76d293c45425">  716</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#aa773be7a8f49f59eefbc76d293c45425">JsonIterator&lt;JsonType&gt;::operator--</a>() -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;{</div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;    validate_iterator();</div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160; </div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">auto</span> &amp;it) -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;    {</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;        validate_offset(it, -1);</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;        std::advance(it, -1);</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160; </div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;    };</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160; </div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator);</div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;}</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160; </div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00733"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a4e430053c075d19db5e9d7eb3a5fdfb3">  733</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a4e430053c075d19db5e9d7eb3a5fdfb3">JsonIterator&lt;JsonType&gt;::operator+=</a>(difference_type offset) -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;{</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;    validate_iterator();</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160; </div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>, &amp;offset](<span class="keyword">auto</span> &amp;it)</div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;    {</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;        <span class="keywordflow">if</span> constexpr (is_array_iterator&lt;decltype(it)&gt;)</div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;        {</div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;            validate_offset(it, offset);</div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;            std::advance(it, offset);</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;        }</div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;        {</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_iterator_exception.html">JsonIteratorException</a>(*m_json, <span class="stringliteral">&quot;JSON type invalid for iterator offset&quot;</span>);</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;        }</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;    };</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160; </div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    std::visit(std::move(visitor), m_iterator);</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;}</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160; </div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00756"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#ac0f19f8ffe31d7775a93325c2d5f0448">  756</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ac0f19f8ffe31d7775a93325c2d5f0448">JsonIterator&lt;JsonType&gt;::operator-=</a>(difference_type offset) -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;{</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;    <span class="keywordflow">return</span> *<span class="keyword">this</span> += -offset;</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;}</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160; </div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00763"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a70950aa9b86f0c34611ec274692a49c2">  763</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a70950aa9b86f0c34611ec274692a49c2">JsonIterator&lt;JsonType&gt;::operator+</a>(difference_type offset) <span class="keyword">const</span> -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a></div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;{</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;    <span class="keyword">auto</span> result = *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;    result += offset;</div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160; </div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;}</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160; </div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator&lt;JsonType&gt;</a> operator+(</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;    <span class="keyword">typename</span> JsonIterator&lt;JsonType&gt;::difference_type offset,</div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;    <span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator&lt;JsonType&gt;</a> &amp;iterator)</div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;{</div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;    <span class="keyword">auto</span> result = iterator;</div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;    result += offset;</div>
+<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160; </div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;}</div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160; </div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00785"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#ab1217377cffd249ce3e7001f5964a935">  785</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ab1217377cffd249ce3e7001f5964a935">JsonIterator&lt;JsonType&gt;::operator-</a>(difference_type offset) <span class="keyword">const</span> -&gt; <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a></div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;{</div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;    <span class="keyword">auto</span> result = *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    result -= offset;</div>
+<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160; </div>
+<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;}</div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160; </div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00795"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#ac38e18c9784f44e2db05cb1634670f39">  795</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#ab1217377cffd249ce3e7001f5964a935">JsonIterator&lt;JsonType&gt;::operator-</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator</a> &amp;iterator) <span class="keyword">const</span> -&gt; difference_type</div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;{</div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;    validate_iterator(iterator);</div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160; </div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it1, <span class="keyword">const</span> <span class="keyword">auto</span> &amp;it2) -&gt; difference_type</div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;    {</div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;        <span class="keywordflow">if</span> constexpr (is_array_iterator&lt;decltype(it1), decltype(it2)&gt;)</div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;        {</div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;            <span class="keywordflow">return</span> std::distance(it2, it1);</div>
+<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;        }</div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;        {</div>
+<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_iterator_exception.html">JsonIteratorException</a>(*m_json, <span class="stringliteral">&quot;JSON type invalid for iterator difference&quot;</span>);</div>
+<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;        }</div>
+<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;    };</div>
+<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160; </div>
+<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator, iterator.m_iterator);</div>
+<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;}</div>
+<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160; </div>
+<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00816"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a12cfbfa3fb9173a8f2a3bbf767ec95ad">  816</a></span>&#160;<span class="keyword">const</span> <span class="keyword">typename</span> json_object_type::key_type &amp;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a12cfbfa3fb9173a8f2a3bbf767ec95ad">JsonIterator&lt;JsonType&gt;::key</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;    validate_iterator();</div>
+<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160; </div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it) -&gt; <span class="keyword">const</span> <span class="keyword">typename</span> json_object_type::key_type &amp;</div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;    {</div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;        <span class="keywordflow">if</span> constexpr (is_object_iterator&lt;decltype(it)&gt;)</div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;        {</div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;            validate_dereference(it);</div>
+<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;            <span class="keywordflow">return</span> it-&gt;first;</div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;        }</div>
+<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;        {</div>
+<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;            <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_iterator_exception.html">JsonIteratorException</a>(*m_json, <span class="stringliteral">&quot;JSON type is not keyed&quot;</span>);</div>
+<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;        }</div>
+<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;    };</div>
+<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160; </div>
+<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_iterator);</div>
+<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;}</div>
+<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160; </div>
+<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00838"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_iterator.html#a592c960a88fd7e22918c659a75620886">  838</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html#a592c960a88fd7e22918c659a75620886">JsonIterator&lt;JsonType&gt;::value</a>() const -&gt; reference</div>
+<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;{</div>
+<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;    <span class="keywordflow">return</span> *(*this);</div>
+<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;}</div>
+<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160; </div>
+<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;<span class="keywordtype">void</span> <a class="code" href="classfly_1_1detail_1_1_json_iterator.html">JsonIterator&lt;JsonType&gt;::validate_iterator</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;    <span class="keywordflow">if</span> (m_json == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;    {</div>
+<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_null_json_exception.html">NullJsonException</a>();</div>
+<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;    }</div>
+<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;}</div>
+<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160; </div>
+<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;<span class="keywordtype">void</span> JsonIterator&lt;JsonType&gt;::validate_iterator(<span class="keyword">const</span> JsonIterator &amp;iterator)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;    validate_iterator();</div>
+<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;    iterator.validate_iterator();</div>
+<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160; </div>
+<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;    <span class="keywordflow">if</span> (m_json != iterator.m_json)</div>
+<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;    {</div>
+<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;        <span class="keywordflow">throw</span> BadJsonComparisonException(*m_json, *iterator.m_json);</div>
+<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;    }</div>
+<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;}</div>
+<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160; </div>
+<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;<span class="keywordtype">void</span> JsonIterator&lt;JsonType&gt;::validate_offset(<span class="keyword">const</span> T &amp;it, difference_type offset)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;<span class="keyword"></span> </div>
+<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;    difference_type distance = 0;</div>
+<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160; </div>
+<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;    <span class="keywordflow">if</span> (offset &gt;= 0)</div>
+<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;    {</div>
+<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;        <span class="keyword">const</span> JsonIterator end = m_json-&gt;end();</div>
+<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;        distance = std::distance(it, std::get&lt;T&gt;(end.m_iterator));</div>
+<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;    }</div>
+<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;    {</div>
+<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;        <span class="keyword">const</span> JsonIterator begin = m_json-&gt;begin();</div>
+<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;        distance = std::distance(std::get&lt;T&gt;(begin.m_iterator), it);</div>
+<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;    }</div>
+<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160; </div>
+<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;    <span class="keywordflow">if</span> (std::abs(offset) &gt; distance)</div>
+<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;    {</div>
+<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;        <span class="keywordflow">throw</span> OutOfRangeJsonException(*m_json, offset);</div>
+<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;    }</div>
+<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;}</div>
+<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160; </div>
+<div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonType&gt;</div>
+<div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;<span class="keywordtype">void</span> JsonIterator&lt;JsonType&gt;::validate_dereference(<span class="keyword">const</span> T &amp;it)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;    <span class="keyword">const</span> JsonIterator end = m_json-&gt;end();</div>
+<div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160; </div>
+<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;    <span class="keywordflow">if</span> (it == std::get&lt;T&gt;(end.m_iterator))</div>
+<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;    {</div>
+<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;        <span class="keywordflow">throw</span> NullJsonException(*m_json);</div>
+<div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;    }</div>
+<div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;}</div>
+<div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160; </div>
+<div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160;} <span class="comment">// namespace fly::detail</span></div>
+<div class="ttc" id="aclassfly_1_1_json_html"><div class="ttname"><a href="classfly_1_1_json.html">fly::Json</a></div><div class="ttdef"><b>Definition:</b> json.hpp:162</div></div>
 <div class="ttc" id="aclassfly_1_1_json_iterator_exception_html"><div class="ttname"><a href="classfly_1_1_json_iterator_exception.html">fly::JsonIteratorException</a></div><div class="ttdef"><b>Definition:</b> json_exception.hpp:58</div></div>
 <div class="ttc" id="aclassfly_1_1_null_json_exception_html"><div class="ttname"><a href="classfly_1_1_null_json_exception.html">fly::NullJsonException</a></div><div class="ttdef"><b>Definition:</b> json_exception.hpp:88</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a></div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:58</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a087985c3536259c3d25649c155d9ef6b"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a087985c3536259c3d25649c155d9ef6b">fly::detail::JsonIterator::operator==</a></div><div class="ttdeci">bool operator==(const JsonIterator &amp;iterator) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:623</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a087985c3536259c3d25649c155d9ef6b"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a087985c3536259c3d25649c155d9ef6b">fly::detail::JsonIterator::operator==</a></div><div class="ttdeci">bool operator==(const JsonIterator &amp;iterator) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:622</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a12cfbfa3fb9173a8f2a3bbf767ec95ad"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a12cfbfa3fb9173a8f2a3bbf767ec95ad">fly::detail::JsonIterator::key</a></div><div class="ttdeci">const json_object_type::key_type &amp; key() const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:816</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a246525d0706b79439db3e7d8ada5e4ce"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a246525d0706b79439db3e7d8ada5e4ce">fly::detail::JsonIterator::iterator_category</a></div><div class="ttdeci">std::bidirectional_iterator_tag iterator_category</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:100</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a2a843aa69761f9a9146c7199dbc68080"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a2a843aa69761f9a9146c7199dbc68080">fly::detail::JsonIterator::operator&lt;=</a></div><div class="ttdeci">bool operator&lt;=(const JsonIterator &amp;iterator) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:659</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a392b568ebd3659a33e2eee89ff716bc2"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a392b568ebd3659a33e2eee89ff716bc2">fly::detail::JsonIterator::operator&gt;=</a></div><div class="ttdeci">bool operator&gt;=(const JsonIterator &amp;iterator) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:673</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a4192d3078f8af40a6c42482f7a17c191"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a4192d3078f8af40a6c42482f7a17c191">fly::detail::JsonIterator::operator[]</a></div><div class="ttdeci">reference operator[](difference_type offset) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:597</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a44b03b6614ce63639c9ab23fbd620c59"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a44b03b6614ce63639c9ab23fbd620c59">fly::detail::JsonIterator::operator!=</a></div><div class="ttdeci">bool operator!=(const JsonIterator &amp;iterator) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:631</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a4606ef6ae8049d53d05c67cc1e1426d4"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a4606ef6ae8049d53d05c67cc1e1426d4">fly::detail::JsonIterator::operator&gt;</a></div><div class="ttdeci">bool operator&gt;(const JsonIterator &amp;iterator) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:666</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a4e430053c075d19db5e9d7eb3a5fdfb3"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a4e430053c075d19db5e9d7eb3a5fdfb3">fly::detail::JsonIterator::operator+=</a></div><div class="ttdeci">JsonIterator &amp; operator+=(difference_type offset)</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:734</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a540cb59bc1c1bafe1742f78c0a8e7f1b"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a540cb59bc1c1bafe1742f78c0a8e7f1b">fly::detail::JsonIterator::operator*</a></div><div class="ttdeci">reference operator*() const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:551</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a592c960a88fd7e22918c659a75620886"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a592c960a88fd7e22918c659a75620886">fly::detail::JsonIterator::value</a></div><div class="ttdeci">reference value() const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:839</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a5f7a73153dfccd41e77274beb64d941b"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a5f7a73153dfccd41e77274beb64d941b">fly::detail::JsonIterator::operator++</a></div><div class="ttdeci">JsonIterator &amp; operator++()</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:690</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a6903b16341639854d7ddb260a0fd8642"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a6903b16341639854d7ddb260a0fd8642">fly::detail::JsonIterator::key</a></div><div class="ttdeci">const JsonTraits::object_type::key_type &amp; key() const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:817</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a70950aa9b86f0c34611ec274692a49c2"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a70950aa9b86f0c34611ec274692a49c2">fly::detail::JsonIterator::operator+</a></div><div class="ttdeci">JsonIterator operator+(difference_type offset) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:764</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_aa773be7a8f49f59eefbc76d293c45425"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#aa773be7a8f49f59eefbc76d293c45425">fly::detail::JsonIterator::operator--</a></div><div class="ttdeci">JsonIterator &amp; operator--()</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:717</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a2a843aa69761f9a9146c7199dbc68080"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a2a843aa69761f9a9146c7199dbc68080">fly::detail::JsonIterator::operator&lt;=</a></div><div class="ttdeci">bool operator&lt;=(const JsonIterator &amp;iterator) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:658</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a392b568ebd3659a33e2eee89ff716bc2"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a392b568ebd3659a33e2eee89ff716bc2">fly::detail::JsonIterator::operator&gt;=</a></div><div class="ttdeci">bool operator&gt;=(const JsonIterator &amp;iterator) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:672</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a4192d3078f8af40a6c42482f7a17c191"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a4192d3078f8af40a6c42482f7a17c191">fly::detail::JsonIterator::operator[]</a></div><div class="ttdeci">reference operator[](difference_type offset) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:596</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a44b03b6614ce63639c9ab23fbd620c59"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a44b03b6614ce63639c9ab23fbd620c59">fly::detail::JsonIterator::operator!=</a></div><div class="ttdeci">bool operator!=(const JsonIterator &amp;iterator) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:630</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a4606ef6ae8049d53d05c67cc1e1426d4"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a4606ef6ae8049d53d05c67cc1e1426d4">fly::detail::JsonIterator::operator&gt;</a></div><div class="ttdeci">bool operator&gt;(const JsonIterator &amp;iterator) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:665</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a4e430053c075d19db5e9d7eb3a5fdfb3"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a4e430053c075d19db5e9d7eb3a5fdfb3">fly::detail::JsonIterator::operator+=</a></div><div class="ttdeci">JsonIterator &amp; operator+=(difference_type offset)</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:733</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a540cb59bc1c1bafe1742f78c0a8e7f1b"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a540cb59bc1c1bafe1742f78c0a8e7f1b">fly::detail::JsonIterator::operator*</a></div><div class="ttdeci">reference operator*() const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:550</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a592c960a88fd7e22918c659a75620886"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a592c960a88fd7e22918c659a75620886">fly::detail::JsonIterator::value</a></div><div class="ttdeci">reference value() const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:838</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a5f7a73153dfccd41e77274beb64d941b"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a5f7a73153dfccd41e77274beb64d941b">fly::detail::JsonIterator::operator++</a></div><div class="ttdeci">JsonIterator &amp; operator++()</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:689</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_a70950aa9b86f0c34611ec274692a49c2"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#a70950aa9b86f0c34611ec274692a49c2">fly::detail::JsonIterator::operator+</a></div><div class="ttdeci">JsonIterator operator+(difference_type offset) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:763</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_aa773be7a8f49f59eefbc76d293c45425"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#aa773be7a8f49f59eefbc76d293c45425">fly::detail::JsonIterator::operator--</a></div><div class="ttdeci">JsonIterator &amp; operator--()</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:716</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_aa83ef1ae58c7e7e23177753822ae3f20"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#aa83ef1ae58c7e7e23177753822ae3f20">fly::detail::JsonIterator::Position</a></div><div class="ttdeci">Position</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:116</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_ab1217377cffd249ce3e7001f5964a935"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#ab1217377cffd249ce3e7001f5964a935">fly::detail::JsonIterator::operator-</a></div><div class="ttdeci">JsonIterator operator-(difference_type offset) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:786</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_ab4536da83b165129d14d010f7b2ba6d8"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#ab4536da83b165129d14d010f7b2ba6d8">fly::detail::JsonIterator::operator&lt;</a></div><div class="ttdeci">bool operator&lt;(const JsonIterator &amp;iterator) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:638</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_ac0f19f8ffe31d7775a93325c2d5f0448"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#ac0f19f8ffe31d7775a93325c2d5f0448">fly::detail::JsonIterator::operator-=</a></div><div class="ttdeci">JsonIterator &amp; operator-=(difference_type offset)</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:757</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_ab1217377cffd249ce3e7001f5964a935"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#ab1217377cffd249ce3e7001f5964a935">fly::detail::JsonIterator::operator-</a></div><div class="ttdeci">JsonIterator operator-(difference_type offset) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:785</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_ab4536da83b165129d14d010f7b2ba6d8"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#ab4536da83b165129d14d010f7b2ba6d8">fly::detail::JsonIterator::operator&lt;</a></div><div class="ttdeci">bool operator&lt;(const JsonIterator &amp;iterator) const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:637</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_ac0f19f8ffe31d7775a93325c2d5f0448"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#ac0f19f8ffe31d7775a93325c2d5f0448">fly::detail::JsonIterator::operator-=</a></div><div class="ttdeci">JsonIterator &amp; operator-=(difference_type offset)</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:756</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_ac5438d332bf5baff4c925f0ba7e49149"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#ac5438d332bf5baff4c925f0ba7e49149">fly::detail::JsonIterator::JsonIterator</a></div><div class="ttdeci">JsonIterator()=default</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_ad805d8453ccc641165b9d91981b0d7b5"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#ad805d8453ccc641165b9d91981b0d7b5">fly::detail::JsonIterator::operator-&gt;</a></div><div class="ttdeci">pointer operator-&gt;() const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:574</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_ae1ff5ce14e6a3fdc7d933909daca193c"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#ae1ff5ce14e6a3fdc7d933909daca193c">fly::detail::JsonIterator::operator=</a></div><div class="ttdeci">JsonIterator &amp; operator=(const NonConstJsonIterator &amp;iterator) noexcept</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:536</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_ad805d8453ccc641165b9d91981b0d7b5"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#ad805d8453ccc641165b9d91981b0d7b5">fly::detail::JsonIterator::operator-&gt;</a></div><div class="ttdeci">pointer operator-&gt;() const</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:573</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_ae1ff5ce14e6a3fdc7d933909daca193c"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#ae1ff5ce14e6a3fdc7d933909daca193c">fly::detail::JsonIterator::operator=</a></div><div class="ttdeci">JsonIterator &amp; operator=(const NonConstJsonIterator &amp;iterator) noexcept</div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:535</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html_ae31a19467299236ce54c39c80b86eacc"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html#ae31a19467299236ce54c39c80b86eacc">fly::detail::JsonIterator::operator+</a></div><div class="ttdeci">friend JsonIterator&lt; J &gt; operator+(typename JsonIterator&lt; J &gt;::difference_type offset, const JsonIterator&lt; J &gt; &amp;iterator)</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html">fly::detail::JsonReverseIterator</a></div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:22</div></div>
 </div><!-- fragment --></div><!-- contents -->

@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -85,6 +85,7 @@ $(document).ready(function(){initNavTree('classfly_1_1net_1_1detail_1_1_base_soc
 
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
@@ -99,8 +100,23 @@ $(document).ready(function(){initNavTree('classfly_1_1net_1_1detail_1_1_base_soc
 Inheritance diagram for fly::net::detail::BaseSocket&lt; EndpointType &gt;:</div>
 <div class="dyncontent">
 <div class="center"><img src="classfly_1_1net_1_1detail_1_1_base_socket__inherit__graph.png" border="0" usemap="#afly_1_1net_1_1detail_1_1_base_socket_3_01_endpoint_type_01_4_inherit__map" alt="Inheritance graph"/></div>
+<map name="afly_1_1net_1_1detail_1_1_base_socket_3_01_endpoint_type_01_4_inherit__map" id="afly_1_1net_1_1detail_1_1_base_socket_3_01_endpoint_type_01_4_inherit__map">
+<area shape="rect" title=" " alt="" coords="5,71,200,112"/>
+<area shape="rect" href="classfly_1_1net_1_1_listen_socket.html" title=" " alt="" coords="248,5,404,47"/>
+<area shape="rect" href="classfly_1_1net_1_1_tcp_socket.html" title=" " alt="" coords="257,71,395,112"/>
+<area shape="rect" href="classfly_1_1net_1_1_udp_socket.html" title=" " alt="" coords="255,136,397,177"/>
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a96c9a56a0581bd01ae550d4fa36cb0ab"><td class="memItemLeft" align="right" valign="top"><a id="a96c9a56a0581bd01ae550d4fa36cb0ab"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>endpoint_type</b> = EndpointType</td></tr>
+<tr class="separator:a96c9a56a0581bd01ae550d4fa36cb0ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea93cbb0c6cb2c341ab028cfc2f60dd9"><td class="memItemLeft" align="right" valign="top"><a id="aea93cbb0c6cb2c341ab028cfc2f60dd9"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>address_type</b> = typename EndpointType::address_type</td></tr>
+<tr class="separator:aea93cbb0c6cb2c341ab028cfc2f60dd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ab676f1a82a47d7bb46c6f1c789d63d8f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html#ab676f1a82a47d7bb46c6f1c789d63d8f">is_open</a> () const</td></tr>
@@ -128,8 +144,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a349c56b95410735dfc04c460faa7779f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab835365dd0cb321ec9683470ac104578"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html#ab835365dd0cb321ec9683470ac104578">is_ipv6</a> ()</td></tr>
 <tr class="separator:ab835365dd0cb321ec9683470ac104578"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a633f97cd0d115f6b63bd8ce9bde7b8ce"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; EndpointType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html#a633f97cd0d115f6b63bd8ce9bde7b8ce">hostname_to_endpoint</a> (std::string_view hostname)</td></tr>
-<tr class="separator:a633f97cd0d115f6b63bd8ce9bde7b8ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b1fab0441484dec8a46cb5f40401e5c"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; address_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html#a9b1fab0441484dec8a46cb5f40401e5c">hostname_to_address</a> (std::string_view hostname)</td></tr>
+<tr class="separator:a9b1fab0441484dec8a46cb5f40401e5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -151,7 +167,7 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a6c22e529780fadcd93f25b51b317cc24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename EndpointType&gt;<br />
+<div class="textblock"><h3>template&lt;fly::net::IPEndpoint EndpointType&gt;<br />
 class fly::net::detail::BaseSocket&lt; EndpointType &gt;</h3>
 
 <p>Base class to represent a network socket and provide functionality needed by all concrete socket types.</p>
@@ -164,7 +180,7 @@ class fly::net::detail::BaseSocket&lt; EndpointType &gt;</h3>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -217,7 +233,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -270,7 +286,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -305,7 +321,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -331,7 +347,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html">fly::net::detail::BaseSocket</a>&lt; EndpointType &gt;::bind </td>
@@ -370,7 +386,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html">fly::net::detail::BaseSocket</a>&lt; EndpointType &gt;::bind </td>
@@ -416,7 +432,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void <a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html">fly::net::detail::BaseSocket</a>&lt; EndpointType &gt;::close</td>
@@ -433,7 +449,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">socket_type <a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html">fly::net::detail::BaseSocket</a>&lt; EndpointType &gt;::handle</td>
@@ -444,19 +460,19 @@ template&lt;typename EndpointType &gt; </div>
 
 </div>
 </div>
-<a id="a633f97cd0d115f6b63bd8ce9bde7b8ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a633f97cd0d115f6b63bd8ce9bde7b8ce">&#9670;&nbsp;</a></span>hostname_to_endpoint()</h2>
+<a id="a9b1fab0441484dec8a46cb5f40401e5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b1fab0441484dec8a46cb5f40401e5c">&#9670;&nbsp;</a></span>hostname_to_address()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::optional&lt; EndpointType &gt; <a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html">fly::net::detail::BaseSocket</a>&lt; EndpointType &gt;::hostname_to_endpoint </td>
+          <td class="memname">auto <a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html">fly::net::detail::BaseSocket</a>&lt; EndpointType &gt;::hostname_to_address </td>
           <td>(</td>
           <td class="paramtype">std::string_view&#160;</td>
           <td class="paramname"><em>hostname</em></td><td>)</td>
@@ -469,14 +485,14 @@ template&lt;typename EndpointType &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Convert a hostname or IP address string to an endpoint.</p>
+<p>Convert a hostname or IP address string to an IP address.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">hostname</td><td>The hostname or IP address string to convert.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>If successful, the converted endpoint. Otherwise, an uninitialized value. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>If successful, the created IP address. Otherwise, an uninitialized value. </dd></dl>
 
 </div>
 </div>
@@ -486,7 +502,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">fly::net::IOMode <a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html">fly::net::detail::BaseSocket</a>&lt; EndpointType &gt;::io_mode</td>
@@ -503,7 +519,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -528,7 +544,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -553,7 +569,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html">fly::net::detail::BaseSocket</a>&lt; EndpointType &gt;::is_open</td>
@@ -570,7 +586,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">std::optional&lt; EndpointType &gt; <a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html">fly::net::detail::BaseSocket</a>&lt; EndpointType &gt;::local_endpoint</td>
@@ -588,7 +604,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -613,7 +629,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -649,7 +665,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -674,7 +690,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html">fly::net::detail::BaseSocket</a>&lt; EndpointType &gt;::set_io_mode </td>
@@ -702,7 +718,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">std::uint64_t <a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html">fly::net::detail::BaseSocket</a>&lt; EndpointType &gt;::socket_id</td>
@@ -719,7 +735,7 @@ template&lt;typename EndpointType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename EndpointType &gt; </div>
+template&lt;fly::net::IPEndpoint EndpointType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">

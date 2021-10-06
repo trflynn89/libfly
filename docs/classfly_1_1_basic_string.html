@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>libfly: fly::BasicString&lt; StringType &gt; Class Template Reference</title>
+<title>libfly: fly::BasicString&lt; CharType &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('classfly_1_1_basic_string.html',''); i
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classfly_1_1_basic_string-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">fly::BasicString&lt; StringType &gt; Class Template Reference</div>  </div>
+<div class="title">fly::BasicString&lt; CharType &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -98,121 +98,143 @@ $(document).ready(function(){initNavTree('classfly_1_1_basic_string.html',''); i
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:ac0299f259b603a93ee1764eeea2a2e65"><td class="memItemLeft" align="right" valign="top"><a id="ac0299f259b603a93ee1764eeea2a2e65"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>string_type</b> = typename <a class="el" href="structfly_1_1detail_1_1_basic_string_traits.html#a7964422bfc4414d79060e8611736136f">traits::string_type</a></td></tr>
-<tr class="separator:ac0299f259b603a93ee1764eeea2a2e65"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a043262c1e9036c1e21d259cd29f63a67"><td class="memItemLeft" align="right" valign="top"><a id="a043262c1e9036c1e21d259cd29f63a67"></a>
+<tr class="memitem:a458b3d76a95aeaa3322b721f214612af"><td class="memItemLeft" align="right" valign="top"><a id="a458b3d76a95aeaa3322b721f214612af"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>string_type</b> = typename traits::string_type</td></tr>
+<tr class="separator:a458b3d76a95aeaa3322b721f214612af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a886297cbaecad6b984128f46b2aa3c65"><td class="memItemLeft" align="right" valign="top"><a id="a886297cbaecad6b984128f46b2aa3c65"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>size_type</b> = typename traits::size_type</td></tr>
-<tr class="separator:a043262c1e9036c1e21d259cd29f63a67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c91d41decb706d2c1a2f7ee24822faf"><td class="memItemLeft" align="right" valign="top"><a id="a1c91d41decb706d2c1a2f7ee24822faf"></a>
+<tr class="separator:a886297cbaecad6b984128f46b2aa3c65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b5b1b0f608e2a83371a7570d891d8d3"><td class="memItemLeft" align="right" valign="top"><a id="a2b5b1b0f608e2a83371a7570d891d8d3"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>char_type</b> = typename traits::char_type</td></tr>
-<tr class="separator:a1c91d41decb706d2c1a2f7ee24822faf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9c87860256a700d17ab5996b1bcdc03"><td class="memItemLeft" align="right" valign="top"><a id="af9c87860256a700d17ab5996b1bcdc03"></a>
+<tr class="separator:a2b5b1b0f608e2a83371a7570d891d8d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3abdebf5684fb8c7678eb0f38de73c24"><td class="memItemLeft" align="right" valign="top"><a id="a3abdebf5684fb8c7678eb0f38de73c24"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>view_type</b> = typename traits::view_type</td></tr>
-<tr class="separator:af9c87860256a700d17ab5996b1bcdc03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97ebf1e67486e2ba54e5714614d57ecc"><td class="memItemLeft" align="right" valign="top"><a id="a97ebf1e67486e2ba54e5714614d57ecc"></a>
+<tr class="separator:a3abdebf5684fb8c7678eb0f38de73c24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacdb5c3ff7839d6c5fc7459e02aa1338"><td class="memItemLeft" align="right" valign="top"><a id="aacdb5c3ff7839d6c5fc7459e02aa1338"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>int_type</b> = typename traits::int_type</td></tr>
-<tr class="separator:a97ebf1e67486e2ba54e5714614d57ecc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a786dbb21f82129fccc66d709f29950c6"><td class="memItemLeft" align="right" valign="top"><a id="a786dbb21f82129fccc66d709f29950c6"></a>
+<tr class="separator:aacdb5c3ff7839d6c5fc7459e02aa1338"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5abcdfd568f5b50d9ee9225e8c637230"><td class="memItemLeft" align="right" valign="top"><a id="a5abcdfd568f5b50d9ee9225e8c637230"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>codepoint_type</b> = typename traits::codepoint_type</td></tr>
-<tr class="separator:a786dbb21f82129fccc66d709f29950c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f65912079aedbffd92cabc8e6bc293b"><td class="memTemplParams" colspan="2"><a id="a9f65912079aedbffd92cabc8e6bc293b"></a>
+<tr class="separator:a5abcdfd568f5b50d9ee9225e8c637230"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32c36a8ff515d2bda24db6d4a4dcd3f2"><td class="memTemplParams" colspan="2"><a id="a32c36a8ff515d2bda24db6d4a4dcd3f2"></a>
 template&lt;typename... ParameterTypes&gt; </td></tr>
-<tr class="memitem:a9f65912079aedbffd92cabc8e6bc293b"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>FormatString</b> = <a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">detail::BasicFormatString</a>&lt; StringType, std::type_identity_t&lt; ParameterTypes &gt;... &gt;</td></tr>
-<tr class="separator:a9f65912079aedbffd92cabc8e6bc293b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32c36a8ff515d2bda24db6d4a4dcd3f2"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><b>FormatString</b> = <a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">detail::BasicFormatString</a>&lt; char_type, std::type_identity_t&lt; ParameterTypes &gt;... &gt;</td></tr>
+<tr class="separator:a32c36a8ff515d2bda24db6d4a4dcd3f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af22199a7c8841ee6909bdc084508ce96"><td class="memTemplParams" colspan="2"><a id="af22199a7c8841ee6909bdc084508ce96"></a>
-template&lt;typename T , enable_if&lt; detail::is_like_supported_string&lt; T &gt;&gt; &gt; </td></tr>
-<tr class="memitem:af22199a7c8841ee6909bdc084508ce96"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>size</b> (T &amp;&amp;value) -&gt; size_type</td></tr>
-<tr class="separator:af22199a7c8841ee6909bdc084508ce96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26cfd5c0a2305dbe1d5ae434ed2c6d1d"><td class="memTemplParams" colspan="2"><a id="a26cfd5c0a2305dbe1d5ae434ed2c6d1d"></a>
+<tr class="memitem:aa6347419b73acc5aef9da7ef8029f176"><td class="memTemplParams" colspan="2"><a id="aa6347419b73acc5aef9da7ef8029f176"></a>
+template&lt;StandardStringLike T&gt; </td></tr>
+<tr class="memitem:aa6347419b73acc5aef9da7ef8029f176"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>size</b> (T &amp;&amp;value) -&gt; size_type</td></tr>
+<tr class="separator:aa6347419b73acc5aef9da7ef8029f176"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5425296b62fd92676c1bc3368eb94b13"><td class="memTemplParams" colspan="2"><a id="a5425296b62fd92676c1bc3368eb94b13"></a>
 template&lt;typename IteratorType &gt; </td></tr>
-<tr class="memitem:a26cfd5c0a2305dbe1d5ae434ed2c6d1d"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>decode_codepoint</b> (IteratorType &amp;it, const IteratorType &amp;end) -&gt; std::optional&lt; codepoint_type &gt;</td></tr>
-<tr class="separator:a26cfd5c0a2305dbe1d5ae434ed2c6d1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5425296b62fd92676c1bc3368eb94b13"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>decode_codepoint</b> (IteratorType &amp;it, const IteratorType &amp;end) -&gt; std::optional&lt; codepoint_type &gt;</td></tr>
+<tr class="separator:a5425296b62fd92676c1bc3368eb94b13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58406252e042b548eacdb931809f8040"><td class="memTemplParams" colspan="2"><a id="a58406252e042b548eacdb931809f8040"></a>
+template&lt;char UnicodePrefix&gt; </td></tr>
+<tr class="memitem:a58406252e042b548eacdb931809f8040"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>escape_all_codepoints</b> (view_type value) -&gt; std::optional&lt; string_type &gt;</td></tr>
+<tr class="separator:a58406252e042b548eacdb931809f8040"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c543786ef77f4d3ad582a56d514c08e"><td class="memTemplParams" colspan="2"><a id="a0c543786ef77f4d3ad582a56d514c08e"></a>
+template&lt;char UnicodePrefix, typename IteratorType &gt; </td></tr>
+<tr class="memitem:a0c543786ef77f4d3ad582a56d514c08e"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>escape_codepoint</b> (IteratorType &amp;it, const IteratorType &amp;end) -&gt; std::optional&lt; string_type &gt;</td></tr>
+<tr class="separator:a0c543786ef77f4d3ad582a56d514c08e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3892c8f23e010d82879cff337aa4f75b"><td class="memTemplParams" colspan="2"><a id="a3892c8f23e010d82879cff337aa4f75b"></a>
+template&lt;typename IteratorType &gt; </td></tr>
+<tr class="memitem:a3892c8f23e010d82879cff337aa4f75b"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>unescape_codepoint</b> (IteratorType &amp;it, const IteratorType &amp;end) -&gt; std::optional&lt; string_type &gt;</td></tr>
+<tr class="separator:a3892c8f23e010d82879cff337aa4f75b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8ae98e1c895857633b82985a0214bc1"><td class="memTemplParams" colspan="2"><a id="ac8ae98e1c895857633b82985a0214bc1"></a>
+template&lt;typename... ParameterTypes&gt; </td></tr>
+<tr class="memitem:ac8ae98e1c895857633b82985a0214bc1"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>format</b> (<a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">FormatString</a>&lt; ParameterTypes... &gt; &amp;&amp;fmt, ParameterTypes &amp;&amp;...parameters) -&gt; string_type</td></tr>
+<tr class="separator:ac8ae98e1c895857633b82985a0214bc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7da6f9b3aaee7cdb57b20968d71275aa"><td class="memTemplParams" colspan="2"><a id="a7da6f9b3aaee7cdb57b20968d71275aa"></a>
+template&lt;typename... Args&gt; </td></tr>
+<tr class="memitem:a7da6f9b3aaee7cdb57b20968d71275aa"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>join</b> (char_type separator, Args &amp;&amp;...args) -&gt; string_type</td></tr>
+<tr class="separator:a7da6f9b3aaee7cdb57b20968d71275aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a01ce84a290b7d8f062e4df728902abfa"><td class="memTemplParams" colspan="2">template&lt;typename T , enable_if&lt; detail::is_like_supported_string&lt; T &gt;&gt;  = 0&gt; </td></tr>
-<tr class="memitem:a01ce84a290b7d8f062e4df728902abfa"><td class="memTemplItemLeft" align="right" valign="top">static constexpr size_type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a01ce84a290b7d8f062e4df728902abfa">size</a> (T &amp;&amp;value)</td></tr>
-<tr class="separator:a01ce84a290b7d8f062e4df728902abfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e50bb6745db448761589840ba8d2492"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a7e50bb6745db448761589840ba8d2492">is_alpha</a> (char_type ch)</td></tr>
-<tr class="separator:a7e50bb6745db448761589840ba8d2492"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac2a7f2d674c1390805e02c4e1b4af19e"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#ac2a7f2d674c1390805e02c4e1b4af19e">is_upper</a> (char_type ch)</td></tr>
-<tr class="separator:ac2a7f2d674c1390805e02c4e1b4af19e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7d8a7ed3c089ff6403a5bb85a1947fd"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#ac7d8a7ed3c089ff6403a5bb85a1947fd">is_lower</a> (char_type ch)</td></tr>
-<tr class="separator:ac7d8a7ed3c089ff6403a5bb85a1947fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fe38a18a63ee464796607c8c187a31a"><td class="memItemLeft" align="right" valign="top">static constexpr char_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a1fe38a18a63ee464796607c8c187a31a">to_upper</a> (char_type ch)</td></tr>
-<tr class="separator:a1fe38a18a63ee464796607c8c187a31a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae7223598069892ad8f701a6397ba7659"><td class="memItemLeft" align="right" valign="top">static constexpr char_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#ae7223598069892ad8f701a6397ba7659">to_lower</a> (char_type ch)</td></tr>
-<tr class="separator:ae7223598069892ad8f701a6397ba7659"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a063bb471ab4167067a6302bac9e1a456"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a063bb471ab4167067a6302bac9e1a456">is_digit</a> (char_type ch)</td></tr>
-<tr class="separator:a063bb471ab4167067a6302bac9e1a456"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c3e5bd7d7cc42418c5d888d83c6a36f"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a1c3e5bd7d7cc42418c5d888d83c6a36f">is_x_digit</a> (char_type ch)</td></tr>
-<tr class="separator:a1c3e5bd7d7cc42418c5d888d83c6a36f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aacf3375a7a732d25a2c28f46abd2c2b6"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#aacf3375a7a732d25a2c28f46abd2c2b6">is_space</a> (char_type ch)</td></tr>
-<tr class="separator:aacf3375a7a732d25a2c28f46abd2c2b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7574cb70c8fbc106034225c4c0b45a25"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; StringType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a7574cb70c8fbc106034225c4c0b45a25">split</a> (view_type input, char_type delimiter)</td></tr>
-<tr class="separator:a7574cb70c8fbc106034225c4c0b45a25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82116d7a93abc2f5893bd478f2c25210"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; StringType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a82116d7a93abc2f5893bd478f2c25210">split</a> (view_type input, char_type delimiter, size_type count)</td></tr>
-<tr class="separator:a82116d7a93abc2f5893bd478f2c25210"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af012575a70e73bb819748add2929fb9f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#af012575a70e73bb819748add2929fb9f">trim</a> (StringType &amp;target)</td></tr>
-<tr class="separator:af012575a70e73bb819748add2929fb9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6e262304fda915d1abfa76f3f31735d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#ac6e262304fda915d1abfa76f3f31735d">replace_all</a> (StringType &amp;target, view_type search, char_type replace)</td></tr>
-<tr class="separator:ac6e262304fda915d1abfa76f3f31735d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdcbd0e7603b9e1c0ddf9d3a17ce12d0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#afdcbd0e7603b9e1c0ddf9d3a17ce12d0">replace_all</a> (StringType &amp;target, view_type search, view_type replace)</td></tr>
-<tr class="separator:afdcbd0e7603b9e1c0ddf9d3a17ce12d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad496bb598d50bcee52a560ab45621869"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#ad496bb598d50bcee52a560ab45621869">remove_all</a> (StringType &amp;target, view_type search)</td></tr>
-<tr class="separator:ad496bb598d50bcee52a560ab45621869"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c09b4a9ef6e0bd648babb1646ce0894"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a7c09b4a9ef6e0bd648babb1646ce0894">wildcard_match</a> (view_type source, view_type search)</td></tr>
-<tr class="separator:a7c09b4a9ef6e0bd648babb1646ce0894"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adab7915d5010b7ce5508ce80d041689f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#adab7915d5010b7ce5508ce80d041689f">validate</a> (view_type value)</td></tr>
-<tr class="separator:adab7915d5010b7ce5508ce80d041689f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a66de183a9d9b0577b22539fd1b575dbe"><td class="memTemplParams" colspan="2">template&lt;typename IteratorType &gt; </td></tr>
-<tr class="memitem:a66de183a9d9b0577b22539fd1b575dbe"><td class="memTemplItemLeft" align="right" valign="top">static std::optional&lt; codepoint_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a66de183a9d9b0577b22539fd1b575dbe">decode_codepoint</a> (IteratorType &amp;it, const IteratorType &amp;end)</td></tr>
-<tr class="separator:a66de183a9d9b0577b22539fd1b575dbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f3abcf860054ae08ce0bc31ece349ab"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; StringType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a7f3abcf860054ae08ce0bc31ece349ab">encode_codepoint</a> (codepoint_type codepoint)</td></tr>
-<tr class="separator:a7f3abcf860054ae08ce0bc31ece349ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4576b56e7b4b086512f02f86c19d42b4"><td class="memTemplParams" colspan="2">template&lt;char UnicodePrefix = 'U'&gt; </td></tr>
-<tr class="memitem:a4576b56e7b4b086512f02f86c19d42b4"><td class="memTemplItemLeft" align="right" valign="top">static std::optional&lt; StringType &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a4576b56e7b4b086512f02f86c19d42b4">escape_all_codepoints</a> (view_type value)</td></tr>
-<tr class="separator:a4576b56e7b4b086512f02f86c19d42b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a017b07c658e113e3b7bfb493b1855b2f"><td class="memTemplParams" colspan="2">template&lt;char UnicodePrefix = 'U', typename IteratorType &gt; </td></tr>
-<tr class="memitem:a017b07c658e113e3b7bfb493b1855b2f"><td class="memTemplItemLeft" align="right" valign="top">static std::optional&lt; StringType &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a017b07c658e113e3b7bfb493b1855b2f">escape_codepoint</a> (IteratorType &amp;it, const IteratorType &amp;end)</td></tr>
-<tr class="separator:a017b07c658e113e3b7bfb493b1855b2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c1cd7927f49c82231891d5a722b739b"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; StringType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a8c1cd7927f49c82231891d5a722b739b">unescape_all_codepoints</a> (view_type value)</td></tr>
-<tr class="separator:a8c1cd7927f49c82231891d5a722b739b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab15fd6e9185f7bb3f1eb7e1473f86107"><td class="memTemplParams" colspan="2">template&lt;typename IteratorType &gt; </td></tr>
-<tr class="memitem:ab15fd6e9185f7bb3f1eb7e1473f86107"><td class="memTemplItemLeft" align="right" valign="top">static std::optional&lt; StringType &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#ab15fd6e9185f7bb3f1eb7e1473f86107">unescape_codepoint</a> (IteratorType &amp;it, const IteratorType &amp;end)</td></tr>
-<tr class="separator:ab15fd6e9185f7bb3f1eb7e1473f86107"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae95f7f2e4dd207a9f42312c15dfc0b2"><td class="memItemLeft" align="right" valign="top">static StringType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#aae95f7f2e4dd207a9f42312c15dfc0b2">generate_random_string</a> (size_type length)</td></tr>
-<tr class="separator:aae95f7f2e4dd207a9f42312c15dfc0b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca6f98cb3e4f612d23f9f309436499f9"><td class="memTemplParams" colspan="2">template&lt;typename... ParameterTypes&gt; </td></tr>
-<tr class="memitem:aca6f98cb3e4f612d23f9f309436499f9"><td class="memTemplItemLeft" align="right" valign="top">static StringType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#aca6f98cb3e4f612d23f9f309436499f9">format</a> (<a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">FormatString</a>&lt; ParameterTypes... &gt; &amp;&amp;fmt, ParameterTypes &amp;&amp;...parameters)</td></tr>
-<tr class="separator:aca6f98cb3e4f612d23f9f309436499f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62209dbbae5f1faba54f5ed170c92086"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
-<tr class="memitem:a62209dbbae5f1faba54f5ed170c92086"><td class="memTemplItemLeft" align="right" valign="top">static StringType&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a62209dbbae5f1faba54f5ed170c92086">join</a> (char_type separator, Args &amp;&amp;...args)</td></tr>
-<tr class="separator:a62209dbbae5f1faba54f5ed170c92086"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a812cee25db27fc85801984dc4bbe1f52"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a812cee25db27fc85801984dc4bbe1f52"><td class="memTemplItemLeft" align="right" valign="top">static std::optional&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a812cee25db27fc85801984dc4bbe1f52">convert</a> (const StringType &amp;value)</td></tr>
-<tr class="separator:a812cee25db27fc85801984dc4bbe1f52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74b3b0cb7ee30de49967ff6adf8a6460"><td class="memTemplParams" colspan="2">template&lt;StandardStringLike T&gt; </td></tr>
+<tr class="memitem:a74b3b0cb7ee30de49967ff6adf8a6460"><td class="memTemplItemLeft" align="right" valign="top">static constexpr size_type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a74b3b0cb7ee30de49967ff6adf8a6460">size</a> (T &amp;&amp;value)</td></tr>
+<tr class="separator:a74b3b0cb7ee30de49967ff6adf8a6460"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b9dcbee59e2f52895021158120988e6"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a7b9dcbee59e2f52895021158120988e6">is_alpha</a> (char_type ch)</td></tr>
+<tr class="separator:a7b9dcbee59e2f52895021158120988e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b0bc79807bbcf63c2dacfc7088b8e82"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a3b0bc79807bbcf63c2dacfc7088b8e82">is_upper</a> (char_type ch)</td></tr>
+<tr class="separator:a3b0bc79807bbcf63c2dacfc7088b8e82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae336d7abb3e980acc675b4dadf8d064a"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#ae336d7abb3e980acc675b4dadf8d064a">is_lower</a> (char_type ch)</td></tr>
+<tr class="separator:ae336d7abb3e980acc675b4dadf8d064a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd362bfc2655b806fbc43eb0a0e224d1"><td class="memItemLeft" align="right" valign="top">static constexpr char_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#abd362bfc2655b806fbc43eb0a0e224d1">to_upper</a> (char_type ch)</td></tr>
+<tr class="separator:abd362bfc2655b806fbc43eb0a0e224d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8affa6281a09010a3d70cf85e09ca151"><td class="memItemLeft" align="right" valign="top">static constexpr char_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a8affa6281a09010a3d70cf85e09ca151">to_lower</a> (char_type ch)</td></tr>
+<tr class="separator:a8affa6281a09010a3d70cf85e09ca151"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8df3b30785d6a1c17d4fa6268b3984dd"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a8df3b30785d6a1c17d4fa6268b3984dd">is_digit</a> (char_type ch)</td></tr>
+<tr class="separator:a8df3b30785d6a1c17d4fa6268b3984dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbaa9bf55cfb04d6858d697d11ba9dc2"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#afbaa9bf55cfb04d6858d697d11ba9dc2">is_x_digit</a> (char_type ch)</td></tr>
+<tr class="separator:afbaa9bf55cfb04d6858d697d11ba9dc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6eaaceed4066e5ada1a834a78a02993b"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a6eaaceed4066e5ada1a834a78a02993b">is_space</a> (char_type ch)</td></tr>
+<tr class="separator:a6eaaceed4066e5ada1a834a78a02993b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4596b45423b5242f32a5a47c4161e34"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; string_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#ad4596b45423b5242f32a5a47c4161e34">split</a> (view_type input, char_type delimiter)</td></tr>
+<tr class="separator:ad4596b45423b5242f32a5a47c4161e34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a222e8c0e173f63f4d1a1edb266d86bb8"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; string_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a222e8c0e173f63f4d1a1edb266d86bb8">split</a> (view_type input, char_type delimiter, size_type count)</td></tr>
+<tr class="separator:a222e8c0e173f63f4d1a1edb266d86bb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96739670960f3963064f5e76d8606688"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a96739670960f3963064f5e76d8606688">trim</a> (string_type &amp;target)</td></tr>
+<tr class="separator:a96739670960f3963064f5e76d8606688"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a524ce1d4cc3d62efcd6a26046fb74800"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a524ce1d4cc3d62efcd6a26046fb74800">replace_all</a> (string_type &amp;target, view_type search, char_type replace)</td></tr>
+<tr class="separator:a524ce1d4cc3d62efcd6a26046fb74800"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a287001989634a14b131bfddecb65c263"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a287001989634a14b131bfddecb65c263">replace_all</a> (string_type &amp;target, view_type search, view_type replace)</td></tr>
+<tr class="separator:a287001989634a14b131bfddecb65c263"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f774aee270f844b2fe75ec2feed7d6a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a1f774aee270f844b2fe75ec2feed7d6a">remove_all</a> (string_type &amp;target, view_type search)</td></tr>
+<tr class="separator:a1f774aee270f844b2fe75ec2feed7d6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef0631f046cf93b4dd352334eb281467"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#aef0631f046cf93b4dd352334eb281467">wildcard_match</a> (view_type source, view_type search)</td></tr>
+<tr class="separator:aef0631f046cf93b4dd352334eb281467"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fa6f9ccfa3d8f00b0d765793d6cd6a8"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a8fa6f9ccfa3d8f00b0d765793d6cd6a8">validate</a> (view_type value)</td></tr>
+<tr class="separator:a8fa6f9ccfa3d8f00b0d765793d6cd6a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ba96a31f302976ba37a4b86d0350bf4"><td class="memTemplParams" colspan="2">template&lt;typename IteratorType &gt; </td></tr>
+<tr class="memitem:a9ba96a31f302976ba37a4b86d0350bf4"><td class="memTemplItemLeft" align="right" valign="top">static std::optional&lt; codepoint_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a9ba96a31f302976ba37a4b86d0350bf4">decode_codepoint</a> (IteratorType &amp;it, const IteratorType &amp;end)</td></tr>
+<tr class="separator:a9ba96a31f302976ba37a4b86d0350bf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84ddbf0e5de084910eaad87c45898224"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; string_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a84ddbf0e5de084910eaad87c45898224">encode_codepoint</a> (codepoint_type codepoint)</td></tr>
+<tr class="separator:a84ddbf0e5de084910eaad87c45898224"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaac25736f21d48819e13da66dc84f7e9"><td class="memTemplParams" colspan="2">template&lt;char UnicodePrefix = 'U'&gt; </td></tr>
+<tr class="memitem:aaac25736f21d48819e13da66dc84f7e9"><td class="memTemplItemLeft" align="right" valign="top">static std::optional&lt; string_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#aaac25736f21d48819e13da66dc84f7e9">escape_all_codepoints</a> (view_type value)</td></tr>
+<tr class="separator:aaac25736f21d48819e13da66dc84f7e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cd72da2251809ada465971c3d1909b0"><td class="memTemplParams" colspan="2">template&lt;char UnicodePrefix = 'U', typename IteratorType &gt; </td></tr>
+<tr class="memitem:a6cd72da2251809ada465971c3d1909b0"><td class="memTemplItemLeft" align="right" valign="top">static std::optional&lt; string_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a6cd72da2251809ada465971c3d1909b0">escape_codepoint</a> (IteratorType &amp;it, const IteratorType &amp;end)</td></tr>
+<tr class="separator:a6cd72da2251809ada465971c3d1909b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b35cb8a4c26be5ba0a52feb5374ad77"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; string_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a7b35cb8a4c26be5ba0a52feb5374ad77">unescape_all_codepoints</a> (view_type value)</td></tr>
+<tr class="separator:a7b35cb8a4c26be5ba0a52feb5374ad77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fe0f27abdcf915410e02ba193db498e"><td class="memTemplParams" colspan="2">template&lt;typename IteratorType &gt; </td></tr>
+<tr class="memitem:a4fe0f27abdcf915410e02ba193db498e"><td class="memTemplItemLeft" align="right" valign="top">static std::optional&lt; string_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a4fe0f27abdcf915410e02ba193db498e">unescape_codepoint</a> (IteratorType &amp;it, const IteratorType &amp;end)</td></tr>
+<tr class="separator:a4fe0f27abdcf915410e02ba193db498e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a827ace4ffc68fa90332ced117d8f458b"><td class="memItemLeft" align="right" valign="top">static string_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a827ace4ffc68fa90332ced117d8f458b">generate_random_string</a> (size_type length)</td></tr>
+<tr class="separator:a827ace4ffc68fa90332ced117d8f458b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30b604da44c9309c4737739e8063ba81"><td class="memTemplParams" colspan="2">template&lt;typename... ParameterTypes&gt; </td></tr>
+<tr class="memitem:a30b604da44c9309c4737739e8063ba81"><td class="memTemplItemLeft" align="right" valign="top">static string_type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a30b604da44c9309c4737739e8063ba81">format</a> (<a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">FormatString</a>&lt; ParameterTypes... &gt; &amp;&amp;fmt, ParameterTypes &amp;&amp;...parameters)</td></tr>
+<tr class="separator:a30b604da44c9309c4737739e8063ba81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9bdcbd266a8e41db419f0884da2d011"><td class="memTemplParams" colspan="2">template&lt;typename OutputIterator , typename... ParameterTypes&gt; </td></tr>
+<tr class="memitem:aa9bdcbd266a8e41db419f0884da2d011"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#aa9bdcbd266a8e41db419f0884da2d011">format_to</a> (OutputIterator output, <a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">FormatString</a>&lt; ParameterTypes... &gt; &amp;&amp;fmt, ParameterTypes &amp;&amp;...parameters)</td></tr>
+<tr class="separator:aa9bdcbd266a8e41db419f0884da2d011"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace38381ce149a0934c2072387f2a2873"><td class="memTemplParams" colspan="2">template&lt;typename... Args&gt; </td></tr>
+<tr class="memitem:ace38381ce149a0934c2072387f2a2873"><td class="memTemplItemLeft" align="right" valign="top">static string_type&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#ace38381ce149a0934c2072387f2a2873">join</a> (char_type separator, Args &amp;&amp;...args)</td></tr>
+<tr class="separator:ace38381ce149a0934c2072387f2a2873"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51c1bbe6fd507f45133157d82250f4a3"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a51c1bbe6fd507f45133157d82250f4a3"><td class="memTemplItemLeft" align="right" valign="top">static std::optional&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1_basic_string.html#a51c1bbe6fd507f45133157d82250f4a3">convert</a> (const string_type &amp;value)</td></tr>
+<tr class="separator:a51c1bbe6fd507f45133157d82250f4a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename StringType&gt;<br />
-class fly::BasicString&lt; StringType &gt;</h3>
+<div class="textblock"><h3>template&lt;StandardCharacter CharType&gt;<br />
+class fly::BasicString&lt; CharType &gt;</h3>
 
-<p>Forward declarations of the supported <a class="el" href="classfly_1_1_basic_string.html">BasicString</a> specializations.</p>
 <p>Static class to provide string utilities not provided by the STL.</p>
 <dl class="section author"><dt>Author</dt><dd>Timothy Flynn (<a href="#" onclick="location.href='mai'+'lto:'+'trf'+'ly'+'nn8'+'9@'+'pm.'+'me'; return false;">trfly<span style="display: none;">.nosp@m.</span>nn89<span style="display: none;">.nosp@m.</span>@pm.m<span style="display: none;">.nosp@m.</span>e</a>) </dd></dl>
 <dl class="section version"><dt>Version</dt><dd>March 21, 2019 </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a812cee25db27fc85801984dc4bbe1f52"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a812cee25db27fc85801984dc4bbe1f52">&#9670;&nbsp;</a></span>convert()</h2>
+<a id="a51c1bbe6fd507f45133157d82250f4a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51c1bbe6fd507f45133157d82250f4a3">&#9670;&nbsp;</a></span>convert()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <div class="memtemplate">
 template&lt;typename T &gt; </div>
 <table class="mlabels">
@@ -220,9 +242,9 @@ template&lt;typename T &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::optional&lt; T &gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::convert </td>
+          <td class="memname">std::optional&lt; T &gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::convert </td>
           <td>(</td>
-          <td class="paramtype">const StringType &amp;&#160;</td>
+          <td class="paramtype">const string_type &amp;&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
           <td></td>
         </tr>
@@ -250,13 +272,13 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="a66de183a9d9b0577b22539fd1b575dbe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a66de183a9d9b0577b22539fd1b575dbe">&#9670;&nbsp;</a></span>decode_codepoint()</h2>
+<a id="a9ba96a31f302976ba37a4b86d0350bf4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ba96a31f302976ba37a4b86d0350bf4">&#9670;&nbsp;</a></span>decode_codepoint()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <div class="memtemplate">
 template&lt;typename IteratorType &gt; </div>
 <table class="mlabels">
@@ -264,7 +286,7 @@ template&lt;typename IteratorType &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static std::optional&lt;codepoint_type&gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::decode_codepoint </td>
+          <td class="memname">static std::optional&lt;codepoint_type&gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::decode_codepoint </td>
           <td>(</td>
           <td class="paramtype">IteratorType &amp;&#160;</td>
           <td class="paramname"><em>it</em>, </td>
@@ -305,19 +327,19 @@ template&lt;typename IteratorType &gt; </div>
 
 </div>
 </div>
-<a id="a7f3abcf860054ae08ce0bc31ece349ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7f3abcf860054ae08ce0bc31ece349ab">&#9670;&nbsp;</a></span>encode_codepoint()</h2>
+<a id="a84ddbf0e5de084910eaad87c45898224"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84ddbf0e5de084910eaad87c45898224">&#9670;&nbsp;</a></span>encode_codepoint()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::optional&lt; StringType &gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::encode_codepoint </td>
+          <td class="memname">auto <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::encode_codepoint </td>
           <td>(</td>
           <td class="paramtype">codepoint_type&#160;</td>
           <td class="paramname"><em>codepoint</em></td><td>)</td>
@@ -341,21 +363,21 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="a4576b56e7b4b086512f02f86c19d42b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4576b56e7b4b086512f02f86c19d42b4">&#9670;&nbsp;</a></span>escape_all_codepoints()</h2>
+<a id="aaac25736f21d48819e13da66dc84f7e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaac25736f21d48819e13da66dc84f7e9">&#9670;&nbsp;</a></span>escape_all_codepoints()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <div class="memtemplate">
-template&lt;char UnicodePrefix&gt; </div>
+template&lt;char UnicodePrefix = 'U'&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::optional&lt; StringType &gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::escape_all_codepoints </td>
+          <td class="memname">static std::optional&lt;string_type&gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::escape_all_codepoints </td>
           <td>(</td>
           <td class="paramtype">view_type&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
@@ -392,21 +414,21 @@ template&lt;char UnicodePrefix&gt; </div>
 
 </div>
 </div>
-<a id="a017b07c658e113e3b7bfb493b1855b2f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a017b07c658e113e3b7bfb493b1855b2f">&#9670;&nbsp;</a></span>escape_codepoint()</h2>
+<a id="a6cd72da2251809ada465971c3d1909b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6cd72da2251809ada465971c3d1909b0">&#9670;&nbsp;</a></span>escape_codepoint()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <div class="memtemplate">
-template&lt;char UnicodePrefix, typename IteratorType &gt; </div>
+template&lt;char UnicodePrefix = 'U', typename IteratorType &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::optional&lt; StringType &gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::escape_codepoint </td>
+          <td class="memname">static std::optional&lt;string_type&gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::escape_codepoint </td>
           <td>(</td>
           <td class="paramtype">IteratorType &amp;&#160;</td>
           <td class="paramname"><em>it</em>, </td>
@@ -425,7 +447,7 @@ template&lt;char UnicodePrefix, typename IteratorType &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -455,13 +477,13 @@ template&lt;char UnicodePrefix, typename IteratorType &gt; </div>
 
 </div>
 </div>
-<a id="aca6f98cb3e4f612d23f9f309436499f9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aca6f98cb3e4f612d23f9f309436499f9">&#9670;&nbsp;</a></span>format()</h2>
+<a id="a30b604da44c9309c4737739e8063ba81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30b604da44c9309c4737739e8063ba81">&#9670;&nbsp;</a></span>format()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <div class="memtemplate">
 template&lt;typename... ParameterTypes&gt; </div>
 <table class="mlabels">
@@ -469,7 +491,7 @@ template&lt;typename... ParameterTypes&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">StringType <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::format </td>
+          <td class="memname">static string_type <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::format </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">FormatString</a>&lt; ParameterTypes... &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>fmt</em>, </td>
@@ -500,18 +522,50 @@ template&lt;typename... ParameterTypes&gt; </div>
 2. An optional non-negative position.
 3. An optional colon ":" following by formatting options.
 4. A final "}" character.
-</pre><p> For a detailed description of replacement fields see <a class="el" href="structfly_1_1detail_1_1_basic_format_specifier.html">fly::detail::BasicFormatSpecifier</a>.</p>
+</pre><p> For a detailed description of replacement fields, see <a class="el" href="structfly_1_1detail_1_1_basic_format_specifier.html">fly::detail::BasicFormatSpecifier</a>.</p>
 <p>This implementation differs from std::format in the following ways:</p>
 <ol type="1">
 <li>All standard string types are supported as format strings.</li>
 <li>All standard string types are supported as format parameters, even if that type differs from the format string type. If the type differs, the format parameter is transcoded to the type of the format string.</li>
-<li>Any generic type for which an operator&lt;&lt; overload is defined will be converted to a string using that overload.</li>
-<li>Formatting of strong enumeration types defaults to the format of the enumeration's underlying type. However, if an overload of operator&lt;&lt; is defined, the type is treated as a generic type according to (3) above.</li>
 <li>This implementation is exceptionless. Any error encountered (such as failed transcoding in (2) above) results in the format parameter that caused the error to be dropped.</li>
 <li>Locale-specific form is not supported. If the option appears in the format string, it will be parsed, but will be ignored.</li>
 </ol>
-<p>The format string type is implicitly constructed from a C-string literal. Callers should only invoke this method accordingly: </p><pre class="fragment">format("Format {:d}", 1);
+<p>The format string type is implicitly constructed from a C-string literal. Callers should only invoke this method accordingly: </p><pre class="fragment">fly::String::format("Format {:d}", 1);
 </pre><p> On compilers that support immediate functions (consteval), the format string is validated at compile time against the types of the format parameters. If the format string is invalid, a compile error with a diagnostic message will be raised. On other compilers, the error message will be returned rather than a formatted string.</p>
+<p>Replacement fields for user-defined types are parsed at runtime. To format a user-defined type, a <a class="el" href="structfly_1_1_formatter.html">fly::Formatter</a> specialization must be defined, analagous to std::formatter. The specialization may extend a standard <a class="el" href="structfly_1_1_formatter.html">fly::Formatter</a>, for example: </p><pre class="fragment">template &lt;typename CharType&gt;
+struct fly::Formatter&lt;MyType, CharType&gt; : public fly::Formatter&lt;int, CharType&gt;
+{
+    template &lt;typename FormatContext&gt;
+    void format(const MyType &amp;value, FormatContext &amp;context)
+    {
+        fly::Formatter&lt;int, CharType&gt;::format(value.as_int(), context);
+    }
+};
+</pre><p> Or, the formatter may be defined without without inheritence: </p><pre class="fragment">template &lt;typename CharType&gt;
+struct fly::Formatter&lt;MyType, CharType&gt;
+{
+    bool m_option {false};
+
+    template &lt;typename FormatParseContext&gt;
+    constexpr void parse(FormatParseContext &amp;context)
+    {
+        if (context.lexer().consume_if(FLY_CHR(CharType, 'o')))
+        {
+            m_option = true;
+        }
+        if (!context.lexer().consume_if(FLY_CHR(CharType, '}')))
+        {
+            context.on_error("UserDefinedTypeWithParser error!");
+        }
+    }
+
+    template &lt;typename FormatContext&gt;
+    void format(const MyType &amp;value, FormatContext &amp;context)
+    {
+        fly::BasicString&lt;CharType&gt;::format_to(context.out(), "{}", value.as_int());
+    }
+};
+</pre><p> The |parse| method is optional. If defined, it is provided a BasicFormatParseContext which contains a lexer that may be used to parse the format string. The lexer is positioned such that it is pointed at the first character after the ":" in the replacement field (if there is one), or after the opening "{" character. The |parse| method is expected to consume up to and including the closing "}" character. It may indicate any parsing errors through the parsing context; if an error occurs, the error is written to the formatted string, and formatting will halt.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">ParameterTypes</td><td>Variadic format parameter types.</td></tr>
@@ -529,19 +583,83 @@ template&lt;typename... ParameterTypes&gt; </div>
 
 </div>
 </div>
-<a id="aae95f7f2e4dd207a9f42312c15dfc0b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aae95f7f2e4dd207a9f42312c15dfc0b2">&#9670;&nbsp;</a></span>generate_random_string()</h2>
+<a id="aa9bdcbd266a8e41db419f0884da2d011"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9bdcbd266a8e41db419f0884da2d011">&#9670;&nbsp;</a></span>format_to()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
+<div class="memtemplate">
+template&lt;typename OutputIterator , typename... ParameterTypes&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">StringType <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::generate_random_string </td>
+          <td class="memname">void <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::format_to </td>
+          <td>(</td>
+          <td class="paramtype">OutputIterator&#160;</td>
+          <td class="paramname"><em>output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classfly_1_1detail_1_1_basic_format_string.html">FormatString</a>&lt; ParameterTypes... &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>fmt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ParameterTypes &amp;&amp;...&#160;</td>
+          <td class="paramname"><em>parameters</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Format a string with a set of format parameters to an existing output iterator. Based strongly upon: <a href="https://en.cppreference.com/w/cpp/utility/format/format">https://en.cppreference.com/w/cpp/utility/format/format</a>.</p>
+<p>For a detailed description of string formatting, see <a class="el" href="classfly_1_1_basic_string.html#a30b604da44c9309c4737739e8063ba81">fly::BasicString::format</a>.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">OutputIterator</td><td>The type of the output iterator. </td></tr>
+    <tr><td class="paramname">ParameterTypes</td><td>Variadic format parameter types.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">output</td><td>The output iterator to write to. </td></tr>
+    <tr><td class="paramname">fmt</td><td>The string to format. </td></tr>
+    <tr><td class="paramname">parameters</td><td>The variadic list of format parameters to be formatted.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A string that has been formatted with the given format parameters. </dd></dl>
+
+</div>
+</div>
+<a id="a827ace4ffc68fa90332ced117d8f458b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a827ace4ffc68fa90332ced117d8f458b">&#9670;&nbsp;</a></span>generate_random_string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;StandardCharacter CharType&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::generate_random_string </td>
           <td>(</td>
           <td class="paramtype">size_type&#160;</td>
           <td class="paramname"><em>length</em></td><td>)</td>
@@ -565,19 +683,19 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="a7e50bb6745db448761589840ba8d2492"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7e50bb6745db448761589840ba8d2492">&#9670;&nbsp;</a></span>is_alpha()</h2>
+<a id="a7b9dcbee59e2f52895021158120988e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b9dcbee59e2f52895021158120988e6">&#9670;&nbsp;</a></span>is_alpha()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::is_alpha </td>
+          <td class="memname">constexpr bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::is_alpha </td>
           <td>(</td>
           <td class="paramtype">char_type&#160;</td>
           <td class="paramname"><em>ch</em></td><td>)</td>
@@ -586,7 +704,7 @@ template&lt;typename StringType &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -602,19 +720,19 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="a063bb471ab4167067a6302bac9e1a456"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a063bb471ab4167067a6302bac9e1a456">&#9670;&nbsp;</a></span>is_digit()</h2>
+<a id="a8df3b30785d6a1c17d4fa6268b3984dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8df3b30785d6a1c17d4fa6268b3984dd">&#9670;&nbsp;</a></span>is_digit()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::is_digit </td>
+          <td class="memname">constexpr bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::is_digit </td>
           <td>(</td>
           <td class="paramtype">char_type&#160;</td>
           <td class="paramname"><em>ch</em></td><td>)</td>
@@ -623,7 +741,7 @@ template&lt;typename StringType &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -639,19 +757,19 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="ac7d8a7ed3c089ff6403a5bb85a1947fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac7d8a7ed3c089ff6403a5bb85a1947fd">&#9670;&nbsp;</a></span>is_lower()</h2>
+<a id="ae336d7abb3e980acc675b4dadf8d064a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae336d7abb3e980acc675b4dadf8d064a">&#9670;&nbsp;</a></span>is_lower()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::is_lower </td>
+          <td class="memname">constexpr bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::is_lower </td>
           <td>(</td>
           <td class="paramtype">char_type&#160;</td>
           <td class="paramname"><em>ch</em></td><td>)</td>
@@ -660,7 +778,7 @@ template&lt;typename StringType &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -676,19 +794,19 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="aacf3375a7a732d25a2c28f46abd2c2b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aacf3375a7a732d25a2c28f46abd2c2b6">&#9670;&nbsp;</a></span>is_space()</h2>
+<a id="a6eaaceed4066e5ada1a834a78a02993b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6eaaceed4066e5ada1a834a78a02993b">&#9670;&nbsp;</a></span>is_space()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::is_space </td>
+          <td class="memname">constexpr bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::is_space </td>
           <td>(</td>
           <td class="paramtype">char_type&#160;</td>
           <td class="paramname"><em>ch</em></td><td>)</td>
@@ -697,7 +815,7 @@ template&lt;typename StringType &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -713,19 +831,19 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="ac2a7f2d674c1390805e02c4e1b4af19e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac2a7f2d674c1390805e02c4e1b4af19e">&#9670;&nbsp;</a></span>is_upper()</h2>
+<a id="a3b0bc79807bbcf63c2dacfc7088b8e82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b0bc79807bbcf63c2dacfc7088b8e82">&#9670;&nbsp;</a></span>is_upper()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::is_upper </td>
+          <td class="memname">constexpr bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::is_upper </td>
           <td>(</td>
           <td class="paramtype">char_type&#160;</td>
           <td class="paramname"><em>ch</em></td><td>)</td>
@@ -734,7 +852,7 @@ template&lt;typename StringType &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -750,19 +868,19 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="a1c3e5bd7d7cc42418c5d888d83c6a36f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1c3e5bd7d7cc42418c5d888d83c6a36f">&#9670;&nbsp;</a></span>is_x_digit()</h2>
+<a id="afbaa9bf55cfb04d6858d697d11ba9dc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbaa9bf55cfb04d6858d697d11ba9dc2">&#9670;&nbsp;</a></span>is_x_digit()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::is_x_digit </td>
+          <td class="memname">constexpr bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::is_x_digit </td>
           <td>(</td>
           <td class="paramtype">char_type&#160;</td>
           <td class="paramname"><em>ch</em></td><td>)</td>
@@ -771,7 +889,7 @@ template&lt;typename StringType &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -787,13 +905,13 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="a62209dbbae5f1faba54f5ed170c92086"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a62209dbbae5f1faba54f5ed170c92086">&#9670;&nbsp;</a></span>join()</h2>
+<a id="ace38381ce149a0934c2072387f2a2873"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace38381ce149a0934c2072387f2a2873">&#9670;&nbsp;</a></span>join()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <div class="memtemplate">
 template&lt;typename... Args&gt; </div>
 <table class="mlabels">
@@ -801,7 +919,7 @@ template&lt;typename... Args&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">StringType <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::join </td>
+          <td class="memname">static string_type <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::join </td>
           <td>(</td>
           <td class="paramtype">char_type&#160;</td>
           <td class="paramname"><em>separator</em>, </td>
@@ -820,7 +938,7 @@ template&lt;typename... Args&gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -842,21 +960,21 @@ template&lt;typename... Args&gt; </div>
 
 </div>
 </div>
-<a id="ad496bb598d50bcee52a560ab45621869"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad496bb598d50bcee52a560ab45621869">&#9670;&nbsp;</a></span>remove_all()</h2>
+<a id="a1f774aee270f844b2fe75ec2feed7d6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f774aee270f844b2fe75ec2feed7d6a">&#9670;&nbsp;</a></span>remove_all()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::remove_all </td>
+          <td class="memname">void <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::remove_all </td>
           <td>(</td>
-          <td class="paramtype">StringType &amp;&#160;</td>
+          <td class="paramtype">string_type &amp;&#160;</td>
           <td class="paramname"><em>target</em>, </td>
         </tr>
         <tr>
@@ -888,21 +1006,21 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="ac6e262304fda915d1abfa76f3f31735d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac6e262304fda915d1abfa76f3f31735d">&#9670;&nbsp;</a></span>replace_all() <span class="overload">[1/2]</span></h2>
+<a id="a524ce1d4cc3d62efcd6a26046fb74800"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a524ce1d4cc3d62efcd6a26046fb74800">&#9670;&nbsp;</a></span>replace_all() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::replace_all </td>
+          <td class="memname">void <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::replace_all </td>
           <td>(</td>
-          <td class="paramtype">StringType &amp;&#160;</td>
+          <td class="paramtype">string_type &amp;&#160;</td>
           <td class="paramname"><em>target</em>, </td>
         </tr>
         <tr>
@@ -941,21 +1059,21 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="afdcbd0e7603b9e1c0ddf9d3a17ce12d0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afdcbd0e7603b9e1c0ddf9d3a17ce12d0">&#9670;&nbsp;</a></span>replace_all() <span class="overload">[2/2]</span></h2>
+<a id="a287001989634a14b131bfddecb65c263"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a287001989634a14b131bfddecb65c263">&#9670;&nbsp;</a></span>replace_all() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::replace_all </td>
+          <td class="memname">void <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::replace_all </td>
           <td>(</td>
-          <td class="paramtype">StringType &amp;&#160;</td>
+          <td class="paramtype">string_type &amp;&#160;</td>
           <td class="paramname"><em>target</em>, </td>
         </tr>
         <tr>
@@ -994,21 +1112,21 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="a01ce84a290b7d8f062e4df728902abfa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01ce84a290b7d8f062e4df728902abfa">&#9670;&nbsp;</a></span>size()</h2>
+<a id="a74b3b0cb7ee30de49967ff6adf8a6460"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74b3b0cb7ee30de49967ff6adf8a6460">&#9670;&nbsp;</a></span>size()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <div class="memtemplate">
-template&lt;typename T , enable_if&lt; detail::is_like_supported_string&lt; T &gt;&gt;  = 0&gt; </div>
+template&lt;StandardStringLike T&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static constexpr size_type <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::size </td>
+          <td class="memname">static constexpr size_type <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::size </td>
           <td>(</td>
           <td class="paramtype">T &amp;&amp;&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
@@ -1038,19 +1156,19 @@ template&lt;typename T , enable_if&lt; detail::is_like_supported_string&lt; T &g
 
 </div>
 </div>
-<a id="a7574cb70c8fbc106034225c4c0b45a25"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7574cb70c8fbc106034225c4c0b45a25">&#9670;&nbsp;</a></span>split() <span class="overload">[1/2]</span></h2>
+<a id="ad4596b45423b5242f32a5a47c4161e34"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4596b45423b5242f32a5a47c4161e34">&#9670;&nbsp;</a></span>split() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; StringType &gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::split </td>
+          <td class="memname">auto <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::split </td>
           <td>(</td>
           <td class="paramtype">view_type&#160;</td>
           <td class="paramname"><em>input</em>, </td>
@@ -1085,19 +1203,19 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="a82116d7a93abc2f5893bd478f2c25210"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a82116d7a93abc2f5893bd478f2c25210">&#9670;&nbsp;</a></span>split() <span class="overload">[2/2]</span></h2>
+<a id="a222e8c0e173f63f4d1a1edb266d86bb8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a222e8c0e173f63f4d1a1edb266d86bb8">&#9670;&nbsp;</a></span>split() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; StringType &gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::split </td>
+          <td class="memname">auto <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::split </td>
           <td>(</td>
           <td class="paramtype">view_type&#160;</td>
           <td class="paramname"><em>input</em>, </td>
@@ -1139,19 +1257,19 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="ae7223598069892ad8f701a6397ba7659"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae7223598069892ad8f701a6397ba7659">&#9670;&nbsp;</a></span>to_lower()</h2>
+<a id="a8affa6281a09010a3d70cf85e09ca151"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8affa6281a09010a3d70cf85e09ca151">&#9670;&nbsp;</a></span>to_lower()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr auto <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::to_lower </td>
+          <td class="memname">constexpr auto <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::to_lower </td>
           <td>(</td>
           <td class="paramtype">char_type&#160;</td>
           <td class="paramname"><em>ch</em></td><td>)</td>
@@ -1160,7 +1278,7 @@ template&lt;typename StringType &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -1176,19 +1294,19 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="a1fe38a18a63ee464796607c8c187a31a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1fe38a18a63ee464796607c8c187a31a">&#9670;&nbsp;</a></span>to_upper()</h2>
+<a id="abd362bfc2655b806fbc43eb0a0e224d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abd362bfc2655b806fbc43eb0a0e224d1">&#9670;&nbsp;</a></span>to_upper()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr auto <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::to_upper </td>
+          <td class="memname">constexpr auto <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::to_upper </td>
           <td>(</td>
           <td class="paramtype">char_type&#160;</td>
           <td class="paramname"><em>ch</em></td><td>)</td>
@@ -1197,7 +1315,7 @@ template&lt;typename StringType &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -1213,21 +1331,21 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="af012575a70e73bb819748add2929fb9f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af012575a70e73bb819748add2929fb9f">&#9670;&nbsp;</a></span>trim()</h2>
+<a id="a96739670960f3963064f5e76d8606688"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96739670960f3963064f5e76d8606688">&#9670;&nbsp;</a></span>trim()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::trim </td>
+          <td class="memname">void <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::trim </td>
           <td>(</td>
-          <td class="paramtype">StringType &amp;&#160;</td>
+          <td class="paramtype">string_type &amp;&#160;</td>
           <td class="paramname"><em>target</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1248,19 +1366,19 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="a8c1cd7927f49c82231891d5a722b739b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c1cd7927f49c82231891d5a722b739b">&#9670;&nbsp;</a></span>unescape_all_codepoints()</h2>
+<a id="a7b35cb8a4c26be5ba0a52feb5374ad77"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b35cb8a4c26be5ba0a52feb5374ad77">&#9670;&nbsp;</a></span>unescape_all_codepoints()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::optional&lt; StringType &gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::unescape_all_codepoints </td>
+          <td class="memname">auto <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::unescape_all_codepoints </td>
           <td>(</td>
           <td class="paramtype">view_type&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
@@ -1287,13 +1405,13 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="ab15fd6e9185f7bb3f1eb7e1473f86107"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab15fd6e9185f7bb3f1eb7e1473f86107">&#9670;&nbsp;</a></span>unescape_codepoint()</h2>
+<a id="a4fe0f27abdcf915410e02ba193db498e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fe0f27abdcf915410e02ba193db498e">&#9670;&nbsp;</a></span>unescape_codepoint()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <div class="memtemplate">
 template&lt;typename IteratorType &gt; </div>
 <table class="mlabels">
@@ -1301,7 +1419,7 @@ template&lt;typename IteratorType &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::optional&lt; StringType &gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::unescape_codepoint </td>
+          <td class="memname">static std::optional&lt;string_type&gt; <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::unescape_codepoint </td>
           <td>(</td>
           <td class="paramtype">IteratorType &amp;&#160;</td>
           <td class="paramname"><em>it</em>, </td>
@@ -1320,7 +1438,7 @@ template&lt;typename IteratorType &gt; </div>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -1345,19 +1463,19 @@ template&lt;typename IteratorType &gt; </div>
 
 </div>
 </div>
-<a id="adab7915d5010b7ce5508ce80d041689f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adab7915d5010b7ce5508ce80d041689f">&#9670;&nbsp;</a></span>validate()</h2>
+<a id="a8fa6f9ccfa3d8f00b0d765793d6cd6a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fa6f9ccfa3d8f00b0d765793d6cd6a8">&#9670;&nbsp;</a></span>validate()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::validate </td>
+          <td class="memname">bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::validate </td>
           <td>(</td>
           <td class="paramtype">view_type&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
@@ -1381,19 +1499,19 @@ template&lt;typename StringType &gt; </div>
 
 </div>
 </div>
-<a id="a7c09b4a9ef6e0bd648babb1646ce0894"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7c09b4a9ef6e0bd648babb1646ce0894">&#9670;&nbsp;</a></span>wildcard_match()</h2>
+<a id="aef0631f046cf93b4dd352334eb281467"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef0631f046cf93b4dd352334eb281467">&#9670;&nbsp;</a></span>wildcard_match()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename StringType &gt; </div>
+template&lt;StandardCharacter CharType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; StringType &gt;::wildcard_match </td>
+          <td class="memname">bool <a class="el" href="classfly_1_1_basic_string.html">fly::BasicString</a>&lt; CharType &gt;::wildcard_match </td>
           <td>(</td>
           <td class="paramtype">view_type&#160;</td>
           <td class="paramname"><em>source</em>, </td>

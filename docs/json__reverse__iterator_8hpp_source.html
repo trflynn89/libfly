@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -90,8 +90,8 @@ $(document).ready(function(){initNavTree('json__reverse__iterator_8hpp_source.ht
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &quot;fly/types/json/json_exception.hpp&quot;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;fly/types/json/json_traits.hpp&quot;</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &quot;fly/types/json/concepts.hpp&quot;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;fly/types/json/json_exception.hpp&quot;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &lt;cstddef&gt;</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;iterator&gt;</span></div>
@@ -140,7 +140,7 @@ $(document).ready(function(){initNavTree('json__reverse__iterator_8hpp_source.ht
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    difference_type operator-(const <a class="code" href="classfly_1_1detail_1_1_json_reverse_iterator.html">JsonReverseIterator</a> &amp;other) const;</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    const typename <a class="code" href="structfly_1_1_json_traits.html">JsonTraits</a>::object_type::key_type &amp;<a class="code" href="classfly_1_1detail_1_1_json_reverse_iterator.html#ada30372d05771034f456881a500c4fa7">key</a>() const;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    const typename json_object_type::key_type &amp;<a class="code" href="classfly_1_1detail_1_1_json_reverse_iterator.html#a1a3b46daff1c168b9dec53977c930e14">key</a>() const;</div>
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160; </div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    reference <a class="code" href="classfly_1_1detail_1_1_json_reverse_iterator.html#abb5be8fd91839246d302e17ead97e52c">value</a>() const;</div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160; </div>
@@ -271,7 +271,7 @@ $(document).ready(function(){initNavTree('json__reverse__iterator_8hpp_source.ht
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160; </div>
 <div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;<span class="comment">//==================================================================================================</span></div>
 <div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> JsonIterator&gt;</div>
-<div class="line"><a name="l00359"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_reverse_iterator.html#ada30372d05771034f456881a500c4fa7">  359</a></span>&#160;<span class="keyword">const</span> <span class="keyword">typename</span> JsonTraits::object_type::key_type &amp;<a class="code" href="classfly_1_1detail_1_1_json_reverse_iterator.html#ada30372d05771034f456881a500c4fa7">JsonReverseIterator&lt;JsonIterator&gt;::key</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00359"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_json_reverse_iterator.html#a1a3b46daff1c168b9dec53977c930e14">  359</a></span>&#160;<span class="keyword">const</span> <span class="keyword">typename</span> json_object_type::key_type &amp;<a class="code" href="classfly_1_1detail_1_1_json_reverse_iterator.html#a1a3b46daff1c168b9dec53977c930e14">JsonReverseIterator&lt;JsonIterator&gt;::key</a>()<span class="keyword"> const</span></div>
 <div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    <span class="keywordflow">try</span></div>
 <div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    {</div>
@@ -313,6 +313,7 @@ $(document).ready(function(){initNavTree('json__reverse__iterator_8hpp_source.ht
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html">fly::detail::JsonReverseIterator</a></div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:22</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_a01da541f55fb9cfc941fdee1a62f41d7"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#a01da541f55fb9cfc941fdee1a62f41d7">fly::detail::JsonReverseIterator::operator-</a></div><div class="ttdeci">JsonReverseIterator operator-(difference_type offset) const</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:343</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_a0d262f652b8a6d132124577db5bd0e93"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#a0d262f652b8a6d132124577db5bd0e93">fly::detail::JsonReverseIterator::operator++</a></div><div class="ttdeci">JsonReverseIterator &amp; operator++()</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:300</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_a1a3b46daff1c168b9dec53977c930e14"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#a1a3b46daff1c168b9dec53977c930e14">fly::detail::JsonReverseIterator::key</a></div><div class="ttdeci">const json_object_type::key_type &amp; key() const</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:359</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_a22a3fe0c5d8e4168a45653ddd21959f6"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#a22a3fe0c5d8e4168a45653ddd21959f6">fly::detail::JsonReverseIterator::operator+=</a></div><div class="ttdeci">JsonReverseIterator &amp; operator+=(difference_type offset)</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:321</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_a6c9dd64d2950daea490b3a93296db3d7"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#a6c9dd64d2950daea490b3a93296db3d7">fly::detail::JsonReverseIterator::operator+</a></div><div class="ttdeci">JsonReverseIterator operator+(difference_type offset) const</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:335</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_a78e1d56211e0543ef4d34a28268dc1d4"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#a78e1d56211e0543ef4d34a28268dc1d4">fly::detail::JsonReverseIterator::operator*</a></div><div class="ttdeci">reference operator*() const</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:258</div></div>
@@ -320,11 +321,9 @@ $(document).ready(function(){initNavTree('json__reverse__iterator_8hpp_source.ht
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_ab006974bb79f572525c4bc72d347b12d"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#ab006974bb79f572525c4bc72d347b12d">fly::detail::JsonReverseIterator::operator-=</a></div><div class="ttdeci">JsonReverseIterator &amp; operator-=(difference_type offset)</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:328</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_abb5be8fd91839246d302e17ead97e52c"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#abb5be8fd91839246d302e17ead97e52c">fly::detail::JsonReverseIterator::value</a></div><div class="ttdeci">reference value() const</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:374</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_acf862401db3f19504fa87ce269b462af"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#acf862401db3f19504fa87ce269b462af">fly::detail::JsonReverseIterator::JsonReverseIterator</a></div><div class="ttdeci">JsonReverseIterator() noexcept</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:238</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_ada30372d05771034f456881a500c4fa7"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#ada30372d05771034f456881a500c4fa7">fly::detail::JsonReverseIterator::key</a></div><div class="ttdeci">const JsonTraits::object_type::key_type &amp; key() const</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:359</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_adb819f3aeebb740de821e4f6b7d455d6"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#adb819f3aeebb740de821e4f6b7d455d6">fly::detail::JsonReverseIterator::operator--</a></div><div class="ttdeci">JsonReverseIterator &amp; operator--()</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:314</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_afcafb7f3e41c77df9f8982347c51c19f"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#afcafb7f3e41c77df9f8982347c51c19f">fly::detail::JsonReverseIterator::value_type</a></div><div class="ttdeci">typename JsonIterator::value_type value_type</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:29</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html_afe318d727ce6986ce0dc7a109cf89055"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html#afe318d727ce6986ce0dc7a109cf89055">fly::detail::JsonReverseIterator::operator-&gt;</a></div><div class="ttdeci">pointer operator-&gt;() const</div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:272</div></div>
-<div class="ttc" id="astructfly_1_1_json_traits_html"><div class="ttname"><a href="structfly_1_1_json_traits.html">fly::JsonTraits</a></div><div class="ttdef"><b>Definition:</b> json_traits.hpp:30</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

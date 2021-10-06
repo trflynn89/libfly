@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -88,7 +88,6 @@ $(document).ready(function(){initNavTree('classfly_1_1net_1_1_i_pv4_address.html
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="classfly_1_1net_1_1_i_pv4_address-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">fly::net::IPv4Address Class Reference</div>  </div>
@@ -126,8 +125,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4cde75774b96402a5a7937139bf41a08"><td class="memItemLeft" align="right" valign="top"><a id="a4cde75774b96402a5a7937139bf41a08"></a>
 <a class="el" href="classfly_1_1net_1_1_i_pv4_address.html">IPv4Address</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classfly_1_1net_1_1_i_pv4_address.html">IPv4Address</a> &amp;&amp;)=default</td></tr>
 <tr class="separator:a4cde75774b96402a5a7937139bf41a08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae01e9ea10b69901617b6456848ba4d3e"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_i_pv4_address.html#ae01e9ea10b69901617b6456848ba4d3e">to_string</a> () const</td></tr>
-<tr class="separator:ae01e9ea10b69901617b6456848ba4d3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:addb55f61d441a186a392ffbdfa67dfc4"><td class="memItemLeft" align="right" valign="top">constexpr int_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_i_pv4_address.html#addb55f61d441a186a392ffbdfa67dfc4">network_order</a> () const</td></tr>
 <tr class="separator:addb55f61d441a186a392ffbdfa67dfc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d0ec2ac0277e767ed2d9b69a39f0ed0"><td class="memItemLeft" align="right" valign="top">constexpr int_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_i_pv4_address.html#a1d0ec2ac0277e767ed2d9b69a39f0ed0">host_order</a> () const</td></tr>
@@ -145,11 +142,6 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:afffa286760e910e31f27fdd432314219"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75d28e0b75571f5c09982d335d97b429"><td class="memItemLeft" align="right" valign="top">static constexpr std::optional&lt; <a class="el" href="classfly_1_1net_1_1_i_pv4_address.html">IPv4Address</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_i_pv4_address.html#a75d28e0b75571f5c09982d335d97b429">from_string</a> (std::string_view address)</td></tr>
 <tr class="separator:a75d28e0b75571f5c09982d335d97b429"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a00789cdedfcb49e168ea33bcf1c9c306"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1net_1_1_i_pv4_address.html#a00789cdedfcb49e168ea33bcf1c9c306">operator&lt;&lt;</a> (std::ostream &amp;stream, const <a class="el" href="classfly_1_1net_1_1_i_pv4_address.html">IPv4Address</a> &amp;address)</td></tr>
-<tr class="separator:a00789cdedfcb49e168ea33bcf1c9c306"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class to store an IPv4 address in network order, and to provide convenient access to its data as required by various network APIs.</p>
@@ -441,74 +433,8 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a id="ae01e9ea10b69901617b6456848ba4d3e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae01e9ea10b69901617b6456848ba4d3e">&#9670;&nbsp;</a></span>to_string()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string fly::net::IPv4Address::to_string </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Convert the IPv4 address to a four octet string in dot-decimal notation.</p>
-<dl class="section return"><dt>Returns</dt><dd>The IPv4 address in dot-decimal notation. </dd></dl>
-
-</div>
-</div>
-<h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a id="a00789cdedfcb49e168ea33bcf1c9c306"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a00789cdedfcb49e168ea33bcf1c9c306">&#9670;&nbsp;</a></span>operator&lt;&lt;</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
-          <td>(</td>
-          <td class="paramtype">std::ostream &amp;&#160;</td>
-          <td class="paramname"><em>stream</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classfly_1_1net_1_1_i_pv4_address.html">IPv4Address</a> &amp;&#160;</td>
-          <td class="paramname"><em>address</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Stream an IPv4 address as a four octet string in dot-decimal notation.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">stream</td><td>A reference to the output stream. </td></tr>
-    <tr><td class="paramname">address</td><td>The IPv4 address to stream.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to the output stream. </dd></dl>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following files:<ul>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>fly/net/<a class="el" href="ipv4__address_8hpp_source.html">ipv4_address.hpp</a></li>
-<li>fly/net/ipv4_address.cpp</li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['direction_938',['Direction',['../structfly_1_1logger_1_1_cursor.html#a54e75c04cb830fb3596869958377d7aa',1,'fly::logger::Cursor']]]
+  ['features_892',['Features',['../classfly_1_1parser_1_1_json_parser.html#aa6c455e16559a9e4c901e8c666be63b4',1,'fly::parser::JsonParser']]]
 ];

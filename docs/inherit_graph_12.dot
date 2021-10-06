@@ -1,8 +1,0 @@
-digraph "Graphical Class Hierarchy"
-{
- // LATEX_PDF_SIZE
-  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
-  node [fontname="Helvetica",fontsize="10",shape=record];
-  rankdir="LR";
-  Node0 [label="fly::detail::Aggregator\l\< T, Base, Digit, Literals... \>",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structfly_1_1detail_1_1_aggregator_3_01_t_00_01_base_00_01_digit_00_01_literals_8_8_8_01_4.html",tooltip=" "];
-}

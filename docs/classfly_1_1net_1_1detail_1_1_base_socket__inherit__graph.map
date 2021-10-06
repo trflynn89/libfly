@@ -1,0 +1,6 @@
+<map id="fly::net::detail::BaseSocket&lt; EndpointType &gt;" name="fly::net::detail::BaseSocket&lt; EndpointType &gt;">
+<area shape="rect" id="node1" title=" " alt="" coords="5,71,200,112"/>
+<area shape="rect" id="node2" href="$classfly_1_1net_1_1_listen_socket.html" title=" " alt="" coords="248,5,404,47"/>
+<area shape="rect" id="node3" href="$classfly_1_1net_1_1_tcp_socket.html" title=" " alt="" coords="257,71,395,112"/>
+<area shape="rect" id="node4" href="$classfly_1_1net_1_1_udp_socket.html" title=" " alt="" coords="255,136,397,177"/>
+</map>

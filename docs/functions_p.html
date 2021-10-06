@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">5.0.0</span>
+   &#160;<span id="projectnumber">6.0.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -91,8 +91,11 @@ $(document).ready(function(){initNavTree('functions_p.html',''); initResizable()
 : <a class="el" href="classfly_1_1net_1_1detail_1_1_base_socket.html#a6c22e529780fadcd93f25b51b317cc24">fly::net::detail::BaseSocket&lt; EndpointType &gt;</a>
 , <a class="el" href="classfly_1_1net_1_1_network_config.html#a81964f5d13be1a21fbd389f884e3ba11">fly::net::NetworkConfig</a>
 </li>
+<li>parameter_type()
+: <a class="el" href="classfly_1_1detail_1_1_basic_format_parse_context.html#a219590bc4dabbb8fea7624e9825bf00e">fly::detail::BasicFormatParseContext&lt; CharType &gt;</a>
+</li>
 <li>parse()
-: <a class="el" href="structfly_1_1detail_1_1_basic_format_specifier.html#a891890010eb57055aa81ea26799c4778">fly::detail::BasicFormatSpecifier&lt; CharType &gt;</a>
+: <a class="el" href="structfly_1_1detail_1_1_basic_format_specifier.html#ae3bb480774e64f4c3ae934bf1ef349d1">fly::detail::BasicFormatSpecifier&lt; CharType &gt;</a>
 </li>
 <li>parse_file()
 : <a class="el" href="classfly_1_1parser_1_1_parser.html#ab0812f2d1ee4005238e5f701039d1a3d">fly::parser::Parser</a>
@@ -104,9 +107,6 @@ $(document).ready(function(){initNavTree('functions_p.html',''); initResizable()
 </li>
 <li>parse_string()
 : <a class="el" href="classfly_1_1parser_1_1_parser.html#a35d92c4fb455cd2ae57bc99e012788ce">fly::parser::Parser</a>
-</li>
-<li>PathEvent
-: <a class="el" href="classfly_1_1path_1_1_path_monitor.html#a79e80e5155c0314bb993abb1cbc66a42">fly::path::PathMonitor</a>
 </li>
 <li>PathEventCallback
 : <a class="el" href="classfly_1_1path_1_1_path_monitor.html#a01457ab659d1c0dd9dbfe05a7d06a989">fly::path::PathMonitor</a>
@@ -121,7 +121,7 @@ $(document).ready(function(){initNavTree('functions_p.html',''); initResizable()
 : <a class="el" href="classfly_1_1path_1_1_path_monitor_impl.html#a2d48d5eade4a16e240d038fd627d4e67">fly::path::PathMonitorImpl</a>
 </li>
 <li>peek()
-: <a class="el" href="classfly_1_1_basic_string_lexer.html#a3affc25ad812928e6f61e847eaaa8d84">fly::BasicStringLexer&lt; StringType &gt;</a>
+: <a class="el" href="classfly_1_1_basic_lexer.html#ae9f06b2be9837ec09dd609d5c1504f98">fly::BasicLexer&lt; CharType &gt;</a>
 , <a class="el" href="classfly_1_1parser_1_1_parser.html#a2cd5f9b9c748fe80c8f687618e577c08">fly::parser::Parser</a>
 </li>
 <li>peek_bits()
@@ -153,7 +153,7 @@ $(document).ready(function(){initNavTree('functions_p.html',''); initResizable()
 : <a class="el" href="classfly_1_1net_1_1_endpoint.html#a59144aa20cc79f39adc8508b0027f0b2">fly::net::Endpoint&lt; IPAddressType &gt;</a>
 </li>
 <li>position()
-: <a class="el" href="classfly_1_1_basic_string_lexer.html#a817ee41ddba3797067ddcf3a6420b8a8">fly::BasicStringLexer&lt; StringType &gt;</a>
+: <a class="el" href="classfly_1_1_basic_lexer.html#a98d5091acad97b782580695b5413ae62">fly::BasicLexer&lt; CharType &gt;</a>
 </li>
 <li>Position
 : <a class="el" href="classfly_1_1detail_1_1_json_iterator.html#aa83ef1ae58c7e7e23177753822ae3f20">fly::detail::JsonIterator&lt; JsonType &gt;</a>
@@ -173,7 +173,7 @@ $(document).ready(function(){initNavTree('functions_p.html',''); initResizable()
 : <a class="el" href="classfly_1_1task_1_1_task_runner.html#a99e063ea386334b6fe29d47dc7419fe4">fly::task::TaskRunner</a>
 </li>
 <li>post_task_with_delay()
-: <a class="el" href="classfly_1_1task_1_1_task_runner.html#a3c999cfd82a3ebc380cf1358b851e873">fly::task::TaskRunner</a>
+: <a class="el" href="classfly_1_1task_1_1_task_runner.html#a14dfecddb4570c1d3e54cdff0a3e6253">fly::task::TaskRunner</a>
 </li>
 <li>post_task_with_delay_and_reply()
 : <a class="el" href="classfly_1_1task_1_1_task_runner.html#a99a3e604f3c0a301051b83537598d617">fly::task::TaskRunner</a>
@@ -183,7 +183,7 @@ $(document).ready(function(){initNavTree('functions_p.html',''); initResizable()
 </li>
 <li>precision()
 : <a class="el" href="structfly_1_1detail_1_1_basic_format_specifier.html#a5603b73b48db558ed07cd728143950af">fly::detail::BasicFormatSpecifier&lt; CharType &gt;</a>
-, <a class="el" href="classfly_1_1detail_1_1_basic_stream_modifiers.html#af98e0e09b7117cd9db35d997a77a43dd">fly::detail::BasicStreamModifiers&lt; StringType &gt;</a>
+, <a class="el" href="classfly_1_1detail_1_1_scoped_stream_modifiers.html#ac1cb1eefbe8f4923343c828796c280da">fly::detail::ScopedStreamModifiers</a>
 </li>
 <li>prune()
 : <a class="el" href="classfly_1_1config_1_1_config_manager.html#ab010c550b6ffc80823ede9944116ea0e">fly::config::ConfigManager</a>
