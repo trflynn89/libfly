@@ -1,9 +1,9 @@
 #pragma once
 
+#include "fly/types/string/concepts.hpp"
 #include "fly/types/string/detail/format_parameter_type.hpp"
-#include "fly/types/string/detail/string_traits.hpp"
+#include "fly/types/string/detail/traits.hpp"
 #include "fly/types/string/lexer.hpp"
-#include "fly/types/string/string_concepts.hpp"
 
 #include <cstddef>
 #include <string_view>

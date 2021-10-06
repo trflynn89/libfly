@@ -2,11 +2,11 @@
 
 #include "fly/concepts/concepts.hpp"
 #include "fly/fly.hpp"
+#include "fly/types/string/concepts.hpp"
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/stream_util.hpp"
 #include "fly/types/string/detail/unicode.hpp"
-#include "fly/types/string/string_concepts.hpp"
 
 #include <array>
 #include <charconv>

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "fly/types/string/concepts.hpp"
 #include "fly/types/string/literals.hpp"
-#include "fly/types/string/string_concepts.hpp"
 
 #include <cctype>
 #include <ios>
