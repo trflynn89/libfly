@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fly/coders/coder.hpp"
-#include "fly/coders/huffman/huffman_types.hpp"
+#include "fly/coders/huffman/types.hpp"
 
 #include <array>
 #include <memory>

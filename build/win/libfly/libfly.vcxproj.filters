@@ -106,7 +106,7 @@
     <ClInclude Include="..\..\..\fly\coders\huffman\huffman_encoder.hpp">
       <Filter>coders\huffman</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\coders\huffman\huffman_types.hpp">
+    <ClInclude Include="..\..\..\fly\coders\huffman\types.hpp">
       <Filter>coders\huffman</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\concepts\concepts.hpp">
@@ -357,7 +357,7 @@
     <ClCompile Include="..\..\..\fly\coders\huffman\huffman_encoder.cpp">
       <Filter>coders\huffman</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\fly\coders\huffman\huffman_types.cpp">
+    <ClCompile Include="..\..\..\fly\coders\huffman\types.cpp">
       <Filter>coders\huffman</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\fly\config\config.cpp">
