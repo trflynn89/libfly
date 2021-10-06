@@ -11,18 +11,6 @@ steps:
 
 - task: PublishBuildArtifacts@1
   inputs:
-    pathtoPublish: $(Build.ArtifactStagingDirectory)
+    pathToPublish: $(Build.ArtifactStagingDirectory)
     artifactName: libfly
   displayName: 'Publish'
-
-- task: GitHubRelease@0
-  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
-  inputs:
-    action: 'edit'
-    tag: $(Build.SourceBranchName)
-    tagSource: 'Git tag'
-    gitHubConnection: trflynn89
-    repositoryName: trflynn89/libfly
-    assets: $(Build.ArtifactStagingDirectory)/*
-    assetUploadMode: 'replace'
-  displayName: Release

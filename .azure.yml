@@ -7,88 +7,117 @@ trigger:
     include:
     - '*'
 
-jobs:
-  #### Linux Clang ####
+stages:
+  - stage: Build
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'clang'
-      mode: 'debug'
-      arch: 'x86'
+    jobs:
+      #### Linux Clang ####
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'clang'
-      mode: 'debug'
-      arch: 'x64'
-      coverage: '1'
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'clang'
+          mode: 'debug'
+          arch: 'x86'
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'clang'
-      mode: 'release'
-      arch: 'x86'
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'clang'
+          mode: 'debug'
+          arch: 'x64'
+          coverage: '1'
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'clang'
-      mode: 'release'
-      arch: 'x64'
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'clang'
+          mode: 'release'
+          arch: 'x86'
 
-  #### Linux GCC ####
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'clang'
+          mode: 'release'
+          arch: 'x64'
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'gcc'
-      mode: 'debug'
-      arch: 'x86'
+      #### Linux GCC ####
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'gcc'
-      mode: 'debug'
-      arch: 'x64'
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'gcc'
+          mode: 'debug'
+          arch: 'x86'
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'gcc'
-      mode: 'release'
-      arch: 'x86'
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'gcc'
+          mode: 'debug'
+          arch: 'x64'
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'gcc'
-      mode: 'release'
-      arch: 'x64'
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'gcc'
+          mode: 'release'
+          arch: 'x86'
 
-  #### macOS ####
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'gcc'
+          mode: 'release'
+          arch: 'x64'
 
-  - template: build/ci/macos.yml
-    parameters:
-      mode: 'debug'
+      #### macOS ####
 
-  - template: build/ci/macos.yml
-    parameters:
-      mode: 'release'
+      - template: build/ci/macos.yml
+        parameters:
+          mode: 'debug'
 
-  #### Windows ####
+      - template: build/ci/macos.yml
+        parameters:
+          mode: 'release'
 
-  - template: build/ci/windows.yml
-    parameters:
-      mode: 'Debug'
-      arch: 'x86'
+      #### Windows ####
 
-  - template: build/ci/windows.yml
-    parameters:
-      mode: 'Debug'
-      arch: 'x64'
+      - template: build/ci/windows.yml
+        parameters:
+          mode: 'Debug'
+          arch: 'x86'
 
-  - template: build/ci/windows.yml
-    parameters:
-      mode: 'Release'
-      arch: 'x86'
+      - template: build/ci/windows.yml
+        parameters:
+          mode: 'Debug'
+          arch: 'x64'
 
-  - template: build/ci/windows.yml
-    parameters:
-      mode: 'Release'
-      arch: 'x64'
+      - template: build/ci/windows.yml
+        parameters:
+          mode: 'Release'
+          arch: 'x86'
+
+      - template: build/ci/windows.yml
+        parameters:
+          mode: 'Release'
+          arch: 'x64'
+
+  - stage: Release
+
+    condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/')
+
+    jobs:
+    - job: 'Release'
+      steps:
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          buildType: current
+          downloadType: all
+          artifactName: libfly
+          downloadPath: $(System.ArtifactsDirectory)
+        displayName: Download
+
+      - task: GitHubRelease@0
+        inputs:
+          action: edit
+          tag: $(Build.SourceBranchName)
+          tagSource: 'Git tag'
+          gitHubConnection: trflynn89
+          repositoryName: trflynn89/libfly
+          assets: $(System.ArtifactsDirectory)/*
+          assetUploadMode: replace
+        displayName: Publish
