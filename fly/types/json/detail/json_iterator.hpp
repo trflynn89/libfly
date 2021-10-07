@@ -53,13 +53,9 @@ class JsonReverseIterator;
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version May 17, 2020
  */
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 class JsonIterator
 {
-    static_assert(
-        fly::SameAs<Json, JsonType>,
-        "JsonIterator must only be declared for a Json type");
-
     static constexpr bool is_const_iterator = std::is_const_v<JsonType>;
 
     /**
@@ -487,7 +483,7 @@ private:
 };
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 JsonIterator<JsonType>::JsonIterator(pointer json, Position position) noexcept(false) : m_json(json)
 {
     auto visitor = [this, &position](auto &value) noexcept(JsonIterable<decltype(value)>)
@@ -517,7 +513,7 @@ JsonIterator<JsonType>::JsonIterator(pointer json, Position position) noexcept(f
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 JsonIterator<JsonType>::JsonIterator(const NonConstJsonIterator &iterator) noexcept :
     m_json(iterator.m_json)
 {
@@ -530,7 +526,7 @@ JsonIterator<JsonType>::JsonIterator(const NonConstJsonIterator &iterator) noexc
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 JsonIterator<JsonType> &
 JsonIterator<JsonType>::operator=(const NonConstJsonIterator &iterator) noexcept
 {
@@ -546,7 +542,7 @@ JsonIterator<JsonType>::operator=(const NonConstJsonIterator &iterator) noexcept
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::operator*() const -> reference
 {
     validate_iterator();
@@ -569,7 +565,7 @@ auto JsonIterator<JsonType>::operator*() const -> reference
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::operator->() const -> pointer
 {
     validate_iterator();
@@ -592,7 +588,7 @@ auto JsonIterator<JsonType>::operator->() const -> pointer
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::operator[](difference_type offset) const -> reference
 {
     validate_iterator();
@@ -618,7 +614,7 @@ auto JsonIterator<JsonType>::operator[](difference_type offset) const -> referen
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 bool JsonIterator<JsonType>::operator==(const JsonIterator &iterator) const
 {
     validate_iterator(iterator);
@@ -626,14 +622,14 @@ bool JsonIterator<JsonType>::operator==(const JsonIterator &iterator) const
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 bool JsonIterator<JsonType>::operator!=(const JsonIterator &iterator) const
 {
     return !(*this == iterator);
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 bool JsonIterator<JsonType>::operator<(const JsonIterator &iterator) const
 {
     validate_iterator(iterator);
@@ -654,28 +650,28 @@ bool JsonIterator<JsonType>::operator<(const JsonIterator &iterator) const
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 bool JsonIterator<JsonType>::operator<=(const JsonIterator &iterator) const
 {
     return !(iterator < *this);
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 bool JsonIterator<JsonType>::operator>(const JsonIterator &iterator) const
 {
     return !(*this <= iterator);
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 bool JsonIterator<JsonType>::operator>=(const JsonIterator &iterator) const
 {
     return !(*this < iterator);
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::operator++(int) -> JsonIterator
 {
     auto result = *this;
@@ -685,7 +681,7 @@ auto JsonIterator<JsonType>::operator++(int) -> JsonIterator
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::operator++() -> JsonIterator &
 {
     validate_iterator();
@@ -702,7 +698,7 @@ auto JsonIterator<JsonType>::operator++() -> JsonIterator &
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::operator--(int) -> JsonIterator
 {
     auto result = *this;
@@ -712,7 +708,7 @@ auto JsonIterator<JsonType>::operator--(int) -> JsonIterator
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::operator--() -> JsonIterator &
 {
     validate_iterator();
@@ -729,7 +725,7 @@ auto JsonIterator<JsonType>::operator--() -> JsonIterator &
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::operator+=(difference_type offset) -> JsonIterator &
 {
     validate_iterator();
@@ -752,14 +748,14 @@ auto JsonIterator<JsonType>::operator+=(difference_type offset) -> JsonIterator 
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::operator-=(difference_type offset) -> JsonIterator &
 {
     return *this += -offset;
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::operator+(difference_type offset) const -> JsonIterator
 {
     auto result = *this;
@@ -769,7 +765,7 @@ auto JsonIterator<JsonType>::operator+(difference_type offset) const -> JsonIter
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 JsonIterator<JsonType> operator+(
     typename JsonIterator<JsonType>::difference_type offset,
     const JsonIterator<JsonType> &iterator)
@@ -781,7 +777,7 @@ JsonIterator<JsonType> operator+(
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::operator-(difference_type offset) const -> JsonIterator
 {
     auto result = *this;
@@ -791,7 +787,7 @@ auto JsonIterator<JsonType>::operator-(difference_type offset) const -> JsonIter
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const -> difference_type
 {
     validate_iterator(iterator);
@@ -812,7 +808,7 @@ auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const -> di
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 const typename json_object_type::key_type &JsonIterator<JsonType>::key() const
 {
     validate_iterator();
@@ -834,14 +830,14 @@ const typename json_object_type::key_type &JsonIterator<JsonType>::key() const
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 auto JsonIterator<JsonType>::value() const -> reference
 {
     return *(*this);
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 void JsonIterator<JsonType>::validate_iterator() const
 {
     if (m_json == nullptr)
@@ -851,7 +847,7 @@ void JsonIterator<JsonType>::validate_iterator() const
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 void JsonIterator<JsonType>::validate_iterator(const JsonIterator &iterator) const
 {
     validate_iterator();
@@ -864,7 +860,7 @@ void JsonIterator<JsonType>::validate_iterator(const JsonIterator &iterator) con
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 template <typename T>
 void JsonIterator<JsonType>::validate_offset(const T &it, difference_type offset) const
 
@@ -889,7 +885,7 @@ void JsonIterator<JsonType>::validate_offset(const T &it, difference_type offset
 }
 
 //==================================================================================================
-template <typename JsonType>
+template <fly::SameAs<Json> JsonType>
 template <typename T>
 void JsonIterator<JsonType>::validate_dereference(const T &it) const
 {
