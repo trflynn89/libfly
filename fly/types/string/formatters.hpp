@@ -228,11 +228,9 @@ private:
      * @param is_negative Whether the original value was negative.
      * @param context The context holding the formatting state.
      */
-    template <typename U, typename FormatContext>
+    template <fly::UnsignedIntegral U, typename FormatContext>
     void format(U value, bool is_negative, FormatContext &context)
     {
-        static_assert(std::is_unsigned_v<U>);
-
         if (m_type == FormatSpecifier::Type::Character)
         {
             format_as_character(value, is_negative, context);
@@ -359,11 +357,9 @@ private:
      * @param is_negative Whether the original value was negative.
      * @param context The context holding the formatting state.
      */
-    template <typename U, typename FormatContext>
+    template <fly::UnsignedIntegral U, typename FormatContext>
     void format_as_character(U value, bool is_negative, FormatContext &context)
     {
-        static_assert(std::is_unsigned_v<U>);
-
         if (is_negative || (value > static_cast<U>(std::numeric_limits<CharType>::max())))
         {
             return;
