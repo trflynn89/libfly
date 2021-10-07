@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/concepts/concepts.hpp"
 #include "fly/config/config.hpp"
 #include "fly/logger/logger.hpp"
 #include "fly/types/json/json.hpp"
@@ -76,7 +77,7 @@ public:
      *
      * @return A reference to the created/found configuration.
      */
-    template <typename T>
+    template <fly::DerivedFrom<Config> T>
     std::shared_ptr<T> create_config();
 
     /**
@@ -124,11 +125,9 @@ private:
 };
 
 //==================================================================================================
-template <typename T>
+template <fly::DerivedFrom<Config> T>
 std::shared_ptr<T> ConfigManager::create_config()
 {
-    static_assert(std::is_base_of_v<Config, T>);
-
     std::shared_ptr<T> config;
 
     std::lock_guard<std::mutex> lock(m_configs_mutex);
