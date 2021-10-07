@@ -214,6 +214,39 @@ struct BasicFormatSpecifier
     std::size_t precision(FormatContext &context, std::size_t fallback) const;
 
     /**
+     * Copy formatting options from this replacement field into another replacement field (which may
+     * be an instance of or derived from this class).
+     *
+     * @param formatter The replacement field to copy formatting options into.
+     */
+    template <fly::DerivedFrom<BasicFormatSpecifier> FormatterType>
+    constexpr void copy_formatting_options_into(FormatterType &formatter) const
+    {
+        // Note: This is defined inline due to: https://bugs.llvm.org/show_bug.cgi?id=48020
+        formatter.m_position = m_position;
+
+        formatter.m_fill = m_fill;
+        formatter.m_alignment = m_alignment;
+
+        formatter.m_sign = m_sign;
+        formatter.m_alternate_form = m_alternate_form;
+        formatter.m_zero_padding = m_zero_padding;
+
+        formatter.m_width = m_width;
+        formatter.m_width_position = m_width_position;
+
+        formatter.m_precision = m_precision;
+        formatter.m_precision_position = m_precision_position;
+
+        formatter.m_locale_specific_form = m_locale_specific_form;
+
+        formatter.m_type = m_type;
+        formatter.m_case = m_case;
+
+        formatter.m_was_parsed_as_standard_formatter = m_was_parsed_as_standard_formatter;
+    }
+
+    /**
      * Compare two replacement field instances for equality.
      *
      * @return True if the two instances are equal.
@@ -247,6 +280,8 @@ struct BasicFormatSpecifier
 
     std::size_t m_parse_index {0};
     std::size_t m_size {0};
+
+    bool m_was_parsed_as_standard_formatter {false};
 
 private:
     /**
@@ -474,6 +509,8 @@ constexpr BasicFormatSpecifier<CharType>::BasicFormatSpecifier(FormatParseContex
 template <fly::StandardCharacter CharType>
 constexpr void BasicFormatSpecifier<CharType>::parse(FormatParseContext &context)
 {
+    m_was_parsed_as_standard_formatter = true;
+
     parse_fill_and_alignment(context);
     parse_sign(context);
     parse_alternate_form_and_zero_padding(context);

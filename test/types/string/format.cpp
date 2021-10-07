@@ -788,6 +788,10 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:.1s}"), FMT("O"), UserFormattedEnum::One);
         test_format(FMT("{:.2s}"), FMT("On"), UserFormattedEnum::One);
         test_format(FMT("{:.3s}"), FMT("One"), UserFormattedEnum::One);
+
+        test_format(FMT("{:.{}s}"), FMT("T"), UserFormattedEnum::Two, 1);
+        test_format(FMT("{:.{}s}"), FMT("Tw"), UserFormattedEnum::Two, 2);
+        test_format(FMT("{:.{}s}"), FMT("Two"), UserFormattedEnum::Two, 3);
     }
 
     CATCH_SECTION("User-defined types may define a parse method")

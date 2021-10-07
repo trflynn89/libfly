@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fly/concepts/concepts.hpp"
 #include "fly/fly.hpp"
 #include "fly/types/string/concepts.hpp"
 #include "fly/types/string/detail/format_parameter_type.hpp"
@@ -205,6 +206,11 @@ constexpr void BasicFormatString<CharType, ParameterTypes...>::parse_user_define
         {
             Formatter formatter;
             formatter.parse(m_context);
+
+            if constexpr (fly::DerivedFrom<Formatter, FormatSpecifier>)
+            {
+                formatter.copy_formatting_options_into(specifier);
+            }
         }
         else
         {
