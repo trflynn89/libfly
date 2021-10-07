@@ -77,7 +77,7 @@ public:
      * @param socket The socket to monitor.
      * @param callback The callback to invoke when the socket is ready for writing.
      */
-    template <Socket SocketType, typename Callback>
+    template <Socket SocketType, SocketNotification<SocketType> Callback>
     void notify_when_writable(const std::shared_ptr<SocketType> &socket, Callback &&callback);
 
     /**
@@ -98,7 +98,7 @@ public:
      * @param socket The socket to monitor.
      * @param callback The callback to invoke when the socket is ready for reading.
      */
-    template <Socket SocketType, typename Callback>
+    template <Socket SocketType, SocketNotification<SocketType> Callback>
     void notify_when_readable(const std::shared_ptr<SocketType> &socket, Callback &&callback);
 
 private:
@@ -158,7 +158,7 @@ private:
      *
      * @return The wrapped callback.
      */
-    template <Socket SocketType, typename Callback>
+    template <Socket SocketType, SocketNotification<SocketType> Callback>
     Notification wrap_callback(const std::shared_ptr<SocketType> &socket, Callback &&callback);
 
     /**
@@ -183,7 +183,7 @@ std::shared_ptr<SocketType> SocketService::create_socket()
 }
 
 //==================================================================================================
-template <Socket SocketType, typename Callback>
+template <Socket SocketType, SocketNotification<SocketType> Callback>
 void SocketService::notify_when_writable(
     const std::shared_ptr<SocketType> &socket,
     Callback &&callback)
@@ -192,7 +192,7 @@ void SocketService::notify_when_writable(
 }
 
 //==================================================================================================
-template <Socket SocketType, typename Callback>
+template <Socket SocketType, SocketNotification<SocketType> Callback>
 void SocketService::notify_when_readable(
     const std::shared_ptr<SocketType> &socket,
     Callback &&callback)
@@ -201,14 +201,10 @@ void SocketService::notify_when_readable(
 }
 
 //==================================================================================================
-template <Socket SocketType, typename Callback>
+template <Socket SocketType, SocketNotification<SocketType> Callback>
 auto SocketService::wrap_callback(const std::shared_ptr<SocketType> &socket, Callback &&callback)
     -> Notification
 {
-    static_assert(
-        std::is_invocable_v<Callback, std::shared_ptr<SocketType>>,
-        "Callback must be invocable with only a strong pointer to its owner");
-
     // Further wrap the callback in a structure to allow perfect forwarding into the lambda below.
     struct CallbackHolder
     {
