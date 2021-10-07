@@ -437,8 +437,6 @@ private:
  * BasicFormatSpecifier.
  */
 #define FLY_DEFINE_FORMATTER(CharType, parameter_type)                                             \
-                                                                                                   \
-protected:                                                                                         \
     using FormatSpecifier = fly::detail::BasicFormatSpecifier<CharType>;                           \
     using FormatSpecifier::m_position;                                                             \
     using FormatSpecifier::m_fill;                                                                 \
@@ -455,7 +453,6 @@ protected:                                                                      
     using FormatSpecifier::m_case;                                                                 \
     using FormatSpecifier::m_parameter_type;                                                       \
                                                                                                    \
-public:                                                                                            \
     Formatter()                                                                                    \
     {                                                                                              \
         m_parameter_type = parameter_type;                                                         \
