@@ -313,8 +313,19 @@ inline void format_user_defined_value(
 
     if constexpr (fly::FormattableWithParsing<decltype(parse_context), Formatter>)
     {
-        parse_context.lexer().set_position(specifier.m_parse_index);
-        formatter.parse(parse_context);
+        bool formatter_requires_parsing = true;
+
+        if constexpr (fly::DerivedFrom<Formatter, decltype(specifier)>)
+        {
+            formatter_requires_parsing = !specifier.m_was_parsed_as_standard_formatter;
+            specifier.copy_formatting_options_into(formatter);
+        }
+
+        if (formatter_requires_parsing)
+        {
+            parse_context.lexer().set_position(specifier.m_parse_index);
+            formatter.parse(parse_context);
+        }
     }
 
     formatter.format(*static_cast<const T *>(value), context);
