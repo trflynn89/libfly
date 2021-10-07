@@ -65,4 +65,10 @@ concept UnsignedIntegral = fly::Integral<T> && std::is_unsigned_v<std::remove_cv
 template <typename T>
 concept FloatingPoint = std::is_floating_point_v<std::remove_cvref_t<T>>;
 
+/**
+ * Concept that is satisified if the first given type is derived from the second given type.
+ */
+template <typename Derived, typename Base>
+concept DerivedFrom = std::is_base_of_v<std::remove_cvref_t<Base>, std::remove_cvref_t<Derived>>;
+
 } // namespace fly
