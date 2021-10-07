@@ -2,6 +2,7 @@ include $(SOURCE_ROOT)/extern/catchorg/flags.mk
 
 SRC_DIRS_$(d) += \
     $(d)/coders \
+    $(d)/concepts \
     $(d)/config \
     $(d)/logger \
     $(d)/net \
@@ -9,7 +10,6 @@ SRC_DIRS_$(d) += \
     $(d)/path \
     $(d)/system \
     $(d)/task \
-    $(d)/traits \
     $(d)/types \
     $(d)/util
 

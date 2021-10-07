@@ -12,7 +12,7 @@ class FooClass
 
 } // namespace
 
-CATCH_TEST_CASE("Concepts", "[traits]")
+CATCH_TEST_CASE("Concepts", "[concepts]")
 {
     CATCH_SECTION("Concept: SameAs")
     {
