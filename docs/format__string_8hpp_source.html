@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">6.0.0</span>
+   &#160;<span id="projectnumber">6.1.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -90,212 +90,203 @@ $(document).ready(function(){initNavTree('format__string_8hpp_source.html',''); 
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &quot;fly/fly.hpp&quot;</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/concepts.hpp&quot;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/detail/format_parameter_type.hpp&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/detail/format_parse_context.hpp&quot;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/detail/format_specifier.hpp&quot;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/detail/traits.hpp&quot;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/lexer.hpp&quot;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/literals.hpp&quot;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;array&gt;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;optional&gt;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">namespace </span>fly::detail {</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
-<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_basic_format_string.html">   32</a></span>&#160;<span class="keyword">class </span><a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;{</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">using</span> <a class="code" href="classfly_1_1detail_1_1_basic_format_parse_context.html">FormatParseContext</a> = <a class="code" href="classfly_1_1detail_1_1_basic_format_parse_context.html">BasicFormatParseContext&lt;CharType&gt;</a>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">using</span> <a class="code" href="structfly_1_1detail_1_1_basic_format_specifier.html">FormatSpecifier</a> = <a class="code" href="structfly_1_1detail_1_1_basic_format_specifier.html">BasicFormatSpecifier&lt;CharType&gt;</a>;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">template</span> &lt;std::<span class="keywordtype">size_t</span> N&gt;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    FLY_CONSTEVAL <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">BasicFormatString</a>(<span class="keyword">const</span> CharType (&amp;format)[N]) noexcept;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">BasicFormatString</a>(<a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;operator=(<a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &quot;fly/concepts/concepts.hpp&quot;</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;fly/fly.hpp&quot;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/concepts.hpp&quot;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/detail/format_parameter_type.hpp&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/detail/format_parse_context.hpp&quot;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/detail/format_specifier.hpp&quot;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/detail/traits.hpp&quot;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/formatters.hpp&quot;</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/lexer.hpp&quot;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;fly/types/string/literals.hpp&quot;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;array&gt;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;optional&gt;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;tuple&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">namespace </span>fly::detail {</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_basic_format_string.html">   35</a></span>&#160;<span class="keyword">class </span><a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;{</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">using</span> <a class="code" href="classfly_1_1detail_1_1_basic_format_parse_context.html">FormatParseContext</a> = <a class="code" href="classfly_1_1detail_1_1_basic_format_parse_context.html">BasicFormatParseContext&lt;CharType&gt;</a>;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">using</span> <a class="code" href="structfly_1_1detail_1_1_basic_format_specifier.html">FormatSpecifier</a> = <a class="code" href="structfly_1_1detail_1_1_basic_format_specifier.html">BasicFormatSpecifier&lt;CharType&gt;</a>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">template</span> &lt;std::<span class="keywordtype">size_t</span> N&gt;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    FLY_CONSTEVAL <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">BasicFormatString</a>(<span class="keyword">const</span> CharType (&amp;format)[N]) noexcept;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    constexpr <a class="code" href="classfly_1_1detail_1_1_basic_format_parse_context.html">FormatParseContext</a> &amp;<a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#a6fc0d551707f90fb26d4010cad71921d">context</a>();</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    std::optional&lt;FormatSpecifier&gt; <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#af67af867e81f8ebe346941d51a95a7c8">next_specifier</a>();</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">BasicFormatString</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;operator=(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    constexpr <a class="code" href="structfly_1_1detail_1_1_basic_format_specifier.html">FormatSpecifier</a> parse_specifier();</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    constexpr <span class="keywordtype">void</span> parse_user_defined_specifier(<a class="code" href="structfly_1_1detail_1_1_basic_format_specifier.html">FormatSpecifier</a> &amp;specifier);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    constexpr <span class="keywordtype">void</span> parse_standard_specifier(<a class="code" href="structfly_1_1detail_1_1_basic_format_specifier.html">FormatSpecifier</a> &amp;specifier);</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">const</span> <span class="keyword">auto</span> s_left_brace = FLY_CHR(CharType, <span class="charliteral">&#39;{&#39;</span>);</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">const</span> <span class="keyword">auto</span> s_right_brace = FLY_CHR(CharType, <span class="charliteral">&#39;}&#39;</span>);</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">const</span> <span class="keyword">auto</span> s_colon = FLY_CHR(CharType, <span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keyword">static</span> constexpr std::array&lt;ParameterType, <span class="keyword">sizeof</span>...(ParameterTypes)&gt; s_parameters {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        infer_parameter_type&lt;ParameterTypes&gt;()...};</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="code" href="classfly_1_1detail_1_1_basic_format_parse_context.html">FormatParseContext</a> m_context;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    std::array&lt;FormatSpecifier, 64&gt; m_specifiers;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    std::size_t m_specifier_count {0};</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    std::size_t m_specifier_index {0};</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;};</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="keyword">template</span> &lt;std::<span class="keywordtype">size_t</span> N&gt;</div>
-<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">  101</a></span>&#160;FLY_CONSTEVAL <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">BasicFormatString&lt;CharType, ParameterTypes...&gt;::BasicFormatString</a>(</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keyword">const</span> CharType (&amp;format)[N]) noexcept :</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    m_context(format, s_parameters.data(), s_parameters.size())</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;{</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    std::optional&lt;CharType&gt; ch;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordflow">while</span> (!m_context.has_error() &amp;&amp; (ch = m_context.lexer().consume()))</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    {</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="keywordflow">if</span> (ch == s_left_brace)</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            <span class="keywordflow">if</span> (m_context.lexer().consume_if(s_left_brace))</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            {</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            }</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (m_specifier_count &gt;= m_specifiers.size())</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;            {</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;                m_context.on_error(<span class="stringliteral">&quot;Exceeded maximum allowed number of specifiers&quot;</span>);</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            }</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;            {</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;                m_specifiers[m_specifier_count++] = parse_specifier();</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;            }</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        }</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (ch == s_right_brace)</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        {</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            <span class="keywordflow">if</span> (m_context.lexer().consume_if(s_right_brace))</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;                <span class="keywordflow">continue</span>;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;            }</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;            m_context.on_error(<span class="stringliteral">&quot;Closing brace } must be esacped&quot;</span>);</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        }</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    }</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;}</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;constexpr <a class="code" href="classfly_1_1detail_1_1_basic_format_parse_context.html">BasicFormatParseContext&lt;CharType&gt;</a> &amp;</div>
-<div class="line"><a name="l00139"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_basic_format_string.html#a6fc0d551707f90fb26d4010cad71921d">  139</a></span>&#160;<a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#a6fc0d551707f90fb26d4010cad71921d">BasicFormatString&lt;CharType, ParameterTypes...&gt;::context</a>()</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;{</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="keywordflow">return</span> m_context;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;}</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160; </div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
-<div class="line"><a name="l00146"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_basic_format_string.html#af67af867e81f8ebe346941d51a95a7c8">  146</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#af67af867e81f8ebe346941d51a95a7c8">BasicFormatString&lt;CharType, ParameterTypes...&gt;::next_specifier</a>()</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    -&gt; std::optional&lt;FormatSpecifier&gt;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;{</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordflow">if</span> (m_specifier_index &gt;= m_specifier_count)</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    {</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <span class="keywordflow">return</span> std::nullopt;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    }</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordflow">return</span> std::move(m_specifiers[m_specifier_index++]);</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;}</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;constexpr <span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString&lt;CharType, ParameterTypes...&gt;::parse_specifier</a>() -&gt; FormatSpecifier</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;{</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="comment">// The opening { will have already been consumed, so the starting position is one less.</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> starting_position = m_context.lexer().position() - 1;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    FormatSpecifier specifier(m_context);</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    specifier.m_parse_index = m_context.lexer().position();</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160; </div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keywordflow">if</span> (m_context.parameter_type(specifier.m_position) == ParameterType::UserDefined)</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    {</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        parse_user_defined_specifier(specifier);</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    }</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    {</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        parse_standard_specifier(specifier);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    }</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    specifier.m_size = m_context.lexer().position() - starting_position;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordflow">return</span> specifier;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;}</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;constexpr <span class="keywordtype">void</span> BasicFormatString&lt;CharType, ParameterTypes...&gt;::parse_user_defined_specifier(</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    FormatSpecifier &amp;specifier)</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;{</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="comment">// Replacement fields for user-defined types are parsed at runtime.</span></div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="comment">// TODO: Formatters that inherit from standard formatters might be parsed at compile time.</span></div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="comment">// TODO: Allow nested format specifiers.</span></div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    std::size_t expected_close_brace_count = 1;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    std::size_t nested_specifier_count = 0;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160; </div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordflow">while</span> (expected_close_brace_count != 0)</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    {</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="keywordflow">if</span> (<span class="keyword">auto</span> ch = m_context.lexer().consume(); ch)</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        {</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;            <span class="keywordflow">if</span> (ch == s_right_brace)</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;            {</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;                --expected_close_brace_count;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;            }</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (ch == s_left_brace)</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;            {</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;                ++expected_close_brace_count;</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;                ++nested_specifier_count;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            }</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (ch == s_colon)</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;            {</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;                specifier.m_parse_index = m_context.lexer().position();</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;            }</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        }</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        {</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;            m_context.on_error(<span class="stringliteral">&quot;Detected unclosed replacement field - must end with }&quot;</span>);</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;            expected_close_brace_count = 0;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">BasicFormatString</a>(<a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;operator=(<a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;&amp;) = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    constexpr <a class="code" href="classfly_1_1detail_1_1_basic_format_parse_context.html">FormatParseContext</a> &amp;<a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#a6fc0d551707f90fb26d4010cad71921d">context</a>();</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    std::optional&lt;FormatSpecifier&gt; <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#af67af867e81f8ebe346941d51a95a7c8">next_specifier</a>();</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">BasicFormatString</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;operator=(<span class="keyword">const</span> <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString</a> &amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    constexpr <a class="code" href="structfly_1_1detail_1_1_basic_format_specifier.html">FormatSpecifier</a> parse_specifier();</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keyword">template</span> &lt;std::<span class="keywordtype">size_t</span> N = 0&gt;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    constexpr <span class="keywordtype">void</span> parse_user_defined_specifier(<a class="code" href="structfly_1_1detail_1_1_basic_format_specifier.html">FormatSpecifier</a> &amp;specifier);</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">const</span> <span class="keyword">auto</span> s_left_brace = FLY_CHR(CharType, <span class="charliteral">&#39;{&#39;</span>);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">const</span> <span class="keyword">auto</span> s_right_brace = FLY_CHR(CharType, <span class="charliteral">&#39;}&#39;</span>);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keyword">static</span> constexpr <span class="keyword">const</span> <span class="keyword">auto</span> s_colon = FLY_CHR(CharType, <span class="charliteral">&#39;:&#39;</span>);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keyword">static</span> constexpr std::array&lt;ParameterType, <span class="keyword">sizeof</span>...(ParameterTypes)&gt; s_parameters {</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        infer_parameter_type&lt;ParameterTypes&gt;()...};</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <a class="code" href="classfly_1_1detail_1_1_basic_format_parse_context.html">FormatParseContext</a> m_context;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    std::array&lt;FormatSpecifier, 64&gt; m_specifiers;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    std::size_t m_specifier_count {0};</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    std::size_t m_specifier_index {0};</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;};</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="keyword">template</span> &lt;std::<span class="keywordtype">size_t</span> N&gt;</div>
+<div class="line"><a name="l00100"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">  100</a></span>&#160;FLY_CONSTEVAL <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">BasicFormatString&lt;CharType, ParameterTypes...&gt;::BasicFormatString</a>(</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keyword">const</span> CharType (&amp;format)[N]) noexcept :</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    m_context(format, s_parameters.data(), s_parameters.size())</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;{</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    std::optional&lt;CharType&gt; ch;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordflow">while</span> (!m_context.has_error() &amp;&amp; (ch = m_context.lexer().consume()))</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    {</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <span class="keywordflow">if</span> (ch == s_left_brace)</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        {</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            <span class="keywordflow">if</span> (m_context.lexer().consume_if(s_left_brace))</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            {</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;                <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            }</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (m_specifier_count &gt;= m_specifiers.size())</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            {</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                m_context.on_error(<span class="stringliteral">&quot;Exceeded maximum allowed number of specifiers&quot;</span>);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            }</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;            {</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;                m_specifiers[m_specifier_count++] = parse_specifier();</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;            }</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        }</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (ch == s_right_brace)</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        {</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;            <span class="keywordflow">if</span> (m_context.lexer().consume_if(s_right_brace))</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            {</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;                <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;            }</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;            m_context.on_error(<span class="stringliteral">&quot;Closing brace } must be escaped&quot;</span>);</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        }</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    }</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;}</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;constexpr <a class="code" href="classfly_1_1detail_1_1_basic_format_parse_context.html">BasicFormatParseContext&lt;CharType&gt;</a> &amp;</div>
+<div class="line"><a name="l00138"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_basic_format_string.html#a6fc0d551707f90fb26d4010cad71921d">  138</a></span>&#160;<a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#a6fc0d551707f90fb26d4010cad71921d">BasicFormatString&lt;CharType, ParameterTypes...&gt;::context</a>()</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;{</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordflow">return</span> m_context;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;}</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
+<div class="line"><a name="l00145"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_basic_format_string.html#af67af867e81f8ebe346941d51a95a7c8">  145</a></span>&#160;<span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html#af67af867e81f8ebe346941d51a95a7c8">BasicFormatString&lt;CharType, ParameterTypes...&gt;::next_specifier</a>()</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    -&gt; std::optional&lt;FormatSpecifier&gt;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;{</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keywordflow">if</span> (m_specifier_index &gt;= m_specifier_count)</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    {</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        <span class="keywordflow">return</span> std::nullopt;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    }</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordflow">return</span> std::move(m_specifiers[m_specifier_index++]);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;}</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;constexpr <span class="keyword">auto</span> <a class="code" href="classfly_1_1detail_1_1_basic_format_string.html">BasicFormatString&lt;CharType, ParameterTypes...&gt;::parse_specifier</a>() -&gt; FormatSpecifier</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;{</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="comment">// The opening { will have already been consumed, so the starting position is one less.</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> starting_position = m_context.lexer().position() - 1;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    FormatSpecifier specifier(m_context);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    specifier.m_parse_index = m_context.lexer().position();</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keywordflow">if</span> (m_context.lexer().consume_if(s_colon))</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    {</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        specifier.m_parse_index = m_context.lexer().position();</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        <span class="keywordflow">if</span> (m_context.parameter_type(specifier.m_position) == ParameterType::UserDefined)</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        {</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;            parse_user_defined_specifier(specifier);</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        }</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        {</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;            specifier.parse(m_context);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        }</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    }</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!m_context.lexer().consume_if(s_right_brace))</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    {</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        m_context.on_error(<span class="stringliteral">&quot;Detected unclosed replacement field - must end with }&quot;</span>);</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    }</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    specifier.m_size = m_context.lexer().position() - starting_position;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordflow">return</span> specifier;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;}</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="keyword">template</span> &lt;std::<span class="keywordtype">size_t</span> N&gt;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;constexpr <span class="keywordtype">void</span> BasicFormatString&lt;CharType, ParameterTypes...&gt;::parse_user_defined_specifier(</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    FormatSpecifier &amp;specifier)</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;{</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keywordflow">if</span> constexpr (N &lt; <span class="keyword">sizeof</span>...(ParameterTypes))</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    {</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        <span class="keywordflow">if</span> (N != specifier.m_position)</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        {</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;            parse_user_defined_specifier&lt;N + 1&gt;(specifier);</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;            <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        }</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160; </div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        <span class="keyword">using</span> T = std::tuple_element_t&lt;N, std::tuple&lt;std::remove_cvref_t&lt;ParameterTypes&gt;...&gt;&gt;;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        <span class="keyword">using</span> Formatter = <a class="code" href="structfly_1_1_formatter_3_01_t_00_01_char_type_01_4.html">fly::Formatter&lt;T, CharType&gt;</a>;</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        <span class="keywordflow">if</span> constexpr (fly::FormattableWithParsing&lt;FormatParseContext, Formatter&gt;)</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        {</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;            Formatter formatter;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;            formatter.<a class="code" href="structfly_1_1detail_1_1_basic_format_specifier.html#ae3bb480774e64f4c3ae934bf1ef349d1">parse</a>(m_context);</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;            <span class="keywordflow">if</span> constexpr (fly::DerivedFrom&lt;Formatter, FormatSpecifier&gt;)</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;            {</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;                formatter.copy_formatting_options_into(specifier);</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;            }</div>
 <div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        }</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    }</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keywordflow">if</span> (nested_specifier_count != 0)</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    {</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        m_context.on_error(<span class="stringliteral">&quot;Nested replacement fields are not allowed in user-defined formatters&quot;</span>);</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    }</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;}</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="keyword">template</span> &lt;fly::StandardCharacter CharType, <span class="keyword">typename</span>... ParameterTypes&gt;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;constexpr <span class="keywordtype">void</span></div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;BasicFormatString&lt;CharType, ParameterTypes...&gt;::parse_standard_specifier(FormatSpecifier &amp;specifier)</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;{</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keywordflow">if</span> (m_context.lexer().consume_if(s_colon))</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    {</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        specifier.m_parse_index = m_context.lexer().position();</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        specifier.parse(m_context);</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    }</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160; </div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="keywordflow">if</span> (!m_context.has_error() &amp;&amp; !m_context.lexer().consume_if(s_right_brace))</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    {</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        m_context.on_error(<span class="stringliteral">&quot;Detected unclosed replacement field - must end with }&quot;</span>);</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    }</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;}</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;} <span class="comment">// namespace fly::detail</span></div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        {</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;            <span class="keywordflow">if</span> (!m_context.lexer().consume_if(s_right_brace))</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;            {</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;                m_context.on_error(</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;                    <span class="stringliteral">&quot;User-defined formatter without a parser may not have formatting options&quot;</span>);</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;            }</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;        }</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    }</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;}</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;} <span class="comment">// namespace fly::detail</span></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_basic_format_parse_context_html"><div class="ttname"><a href="classfly_1_1detail_1_1_basic_format_parse_context.html">fly::detail::BasicFormatParseContext</a></div><div class="ttdef"><b>Definition:</b> format_parse_context.hpp:22</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_basic_format_string_html"><div class="ttname"><a href="classfly_1_1detail_1_1_basic_format_string.html">fly::detail::BasicFormatString</a></div><div class="ttdef"><b>Definition:</b> format_string.hpp:33</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_basic_format_string_html_a6fc0d551707f90fb26d4010cad71921d"><div class="ttname"><a href="classfly_1_1detail_1_1_basic_format_string.html#a6fc0d551707f90fb26d4010cad71921d">fly::detail::BasicFormatString::context</a></div><div class="ttdeci">constexpr FormatParseContext &amp; context()</div><div class="ttdef"><b>Definition:</b> format_string.hpp:139</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_basic_format_string_html_a8f1054e0b16cfe1d5c32420bb3349baa"><div class="ttname"><a href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">fly::detail::BasicFormatString::BasicFormatString</a></div><div class="ttdeci">FLY_CONSTEVAL BasicFormatString(const CharType(&amp;format)[N]) noexcept</div><div class="ttdef"><b>Definition:</b> format_string.hpp:101</div></div>
-<div class="ttc" id="aclassfly_1_1detail_1_1_basic_format_string_html_af67af867e81f8ebe346941d51a95a7c8"><div class="ttname"><a href="classfly_1_1detail_1_1_basic_format_string.html#af67af867e81f8ebe346941d51a95a7c8">fly::detail::BasicFormatString::next_specifier</a></div><div class="ttdeci">std::optional&lt; FormatSpecifier &gt; next_specifier()</div><div class="ttdef"><b>Definition:</b> format_string.hpp:146</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_basic_format_string_html"><div class="ttname"><a href="classfly_1_1detail_1_1_basic_format_string.html">fly::detail::BasicFormatString</a></div><div class="ttdef"><b>Definition:</b> format_string.hpp:36</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_basic_format_string_html_a6fc0d551707f90fb26d4010cad71921d"><div class="ttname"><a href="classfly_1_1detail_1_1_basic_format_string.html#a6fc0d551707f90fb26d4010cad71921d">fly::detail::BasicFormatString::context</a></div><div class="ttdeci">constexpr FormatParseContext &amp; context()</div><div class="ttdef"><b>Definition:</b> format_string.hpp:138</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_basic_format_string_html_a8f1054e0b16cfe1d5c32420bb3349baa"><div class="ttname"><a href="classfly_1_1detail_1_1_basic_format_string.html#a8f1054e0b16cfe1d5c32420bb3349baa">fly::detail::BasicFormatString::BasicFormatString</a></div><div class="ttdeci">FLY_CONSTEVAL BasicFormatString(const CharType(&amp;format)[N]) noexcept</div><div class="ttdef"><b>Definition:</b> format_string.hpp:100</div></div>
+<div class="ttc" id="aclassfly_1_1detail_1_1_basic_format_string_html_af67af867e81f8ebe346941d51a95a7c8"><div class="ttname"><a href="classfly_1_1detail_1_1_basic_format_string.html#af67af867e81f8ebe346941d51a95a7c8">fly::detail::BasicFormatString::next_specifier</a></div><div class="ttdeci">std::optional&lt; FormatSpecifier &gt; next_specifier()</div><div class="ttdef"><b>Definition:</b> format_string.hpp:145</div></div>
+<div class="ttc" id="astructfly_1_1_formatter_3_01_t_00_01_char_type_01_4_html"><div class="ttname"><a href="structfly_1_1_formatter_3_01_t_00_01_char_type_01_4.html">fly::Formatter&lt; T, CharType &gt;</a></div><div class="ttdef"><b>Definition:</b> formatters.hpp:41</div></div>
 <div class="ttc" id="astructfly_1_1detail_1_1_basic_format_specifier_html"><div class="ttname"><a href="structfly_1_1detail_1_1_basic_format_specifier.html">fly::detail::BasicFormatSpecifier</a></div><div class="ttdef"><b>Definition:</b> format_specifier.hpp:116</div></div>
+<div class="ttc" id="astructfly_1_1detail_1_1_basic_format_specifier_html_ae3bb480774e64f4c3ae934bf1ef349d1"><div class="ttname"><a href="structfly_1_1detail_1_1_basic_format_specifier.html#ae3bb480774e64f4c3ae934bf1ef349d1">fly::detail::BasicFormatSpecifier::parse</a></div><div class="ttdeci">constexpr void parse(FormatParseContext &amp;context)</div><div class="ttdef"><b>Definition:</b> format_specifier.hpp:510</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

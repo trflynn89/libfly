@@ -382,6 +382,7 @@ var namespaces_dup =
       [ "operator>=", "json_8cpp.html#a8ea692f892836f4d77d639cd1d7a1b07", null ],
       [ "supports_consteval", "fly_8hpp.html#a70efbc7c8bc68fd2c821b1359aaf6317", null ],
       [ "supports_floating_point_charconv", "fly_8hpp.html#a68a13322ee60d8844a1e450451b83a5a", null ],
+      [ "DerivedFrom", "concepts_2concepts_8hpp.html#a2ad3d540558015279855304343777b96", null ],
       [ "FloatingPoint", "concepts_2concepts_8hpp.html#a1fdcc99f3676f5845d91ae4be339473d", null ],
       [ "Formattable", "types_2string_2concepts_8hpp.html#a7998e5db4453d4676686a9789437898c", null ],
       [ "FormattableBoolean", "types_2string_2concepts_8hpp.html#afc0b5f20382d6115ada38c9a474fd767", null ],

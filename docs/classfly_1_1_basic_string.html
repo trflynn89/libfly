@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">6.0.0</span>
+   &#160;<span id="projectnumber">6.1.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -565,7 +565,10 @@ struct fly::Formatter&lt;MyType, CharType&gt;
         fly::BasicString&lt;CharType&gt;::format_to(context.out(), "{}", value.as_int());
     }
 };
-</pre><p> The |parse| method is optional. If defined, it is provided a BasicFormatParseContext which contains a lexer that may be used to parse the format string. The lexer is positioned such that it is pointed at the first character after the ":" in the replacement field (if there is one), or after the opening "{" character. The |parse| method is expected to consume up to and including the closing "}" character. It may indicate any parsing errors through the parsing context; if an error occurs, the error is written to the formatted string, and formatting will halt.</p>
+</pre><p> The |parse| method is optional. If defined, it is provided a BasicFormatParseContext which contains a lexer that may be used to parse the format string. The position of the lexer will be one of the following within the replacement field: </p><pre class="fragment">1. The position immediately after the colon, if there is one.
+2. Otherwise, the position immediately after the format parameter index, if there is one.
+3. Otherwise, the position immeidately after the opening brace.
+</pre><p> The |parse| method is expected to consume up to and including the closing "}" character. It must be declared constexpr, as it will be invoked at compile time to validate the replacement field. The parser may indicate any parsing errors through the parsing context; if an error occurs, the error is handled the same as any standard replacement field (see above). Even though the parser is invoked at compile time, the result of user-defined parsing cannot be stored generically. Thus, parsing is invoked again at runtime immediately before |format|.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">ParameterTypes</td><td>Variadic format parameter types.</td></tr>
