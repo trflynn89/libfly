@@ -293,7 +293,7 @@ private:
  *
  * @param parameters The format parameters to store.
  */
-template <typename FormatContext, Formattable<FormatContext>... ParameterTypes>
+template <typename FormatContext, fly::Formattable<FormatContext>... ParameterTypes>
 constexpr auto make_format_parameters(ParameterTypes &&...parameters)
 {
     return BasicFormatParameters<FormatContext, ParameterTypes...> {
@@ -313,7 +313,7 @@ inline void format_user_defined_value(
     Formatter formatter;
     parse_context.lexer().set_position(specifier.m_parse_index);
 
-    if constexpr (FormattableWithParsing<decltype(parse_context), Formatter>)
+    if constexpr (fly::FormattableWithParsing<decltype(parse_context), Formatter>)
     {
         formatter.parse(parse_context);
     }
@@ -357,7 +357,7 @@ inline void format_standard_value(
 {
     typename FormatContext::template formatter_type<T> formatter(std::move(specifier));
 
-    if constexpr (FormattablePointer<T>)
+    if constexpr (fly::FormattablePointer<T>)
     {
         if constexpr (std::is_null_pointer_v<T>)
         {
