@@ -2,6 +2,8 @@
 
 #include "fly/concepts/concepts.hpp"
 
+#include <memory>
+
 namespace fly::net {
 
 class IPv4Address;
@@ -43,5 +45,16 @@ concept Socket = fly::SameAsAny<
     TcpSocket<Endpoint<IPv6Address>>,
     UdpSocket<Endpoint<IPv4Address>>,
     UdpSocket<Endpoint<IPv6Address>>>;
+
+/**
+ * Concept that is satisfied if the provided type is a callback which accepts a strong pointer to an
+ * IPv4 or IPv6 socket type.
+ */
+template <typename T, typename SocketType>
+concept SocketNotification = requires(T callback)
+{
+    requires Socket<SocketType>;
+    callback(std::declval<std::shared_ptr<SocketType>>());
+};
 
 } // namespace fly::net
