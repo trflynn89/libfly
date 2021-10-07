@@ -781,7 +781,7 @@ CATCH_TEMPLATE_TEST_CASE(
     using char_type = typename BasicString::char_type;
 
     UserDefinedType u {};
-    UserDefinedTypeWithParser p {};
+    UserDefinedTypeWithParser up {};
 
     CATCH_SECTION("User-defined types inherit parent's parse method")
     {
@@ -792,13 +792,16 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("User-defined types may define a parse method")
     {
-        test_format(FMT("{}"), FMT("false"), p);
-        test_format(FMT("{:o}"), FMT("true"), p);
+        test_format(FMT("{}"), FMT("false"), up);
+        test_format(FMT("{:o}"), FMT("true"), up);
     }
 
     CATCH_SECTION("User-defined types with a parse method may report errors")
     {
-        test_format(FMT("{:x}"), FMT("UserDefinedTypeWithParser error!"), p);
+        test_format(
+            FMT("{:x}"),
+            FMT("Ignored invalid formatter: UserDefinedTypeWithParser error!"),
+            up);
     }
 
     CATCH_SECTION("User-defined types do not need to define a parse method")
@@ -808,15 +811,17 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(FMT("{:}"), FMT("UserDefinedType"), u);
     }
 
-    CATCH_SECTION("User-defined formatter without a parse method may not have formatting options")
+    CATCH_SECTION("User-defined formatter without a parser may not have formatting options")
     {
         test_format(
             FMT("{:s}"),
-            FMT("User-defined formatter without a parse method may not have formatting options"),
+            FMT("Ignored invalid formatter: User-defined formatter without a parser may not have "
+                "formatting options"),
             u);
         test_format(
             FMT("{:.3}"),
-            FMT("User-defined formatter without a parse method may not have formatting options"),
+            FMT("Ignored invalid formatter: User-defined formatter without a parser may not have "
+                "formatting options"),
             u);
     }
 }

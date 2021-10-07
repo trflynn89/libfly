@@ -24,6 +24,14 @@ struct UserDefinedType
 {
 };
 
+struct UserDefinedTypeWithParser
+{
+};
+
+struct UserDefinedTypeWithParserWhichFails
+{
+};
+
 enum class UserFormattedEnum
 {
     One = 1,
@@ -92,8 +100,8 @@ void test_format(FormatStringType &&format, const SpecifierType &...specifiers)
         CATCH_CHECK(actual_specifier == specifier);
     };
 
-    CATCH_CHECK_FALSE(format.context().has_error());
     CATCH_CAPTURE(format.context().error());
+    CATCH_CHECK_FALSE(format.context().has_error());
     (equals(specifiers), ...);
 
     CATCH_CHECK_FALSE(format.next_specifier());
@@ -135,7 +143,7 @@ constexpr const char *s_bad_precision_position =
 constexpr const char *s_bad_locale =
     "Locale-specific form may only be used for numeric and boolean types";
 constexpr const char *s_bad_user_defined =
-    "Nested replacement fields are not allowed in user-defined formatters";
+    "User-defined formatter without a parser may not have formatting options";
 constexpr const char *s_bad_character = "Character types must be formatted with {} or {:cbBodxX}";
 constexpr const char *s_bad_string = "String types must be formatted with {} or {:s}";
 constexpr const char *s_bad_pointer = "Pointer types must be formatted with {} or {:p}";
@@ -150,15 +158,54 @@ constexpr const char *s_bad_bool = "Boolean types must be formatted with {} or o
 } // namespace
 
 template <typename CharType>
-struct fly::Formatter<UserDefinedType, CharType> :
-    public fly::Formatter<std::basic_string_view<CharType>, CharType>
+struct fly::Formatter<UserDefinedType, CharType>
 {
     template <typename FormatContext>
-    void format(const UserDefinedType &, FormatContext &context)
+    void format(UserDefinedType, FormatContext &)
     {
-        fly::Formatter<std::basic_string_view<CharType>, CharType>::format(
-            FLY_STR(CharType, "UserDefinedType"),
-            context);
+    }
+};
+
+template <typename CharType>
+struct fly::Formatter<UserDefinedTypeWithParser, CharType>
+{
+    template <typename FormatParseContext>
+    constexpr void parse(FormatParseContext &context)
+    {
+        while (!context.has_error())
+        {
+            if (auto ch = context.lexer().consume(); ch)
+            {
+                if (ch == FLY_CHR(CharType, '}'))
+                {
+                    break;
+                }
+            }
+            else
+            {
+                context.on_error("EOF");
+            }
+        }
+    }
+
+    template <typename FormatContext>
+    void format(UserDefinedTypeWithParser, FormatContext &)
+    {
+    }
+};
+
+template <typename CharType>
+struct fly::Formatter<UserDefinedTypeWithParserWhichFails, CharType>
+{
+    template <typename FormatParseContext>
+    constexpr void parse(FormatParseContext &context)
+    {
+        context.on_error("UserDefinedTypeWithParserWhichFails");
+    }
+
+    template <typename FormatContext>
+    void format(UserDefinedTypeWithParserWhichFails, FormatContext &)
+    {
     }
 };
 
@@ -167,11 +214,8 @@ struct fly::Formatter<UserFormattedEnum, CharType> :
     public fly::Formatter<std::basic_string_view<CharType>, CharType>
 {
     template <typename FormatContext>
-    void format(UserFormattedEnum value, FormatContext &context)
+    void format(UserFormattedEnum, FormatContext &)
     {
-        fly::Formatter<std::basic_string_view<CharType>, CharType>::format(
-            value == UserFormattedEnum::One ? FLY_STR(CharType, "One") : FLY_STR(CharType, "Two"),
-            context);
     }
 };
 
@@ -187,14 +231,14 @@ CATCH_TEMPLATE_TEST_CASE(
     using char_type = TestType;
     using Specifier = fly::detail::BasicFormatSpecifier<char_type>;
 
-    constexpr const UserDefinedType g {};
+    constexpr const UserDefinedType u {};
+    constexpr const UserDefinedTypeWithParser up {};
     constexpr const auto c = FLY_CHR(char_type, 'a');
     constexpr const auto s = FLY_STR(char_type, "a");
     constexpr const auto &a = FLY_ARR(char_type, "a");
     constexpr const int i = 1;
     constexpr const float f = 3.14f;
     constexpr const bool b = true;
-    constexpr const UserFormattedEnum u = UserFormattedEnum::One;
 
     CATCH_SECTION("No specifiers are parsed from empty string")
     {
@@ -218,7 +262,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("A single, empty specifier has default values")
     {
-        test_format(make_format(FMT("{}"), g), Specifier {});
+        test_format(make_format(FMT("{}"), u), Specifier {});
     }
 
     CATCH_SECTION("Able to parse the maxiumum allowed number of replacement fields")
@@ -243,8 +287,8 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Extra format parameters are ignored")
     {
-        test_format(make_format(FMT(""), g, f, b));
-        test_format(make_format(FMT("{}"), g, f, b), Specifier {});
+        test_format(make_format(FMT(""), u, f, b));
+        test_format(make_format(FMT("{}"), u, f, b), Specifier {});
     }
 
     CATCH_SECTION("Format position option can be automatically incremented")
@@ -253,7 +297,7 @@ CATCH_TEMPLATE_TEST_CASE(
         Specifier specifier2 {};
         specifier2.m_position = 1;
 
-        test_format(make_format(FMT("{} {}"), g, g), specifier1, specifier2);
+        test_format(make_format(FMT("{} {}"), u, u), specifier1, specifier2);
     }
 
     CATCH_SECTION("Format position option can be manually specified")
@@ -262,10 +306,10 @@ CATCH_TEMPLATE_TEST_CASE(
         Specifier specifier2 {};
         specifier2.m_position = 1;
 
-        test_format(make_format(FMT("{0}"), g), specifier1);
-        test_format(make_format(FMT("{0} {0}"), g), specifier1, specifier1);
-        test_format(make_format(FMT("{0} {1}"), g, g), specifier1, specifier2);
-        test_format(make_format(FMT("{1} {0}"), g, g), specifier2, specifier1);
+        test_format(make_format(FMT("{0}"), u), specifier1);
+        test_format(make_format(FMT("{0} {0}"), u), specifier1, specifier1);
+        test_format(make_format(FMT("{0} {1}"), u, u), specifier1, specifier2);
+        test_format(make_format(FMT("{1} {0}"), u, u), specifier2, specifier1);
     }
 
     CATCH_SECTION("Fill character may be set")
@@ -439,8 +483,8 @@ CATCH_TEMPLATE_TEST_CASE(
         Specifier specifier {};
 
         specifier.m_type = Specifier::Type::None;
-        test_format(make_format(FMT("{}"), g), specifier);
         test_format(make_format(FMT("{}"), u), specifier);
+        test_format(make_format(FMT("{}"), UserFormattedEnum::One), specifier);
 
         specifier.m_type = Specifier::Type::Character;
         test_format(make_format(FMT("{}"), c), specifier);
@@ -487,7 +531,7 @@ CATCH_TEMPLATE_TEST_CASE(
         Specifier specifier {};
         specifier.m_type = Specifier::Type::Pointer;
 
-        test_format(make_format(FMT("{:p}"), &g), specifier);
+        test_format(make_format(FMT("{:p}"), &u), specifier);
         test_format(make_format(FMT("{:p}"), &i), specifier);
         test_format(make_format(FMT("{:p}"), nullptr), specifier);
     }
@@ -642,17 +686,23 @@ CATCH_TEMPLATE_TEST_CASE(
         test_format(make_format(FMT("{1:F}"), f, f), specifier);
     }
 
-    CATCH_SECTION("User-defined types may have any formatting options")
+    CATCH_SECTION("User-defined formatter without a parse method or formatting options")
     {
         Specifier specifier {};
-        test_format(make_format(FMT("{}"), g), specifier);
-        test_format(make_format(FMT("{:g}"), g), specifier);
-        test_format(make_format(FMT("{:abcdefghijklmnop}"), g), specifier);
+        test_format(make_format(FMT("{}"), u), specifier);
+    }
+
+    CATCH_SECTION("User-defined formatter with a parse method")
+    {
+        Specifier specifier {};
+        test_format(make_format(FMT("{}"), up), specifier);
+        test_format(make_format(FMT("{:g}"), up), specifier);
+        test_format(make_format(FMT("{:abcdefghijklmnop}"), up), specifier);
     }
 
     CATCH_SECTION("Specifiers track their size in the format string")
     {
-        auto format = make_format(FMT("ab {0} cd {1:d} ef {2:abcdefghijklmnop}"), 1, 2, u);
+        auto format = make_format(FMT("ab {0} cd {1:d} ef {2:abcdefghijklmnop}"), 1, 2, up);
         CATCH_CHECK_FALSE(format.context().has_error());
 
         auto specifier1 = format.next_specifier();
@@ -673,7 +723,7 @@ CATCH_TEMPLATE_TEST_CASE(
     CATCH_SECTION("Specifiers track their parsing index in the format string")
     {
         {
-            auto format = make_format(FMT("ab {0} cd {1:d} ef {002:abcdefghijklmnop}"), 1, 2, u);
+            auto format = make_format(FMT("ab {0} cd {1:d} ef {002:abcdefghijklmnop}"), 1, 2, up);
             CATCH_CHECK_FALSE(format.context().has_error());
 
             auto specifier1 = format.next_specifier();
@@ -691,7 +741,7 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK_FALSE(format.next_specifier());
         }
         {
-            auto format = make_format(FMT("ab {} cd {:abcdefghijklmnop} ef {:d}"), 1, u, 2);
+            auto format = make_format(FMT("ab {} cd {:abcdefghijklmnop} ef {:d}"), 1, up, 2);
             CATCH_CHECK_FALSE(format.context().has_error());
 
             auto specifier1 = format.next_specifier();
@@ -725,7 +775,8 @@ CATCH_TEMPLATE_TEST_CASE(
 {
     using char_type = TestType;
 
-    constexpr const UserDefinedType g {};
+    constexpr const UserDefinedType u {};
+    constexpr const UserDefinedTypeWithParserWhichFails upf {};
     constexpr const auto c = FLY_CHR(char_type, 'a');
     constexpr const auto s = FLY_STR(char_type, "a");
     constexpr const int i = 1;
@@ -736,8 +787,7 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         test_error(make_format(FMT("{"), 1), s_unclosed_string);
         test_error(make_format(FMT("{:"), 1), s_unclosed_string);
-        test_error(make_format(FMT("{"), g), s_unclosed_string);
-        test_error(make_format(FMT("{:"), g), s_unclosed_string);
+        test_error(make_format(FMT("{"), u), s_unclosed_string);
     }
 
     CATCH_SECTION("Cannot parse single closing brace")
@@ -1100,9 +1150,14 @@ CATCH_TEMPLATE_TEST_CASE(
         test_error(make_format(FMT("{:Z}"), i), s_unclosed_string);
     }
 
-    CATCH_SECTION("User-defined types may not have nested replacement fields")
+    CATCH_SECTION("User-defined formatter without a parser may not have formatting options")
     {
-        test_error(make_format(FMT("{:{}}"), g), s_bad_user_defined);
+        test_error(make_format(FMT("{:s}"), u), s_bad_user_defined);
+    }
+
+    CATCH_SECTION("User-defined formatter with a parser may raise errors")
+    {
+        test_error(make_format(FMT("{:s}"), upf), "UserDefinedTypeWithParserWhichFails");
     }
 
     CATCH_SECTION("Cannot parse erroneous whitespace")
