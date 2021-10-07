@@ -312,6 +312,7 @@ public:
      *         Otherwise, an uninitialized value.
      */
     template <char UnicodePrefix = 'U'>
+    requires fly::UnicodePrefixCharacter<UnicodePrefix>
     static std::optional<string_type> escape_all_codepoints(view_type value);
 
     /**
@@ -343,6 +344,7 @@ public:
      *         uninitialized value.
      */
     template <char UnicodePrefix = 'U', typename IteratorType>
+    requires fly::UnicodePrefixCharacter<UnicodePrefix>
     static std::optional<string_type> escape_codepoint(IteratorType &it, const IteratorType &end);
 
     /**
@@ -803,6 +805,7 @@ inline auto BasicString<CharType>::encode_codepoint(codepoint_type codepoint)
 //==================================================================================================
 template <StandardCharacter CharType>
 template <char UnicodePrefix>
+requires fly::UnicodePrefixCharacter<UnicodePrefix>
 auto BasicString<CharType>::escape_all_codepoints(view_type value) -> std::optional<string_type>
 {
     string_type result;
@@ -828,6 +831,7 @@ auto BasicString<CharType>::escape_all_codepoints(view_type value) -> std::optio
 //==================================================================================================
 template <StandardCharacter CharType>
 template <char UnicodePrefix, typename IteratorType>
+requires fly::UnicodePrefixCharacter<UnicodePrefix>
 inline auto BasicString<CharType>::escape_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<string_type>
 {

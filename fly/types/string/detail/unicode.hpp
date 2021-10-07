@@ -132,6 +132,7 @@ public:
      *         uninitialized value.
      */
     template <char UnicodePrefix = 'U', typename IteratorType>
+    requires fly::UnicodePrefixCharacter<UnicodePrefix>
     static std::optional<string_type> escape_codepoint(IteratorType &it, const IteratorType &end);
 
     /**
@@ -174,6 +175,7 @@ private:
      *         uninitialized value.
      */
     template <char UnicodePrefix>
+    requires fly::UnicodePrefixCharacter<UnicodePrefix>
     static string_type escape_codepoint(codepoint_type codepoint);
 
     /**
@@ -189,6 +191,7 @@ private:
      *         invalid codepoint.
      */
     template <char UnicodePrefix, typename IteratorType>
+    requires fly::UnicodePrefixCharacter<UnicodePrefix>
     static codepoint_type unescape_codepoint(IteratorType &it, const IteratorType &end);
 
     /**
@@ -449,11 +452,10 @@ auto BasicUnicode<CharType>::encode_codepoint(codepoint_type codepoint)
 //==================================================================================================
 template <fly::StandardCharacter CharType>
 template <char UnicodePrefix, typename IteratorType>
+requires fly::UnicodePrefixCharacter<UnicodePrefix>
 auto BasicUnicode<CharType>::escape_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<string_type>
 {
-    static_assert((UnicodePrefix == 'u') || (UnicodePrefix == 'U'));
-
     if (auto codepoint = decode_codepoint(it, end); codepoint)
     {
         return escape_codepoint<UnicodePrefix>(*codepoint);
@@ -500,6 +502,7 @@ auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const Iterator
 //==================================================================================================
 template <fly::StandardCharacter CharType>
 template <char UnicodePrefix>
+requires fly::UnicodePrefixCharacter<UnicodePrefix>
 auto BasicUnicode<CharType>::escape_codepoint(codepoint_type codepoint) -> string_type
 {
     string_type result;
@@ -555,11 +558,10 @@ auto BasicUnicode<CharType>::escape_codepoint(codepoint_type codepoint) -> strin
 //==================================================================================================
 template <fly::StandardCharacter CharType>
 template <char UnicodePrefix, typename IteratorType>
+requires fly::UnicodePrefixCharacter<UnicodePrefix>
 auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
     -> codepoint_type
 {
-    static_assert((UnicodePrefix == 'u') || (UnicodePrefix == 'U'));
-
     if ((it == end) || (*it != '\\') || (++it == end) || (*it != UnicodePrefix))
     {
         return s_invalid_codepoint;

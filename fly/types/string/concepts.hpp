@@ -117,4 +117,10 @@ concept FormattableUserDefined = requires
     requires !FormattableBoolean<T>;
 };
 
+/**
+ * Concept that is satisfied when the given character is a valid Unicode prefix ('u' or 'U').
+ */
+template <char Ch>
+concept UnicodePrefixCharacter = (Ch == 'u') || (Ch == 'U');
+
 } // namespace fly
