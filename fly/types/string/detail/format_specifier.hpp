@@ -486,6 +486,11 @@ constexpr void BasicFormatSpecifier<CharType>::parse(FormatParseContext &context
     parse_type(context);
 
     validate(context);
+
+    if (!context.has_error() && !context.lexer().consume_if(s_right_brace))
+    {
+        context.on_error("Detected unclosed replacement field - must end with }");
+    }
 }
 
 //==================================================================================================

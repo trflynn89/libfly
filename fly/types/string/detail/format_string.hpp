@@ -6,12 +6,14 @@
 #include "fly/types/string/detail/format_parse_context.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
 #include "fly/types/string/detail/traits.hpp"
+#include "fly/types/string/formatters.hpp"
 #include "fly/types/string/lexer.hpp"
 #include "fly/types/string/literals.hpp"
 
 #include <array>
 #include <cstdint>
 #include <optional>
+#include <tuple>
 #include <type_traits>
 
 namespace fly::detail {
@@ -68,18 +70,14 @@ private:
     constexpr FormatSpecifier parse_specifier();
 
     /**
-     * Parse a replacement field for a user-defined type.
+     * Parse a replacement field for a user-defined type. If the formatter for the user-defined type
+     * defines a |parse| method, it is invoked to parse any formatting options. Otherwise, it is an
+     * error if any formatting options are specified.
      *
      * @param specifier The replacement field being parsed.
      */
+    template <std::size_t N = 0>
     constexpr void parse_user_defined_specifier(FormatSpecifier &specifier);
-
-    /**
-     * Parse a replacement field for a standard type.
-     *
-     * @param specifier The replacement field being parsed.
-     */
-    constexpr void parse_standard_specifier(FormatSpecifier &specifier);
 
     static constexpr const auto s_left_brace = FLY_CHR(CharType, '{');
     static constexpr const auto s_right_brace = FLY_CHR(CharType, '}');
@@ -164,13 +162,22 @@ constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier()
     FormatSpecifier specifier(m_context);
     specifier.m_parse_index = m_context.lexer().position();
 
-    if (m_context.parameter_type(specifier.m_position) == ParameterType::UserDefined)
+    if (m_context.lexer().consume_if(s_colon))
     {
-        parse_user_defined_specifier(specifier);
+        specifier.m_parse_index = m_context.lexer().position();
+
+        if (m_context.parameter_type(specifier.m_position) == ParameterType::UserDefined)
+        {
+            parse_user_defined_specifier(specifier);
+        }
+        else
+        {
+            specifier.parse(m_context);
+        }
     }
-    else
+    else if (!m_context.lexer().consume_if(s_right_brace))
     {
-        parse_standard_specifier(specifier);
+        m_context.on_error("Detected unclosed replacement field - must end with }");
     }
 
     specifier.m_size = m_context.lexer().position() - starting_position;
@@ -179,61 +186,34 @@ constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier()
 
 //==================================================================================================
 template <fly::StandardCharacter CharType, typename... ParameterTypes>
+template <std::size_t N>
 constexpr void BasicFormatString<CharType, ParameterTypes...>::parse_user_defined_specifier(
     FormatSpecifier &specifier)
 {
-    // Replacement fields for user-defined types are parsed at runtime.
-    //
-    // TODO: Formatters that inherit from standard formatters might be parsed at compile time.
-    // TODO: Allow nested format specifiers.
-    std::size_t expected_close_brace_count = 1;
-    std::size_t nested_specifier_count = 0;
-
-    while (expected_close_brace_count != 0)
+    if constexpr (N < sizeof...(ParameterTypes))
     {
-        if (auto ch = m_context.lexer().consume(); ch)
+        if (N != specifier.m_position)
         {
-            if (ch == s_right_brace)
-            {
-                --expected_close_brace_count;
-            }
-            else if (ch == s_left_brace)
-            {
-                ++expected_close_brace_count;
-                ++nested_specifier_count;
-            }
-            else if (ch == s_colon)
-            {
-                specifier.m_parse_index = m_context.lexer().position();
-            }
+            parse_user_defined_specifier<N + 1>(specifier);
+            return;
+        }
+
+        using T = std::tuple_element_t<N, std::tuple<std::remove_cvref_t<ParameterTypes>...>>;
+        using Formatter = fly::Formatter<T, CharType>;
+
+        if constexpr (fly::FormattableWithParsing<FormatParseContext, Formatter>)
+        {
+            Formatter formatter;
+            formatter.parse(m_context);
         }
         else
         {
-            m_context.on_error("Detected unclosed replacement field - must end with }");
-            expected_close_brace_count = 0;
+            if (!m_context.lexer().consume_if(s_right_brace))
+            {
+                m_context.on_error(
+                    "User-defined formatter without a parser may not have formatting options");
+            }
         }
-    }
-
-    if (nested_specifier_count != 0)
-    {
-        m_context.on_error("Nested replacement fields are not allowed in user-defined formatters");
-    }
-}
-
-//==================================================================================================
-template <fly::StandardCharacter CharType, typename... ParameterTypes>
-constexpr void
-BasicFormatString<CharType, ParameterTypes...>::parse_standard_specifier(FormatSpecifier &specifier)
-{
-    if (m_context.lexer().consume_if(s_colon))
-    {
-        specifier.m_parse_index = m_context.lexer().position();
-        specifier.parse(m_context);
-    }
-
-    if (!m_context.has_error() && !m_context.lexer().consume_if(s_right_brace))
-    {
-        m_context.on_error("Detected unclosed replacement field - must end with }");
     }
 }
 

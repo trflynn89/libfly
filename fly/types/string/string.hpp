@@ -477,12 +477,19 @@ public:
      *     };
      *
      * The |parse| method is optional. If defined, it is provided a BasicFormatParseContext which
-     * contains a lexer that may be used to parse the format string. The lexer is positioned such
-     * that it is pointed at the first character after the ":" in the replacement field (if there is
-     * one), or after the opening "{" character. The |parse| method is expected to consume up to and
-     * including the closing "}" character. It may indicate any parsing errors through the parsing
-     * context; if an error occurs, the error is written to the formatted string, and formatting
-     * will halt.
+     * contains a lexer that may be used to parse the format string. The position of the lexer
+     * will be one of the following within the replacement field:
+     *
+     *     1. The position immediately after the colon, if there is one.
+     *     2. Otherwise, the position immediately after the format parameter index, if there is one.
+     *     3. Otherwise, the position immeidately after the opening brace.
+     *
+     * The |parse| method is expected to consume up to and including the closing "}" character. It
+     * must be declared constexpr, as it will be invoked at compile time to validate the replacement
+     * field. The parser may indicate any parsing errors through the parsing context; if an error
+     * occurs, the error is handled the same as any standard replacement field (see above). Even
+     * though the parser is invoked at compile time, the result of user-defined parsing cannot be
+     * stored generically. Thus, parsing is invoked again at runtime immediately before |format|.
      *
      * @tparam ParameterTypes Variadic format parameter types.
      *
@@ -969,12 +976,6 @@ void BasicString<CharType>::format_to(
 
                     const auto parameter = context.arg(specifier.m_position);
                     parameter.format(parse_context, context, std::move(specifier));
-
-                    if (parse_context.has_error())
-                    {
-                        format_to(output, FLY_ARR(char_type, "{}"), parse_context.error());
-                        return;
-                    }
                 }
                 break;
 

@@ -309,27 +309,15 @@ inline void format_user_defined_value(
     BasicFormatSpecifier<typename FormatContext::char_type> &&specifier)
 {
     using Formatter = typename FormatContext::template formatter_type<T>;
-
     Formatter formatter;
-    parse_context.lexer().set_position(specifier.m_parse_index);
 
     if constexpr (fly::FormattableWithParsing<decltype(parse_context), Formatter>)
     {
+        parse_context.lexer().set_position(specifier.m_parse_index);
         formatter.parse(parse_context);
     }
-    else
-    {
-        if (!parse_context.lexer().consume_if(FLY_CHR(typename FormatContext::char_type, '}')))
-        {
-            parse_context.on_error(
-                "User-defined formatter without a parse method may not have formatting options");
-        }
-    }
 
-    if (!parse_context.has_error())
-    {
-        formatter.format(*static_cast<const T *>(value), context);
-    }
+    formatter.format(*static_cast<const T *>(value), context);
 }
 
 //==================================================================================================
