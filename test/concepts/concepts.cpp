@@ -10,6 +10,14 @@ class FooClass
 {
 };
 
+class BarClass
+{
+};
+
+class BazClass : public FooClass
+{
+};
+
 } // namespace
 
 CATCH_TEST_CASE("Concepts", "[concepts]")
@@ -189,5 +197,31 @@ CATCH_TEST_CASE("Concepts", "[concepts]")
         CATCH_CHECK_FALSE(fly::SizeOfTypeIs<int, sizeof(int) + 1>);
         CATCH_CHECK_FALSE(fly::SizeOfTypeIs<bool, sizeof(bool) + 1>);
         CATCH_CHECK_FALSE(fly::SizeOfTypeIs<FooClass, sizeof(FooClass) + 1>);
+    }
+
+    CATCH_SECTION("Concept: DerivedFrom")
+    {
+        CATCH_CHECK(fly::DerivedFrom<FooClass, FooClass>);
+        CATCH_CHECK(fly::DerivedFrom<BarClass, BarClass>);
+        CATCH_CHECK(fly::DerivedFrom<BazClass, BazClass>);
+
+        CATCH_CHECK(fly::DerivedFrom<BazClass, FooClass>);
+        CATCH_CHECK(fly::DerivedFrom<BazClass, const FooClass &>);
+        CATCH_CHECK(fly::DerivedFrom<BazClass, FooClass &&>);
+
+        CATCH_CHECK(fly::DerivedFrom<BazClass, FooClass>);
+        CATCH_CHECK(fly::DerivedFrom<const BazClass &, FooClass>);
+        CATCH_CHECK(fly::DerivedFrom<BazClass &&, FooClass>);
+
+        CATCH_CHECK(fly::DerivedFrom<const BazClass &, const FooClass &>);
+        CATCH_CHECK(fly::DerivedFrom<BazClass &&, FooClass &&>);
+
+        CATCH_CHECK(fly::DerivedFrom<const BazClass &, FooClass &&>);
+        CATCH_CHECK(fly::DerivedFrom<BazClass &&, const FooClass &>);
+
+        CATCH_CHECK_FALSE(fly::DerivedFrom<BazClass, BarClass>);
+        CATCH_CHECK_FALSE(fly::DerivedFrom<BarClass, FooClass>);
+        CATCH_CHECK_FALSE(fly::DerivedFrom<FooClass, BazClass>);
+        CATCH_CHECK_FALSE(fly::DerivedFrom<FooClass, int>);
     }
 }
