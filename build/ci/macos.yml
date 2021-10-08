@@ -21,9 +21,7 @@ jobs:
 
     - template: cache.yml
       parameters:
-        toolchain: ${{ parameters.toolchain }}
         mode: ${{ parameters.mode }}
-        arch: ${{ parameters.arch }}
 
     - script: |
         echo "##vso[task.setvariable variable=config]mode=${{ parameters.mode }} cacher=ccache XCODE=/Applications/Xcode_13.0.app/Contents/Developer"
