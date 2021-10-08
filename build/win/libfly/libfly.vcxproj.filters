@@ -283,6 +283,9 @@
     <ClInclude Include="..\..\..\fly\types\numeric\literals.hpp">
       <Filter>types\numeric</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\numeric\detail\byte_swap.hpp">
+      <Filter>types\numeric\detail</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\numeric\detail\endian_concepts.hpp">
       <Filter>types\numeric\detail</Filter>
     </ClInclude>
