@@ -6,6 +6,7 @@ parameters:
 
 jobs:
   - job: 'Linux_${{ parameters.toolchain }}_${{ parameters.mode }}_${{ parameters.arch }}'
+    displayName: 'Linux (${{ parameters.toolchain }} ${{ parameters.mode }} ${{ parameters.arch }})'
 
     variables:
     - name: CCACHE_DIR

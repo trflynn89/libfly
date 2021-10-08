@@ -3,6 +3,7 @@ parameters:
 
 jobs:
   - job: 'macOS_${{ parameters.mode }}'
+    displayName: 'macOS (${{ parameters.mode }})'
 
     variables:
     - name: CCACHE_DIR
