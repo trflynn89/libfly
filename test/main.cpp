@@ -1,15 +1,20 @@
 #include "fly/logger/styler.hpp"
 #include "fly/types/string/string.hpp"
 
-//clang-format off
+// clang-format off
 // Due to a missing #include in catch_reporter_registrars.hpp, this must be included first.
 #include "catch2/interfaces/catch_interfaces_reporter.hpp"
-//clang-format on
+// clang-format on
 
 #include "catch2/catch_reporter_registrars.hpp"
 #include "catch2/catch_session.hpp"
 #include "catch2/catch_test_case_info.hpp"
 #include "catch2/reporters/catch_reporter_console.hpp"
+
+#include <chrono>
+#include <cstdint>
+#include <string>
+#include <vector>
 
 /**
  * A Catch2 test reporter for reporting colorful test and section names to console.
@@ -17,7 +22,7 @@
 class FlyReporter : public Catch::ConsoleReporter
 {
 public:
-    FlyReporter(const Catch::ReporterConfig &config) : Catch::ConsoleReporter(config)
+    explicit FlyReporter(const Catch::ReporterConfig &config) : Catch::ConsoleReporter(config)
     {
     }
 
@@ -52,29 +57,54 @@ public:
 
     void testCaseStarting(const Catch::TestCaseInfo &info) override
     {
-        const auto style = fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Green);
-        stream << style << fly::String::format("[{:=>4}{} Test{:=<4}]\n", ' ', info.name, ' ');
-
         Catch::ConsoleReporter::testCaseStarting(info);
 
+        stream_header(fly::logger::Color::Green, fly::String::format("{} Test", info.name));
         m_current_test_case_start = std::chrono::steady_clock::now();
-        m_current_test_case = info.name;
     }
 
     void sectionStarting(const Catch::SectionInfo &info) override
     {
-        if (info.name != m_current_test_case)
+        Catch::ConsoleReporter::sectionStarting(info);
+        std::size_t level = m_section_level++;
+
+        if (level == 0)
         {
-            const auto style =
-                fly::logger::Styler(fly::logger::Style::Italic, fly::logger::Color::Cyan);
-            stream << style << fly::String::format("[ {} ]\n", info.name);
+            m_sections.push_back(info.name);
+            return;
         }
 
-        Catch::ConsoleReporter::sectionStarting(info);
+        auto path = fly::String::join('/', m_sections.back(), info.name);
+
+        if (auto it = std::find(m_sections.begin(), m_sections.end(), path); it != m_sections.end())
+        {
+            std::swap(*it, *(m_sections.end() - 1));
+            return;
+        }
+
+        const fly::logger::Styler style(fly::logger::Color::Cyan, fly::logger::Style::Italic);
+        stream << style << "[ ";
+
+        if (level != 1)
+        {
+            stream << fly::String::format("{: >{}}└─➤ ", "", (level - 2) * 4);
+        }
+
+        stream << fly::String::format("{} ]\n", info.name);
+
+        m_sections.push_back(std::move(path));
+    }
+
+    void sectionEnded(const Catch::SectionStats &stats) override
+    {
+        Catch::ConsoleReporter::sectionEnded(stats);
+        --m_section_level;
     }
 
     void testCaseEnded(const Catch::TestCaseStats &stats) override
     {
+        Catch::ConsoleReporter::testCaseEnded(stats);
+
         const auto end = std::chrono::steady_clock::now();
         const auto duration = std::chrono::duration<double>(end - m_current_test_case_start);
 
@@ -82,36 +112,33 @@ public:
 
         if (stats.totals.assertions.allOk())
         {
-            const auto style =
-                fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Green);
-            stream << style;
-
-            stream << fly::String::format(
-                "[==== PASSED {} ({:.3f} seconds) ====]\n\n",
-                name,
-                duration.count());
+            stream_header(
+                fly::logger::Color::Green,
+                fly::String::format("PASSED {} ({:.3f} seconds)", name, duration.count()));
         }
         else
         {
-            const auto style =
-                fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Red);
-            stream << style;
-
-            stream << fly::String::format(
-                "[==== FAILED {} ({:.3f} seconds) ====]\n\n",
-                name,
-                duration.count());
+            stream_header(
+                fly::logger::Color::Red,
+                fly::String::format("FAILED {} ({:.3f} seconds)", name, duration.count()));
         }
 
-        Catch::ConsoleReporter::testCaseEnded(stats);
-        m_current_test_case.clear();
+        stream << '\n';
+        m_sections.clear();
     }
 
 private:
-    std::chrono::steady_clock::time_point m_test_start;
+    void stream_header(fly::logger::Color::StandardColor color, std::string message)
+    {
+        stream << fly::logger::Styler(fly::logger::Style::Bold, color)
+               << fly::String::format("[==== {} ====]\n", message);
+    }
 
+    std::chrono::steady_clock::time_point m_test_start;
     std::chrono::steady_clock::time_point m_current_test_case_start;
-    std::string m_current_test_case;
+
+    std::vector<std::string> m_sections;
+    std::size_t m_section_level {0};
 };
 
 CATCH_REGISTER_REPORTER("libfly", FlyReporter)
