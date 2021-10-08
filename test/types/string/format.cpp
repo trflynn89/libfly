@@ -217,6 +217,7 @@ CATCH_TEMPLATE_TEST_CASE("Format", "[string]", char, wchar_t, char8_t, char16_t,
     CATCH_SECTION("Alignment default is based on presentation type")
     {
         test_format(FMT("{:6}"), FMT("ab    "), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:6}"), FMT("     a"), FLY_CHR(char_type, 'a'));
         test_format(FMT("{:6}"), FMT("     1"), 1);
         test_format(FMT("{:6b}"), FMT("    11"), 0b11);
         test_format(FMT("{:6.2f}"), FMT("  3.14"), 3.14);
@@ -225,6 +226,7 @@ CATCH_TEMPLATE_TEST_CASE("Format", "[string]", char, wchar_t, char8_t, char16_t,
     CATCH_SECTION("Alignment may be set to left-alignment")
     {
         test_format(FMT("{:<6}"), FMT("ab    "), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:<6}"), FMT("a     "), FLY_CHR(char_type, 'a'));
         test_format(FMT("{:<6}"), FMT("1     "), 1);
         test_format(FMT("{:<6b}"), FMT("11    "), 0b11);
         test_format(FMT("{:<6.2f}"), FMT("3.14  "), 3.14);
@@ -233,6 +235,7 @@ CATCH_TEMPLATE_TEST_CASE("Format", "[string]", char, wchar_t, char8_t, char16_t,
     CATCH_SECTION("Alignment may be set to right-alignment")
     {
         test_format(FMT("{:>6}"), FMT("    ab"), FLY_STR(char_type, "ab"));
+        test_format(FMT("{:>6}"), FMT("     a"), FLY_CHR(char_type, 'a'));
         test_format(FMT("{:>6}"), FMT("     1"), 1);
         test_format(FMT("{:>6b}"), FMT("    11"), 0b11);
         test_format(FMT("{:>6.2f}"), FMT("  3.14"), 3.14);
