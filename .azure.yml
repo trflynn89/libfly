@@ -7,88 +7,92 @@ trigger:
     include:
     - '*'
 
-jobs:
-  #### Linux Clang ####
+stages:
+  - stage: Linux
+    dependsOn: []
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'clang'
-      mode: 'debug'
-      arch: 'x86'
+    jobs:
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'clang'
+          mode: 'debug'
+          arch: 'x86'
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'clang'
-      mode: 'debug'
-      arch: 'x64'
-      coverage: '1'
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'clang'
+          mode: 'debug'
+          arch: 'x64'
+          coverage: '1'
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'clang'
-      mode: 'release'
-      arch: 'x86'
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'clang'
+          mode: 'release'
+          arch: 'x86'
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'clang'
-      mode: 'release'
-      arch: 'x64'
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'clang'
+          mode: 'release'
+          arch: 'x64'
 
-  #### Linux GCC ####
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'gcc'
+          mode: 'debug'
+          arch: 'x86'
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'gcc'
-      mode: 'debug'
-      arch: 'x86'
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'gcc'
+          mode: 'debug'
+          arch: 'x64'
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'gcc'
-      mode: 'debug'
-      arch: 'x64'
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'gcc'
+          mode: 'release'
+          arch: 'x86'
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'gcc'
-      mode: 'release'
-      arch: 'x86'
+      - template: build/ci/linux.yml
+        parameters:
+          toolchain: 'gcc'
+          mode: 'release'
+          arch: 'x64'
 
-  - template: build/ci/linux.yml
-    parameters:
-      toolchain: 'gcc'
-      mode: 'release'
-      arch: 'x64'
+  - stage: macOS
+    dependsOn: []
 
-  #### macOS ####
+    jobs:
+      - template: build/ci/macos.yml
+        parameters:
+          mode: 'debug'
 
-  - template: build/ci/macos.yml
-    parameters:
-      mode: 'debug'
+      - template: build/ci/macos.yml
+        parameters:
+          mode: 'release'
 
-  - template: build/ci/macos.yml
-    parameters:
-      mode: 'release'
+  - stage: Windows
+    dependsOn: []
 
-  #### Windows ####
+    jobs:
+      - template: build/ci/windows.yml
+        parameters:
+          mode: 'Debug'
+          arch: 'x86'
 
-  - template: build/ci/windows.yml
-    parameters:
-      mode: 'Debug'
-      arch: 'x86'
+      - template: build/ci/windows.yml
+        parameters:
+          mode: 'Debug'
+          arch: 'x64'
 
-  - template: build/ci/windows.yml
-    parameters:
-      mode: 'Debug'
-      arch: 'x64'
+      - template: build/ci/windows.yml
+        parameters:
+          mode: 'Release'
+          arch: 'x86'
 
-  - template: build/ci/windows.yml
-    parameters:
-      mode: 'Release'
-      arch: 'x86'
-
-  - template: build/ci/windows.yml
-    parameters:
-      mode: 'Release'
-      arch: 'x64'
+      - template: build/ci/windows.yml
+        parameters:
+          mode: 'Release'
+          arch: 'x64'

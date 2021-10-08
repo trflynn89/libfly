@@ -4,6 +4,8 @@ parameters:
 
 jobs:
   - job: 'Windows_${{ parameters.mode }}_${{ parameters.arch }}'
+    displayName: 'Windows (${{ parameters.mode }} ${{ parameters.arch }})'
+
     pool:
       vmImage: windows-2019
 
