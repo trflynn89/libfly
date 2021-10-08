@@ -96,3 +96,34 @@ stages:
         parameters:
           mode: 'Release'
           arch: 'x64'
+
+  - stage: Release
+
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+
+    dependsOn:
+      - Linux
+      - macOS
+      - Windows
+
+    jobs:
+    - job: 'Release'
+      steps:
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          buildType: current
+          downloadType: all
+          artifactName: libfly
+          downloadPath: $(System.ArtifactsDirectory)
+        displayName: Download
+
+      - task: GitHubRelease@0
+        inputs:
+          action: edit
+          tag: $(Build.SourceBranchName)
+          tagSource: 'Git tag'
+          gitHubConnection: trflynn89
+          repositoryName: trflynn89/libfly
+          assets: $(System.ArtifactsDirectory)/libfly/*
+          assetUploadMode: delete
+        displayName: Publish
