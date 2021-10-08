@@ -10,9 +10,9 @@ steps:
 
   - task: Cache@2
     inputs:
-      key: '"ccache" | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}" | "$(timestamp)"'
+      key: '"ccache" | "$(Agent.OS)" | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}" | "$(timestamp)"'
       restoreKeys: |
-        "ccache" | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}"
+        "ccache" | "$(Agent.OS)" | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}"
       path: $(CCACHE_DIR)
     displayName: 'Compiler Cache'
 
