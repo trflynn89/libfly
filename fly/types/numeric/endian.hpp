@@ -1,65 +1,11 @@
 #pragma once
 
 #include "fly/concepts/concepts.hpp"
-#include "fly/fly.hpp"
+#include "fly/types/numeric/detail/byte_swap.hpp"
 #include "fly/types/numeric/detail/endian_concepts.hpp"
 
 #include <bit>
 #include <cstdint>
-
-#if defined(FLY_LINUX)
-#    include <byteswap.h>
-#elif defined(FLY_MACOS)
-#    include <libkern/OSByteOrder.h>
-#elif defined(FLY_WINDOWS)
-#    include "fly/types/numeric/literals.hpp"
-#else
-#    error Unknown byte swapping includes.
-#endif
-
-#if defined(FLY_LINUX)
-#    define byte_swap_16(b) __builtin_bswap16(b)
-#    define byte_swap_32(b) __builtin_bswap32(b)
-#    define byte_swap_64(b) __builtin_bswap64(b)
-#elif defined(FLY_MACOS)
-#    define byte_swap_16(b) OSSwapInt16(b)
-#    define byte_swap_32(b) OSSwapInt32(b)
-#    define byte_swap_64(b) OSSwapInt64(b)
-#elif defined(FLY_WINDOWS)
-
-// Windows has _byteswap_ushort, _byteswap_ulong, and _byteswap_uint64, but they are non-constexpr.
-// So to allow endian swapping to be used at compile time, use custom byte swapping methods.
-
-constexpr std::uint16_t byte_swap_16(std::uint16_t value)
-{
-    using namespace fly::literals::numeric_literals;
-
-    return ((value & 0xff00_u16) >> 8) | ((value & 0x00ff_u16) << 8);
-}
-
-constexpr std::uint32_t byte_swap_32(std::uint32_t value)
-{
-    using namespace fly::literals::numeric_literals;
-
-    return (
-        ((value & 0xff00'0000_u32) >> 24) | ((value & 0x00ff'0000_u32) >> 8) |
-        ((value & 0x0000'ff00_u32) << 8) | ((value & 0x0000'00ff_u32) << 24));
-}
-
-constexpr std::uint64_t byte_swap_64(std::uint64_t value)
-{
-    using namespace fly::literals::numeric_literals;
-
-    return (
-        ((value & 0xff00'0000'0000'0000_u64) >> 56) | ((value & 0x00ff'0000'0000'0000_u64) >> 40) |
-        ((value & 0x0000'ff00'0000'0000_u64) >> 24) | ((value & 0x0000'00ff'0000'0000_u64) >> 8) |
-        ((value & 0x0000'0000'ff00'0000_u64) << 8) | ((value & 0x0000'0000'00ff'0000_u64) << 24) |
-        ((value & 0x0000'0000'0000'ff00_u64) << 40) | ((value & 0x0000'0000'0000'00ff_u64) << 56));
-}
-
-#else
-#    error Unknown byte swapping methods.
-#endif
 
 namespace fly {
 
@@ -81,15 +27,15 @@ constexpr T endian_swap(T value)
     }
     else if constexpr (fly::SizeOfTypeIs<T, 2>)
     {
-        return static_cast<T>(byte_swap_16(static_cast<std::uint16_t>(value)));
+        return static_cast<T>(detail::byte_swap(static_cast<std::uint16_t>(value)));
     }
     else if constexpr (fly::SizeOfTypeIs<T, 4>)
     {
-        return static_cast<T>(byte_swap_32(static_cast<std::uint32_t>(value)));
+        return static_cast<T>(detail::byte_swap(static_cast<std::uint32_t>(value)));
     }
     else if constexpr (fly::SizeOfTypeIs<T, 8>)
     {
-        return static_cast<T>(byte_swap_64(static_cast<std::uint64_t>(value)));
+        return static_cast<T>(detail::byte_swap(static_cast<std::uint64_t>(value)));
     }
 }
 

@@ -228,6 +228,7 @@
     <ClInclude Include="..\..\..\fly\types\json\json.hpp" />
     <ClInclude Include="..\..\..\fly\types\json\json_exception.hpp" />
     <ClInclude Include="..\..\..\fly\types\json\types.hpp" />
+    <ClInclude Include="..\..\..\fly\types\numeric\detail\byte_swap.hpp" />
     <ClInclude Include="..\..\..\fly\types\numeric\detail\endian_concepts.hpp" />
     <ClInclude Include="..\..\..\fly\types\numeric\detail\literal_parser.hpp" />
     <ClInclude Include="..\..\..\fly\types\numeric\endian.hpp" />
