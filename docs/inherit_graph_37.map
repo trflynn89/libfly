@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classfly_1_1detail_1_1_basic_unicode.html" title=" " alt="" coords="5,5,184,47"/>
+<area shape="rect" id="node1" href="$classfly_1_1detail_1_1_bit_stream.html" title=" " alt="" coords="5,31,160,57"/>
+<area shape="rect" id="node2" href="$classfly_1_1_bit_stream_reader.html" title=" " alt="" coords="208,5,364,32"/>
+<area shape="rect" id="node3" href="$classfly_1_1_bit_stream_writer.html" title=" " alt="" coords="211,56,361,83"/>
 </map>

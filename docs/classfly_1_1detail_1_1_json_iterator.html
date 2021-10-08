@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">6.1.0</span>
+   &#160;<span id="projectnumber">6.2.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -175,7 +175,7 @@ Friends</h2></td></tr>
 <tr class="separator:ae31a19467299236ce54c39c80b86eacc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename JsonType&gt;<br />
+<div class="textblock"><h3>template&lt;fly::SameAs&lt; Json &gt; JsonType&gt;<br />
 class fly::detail::JsonIterator&lt; JsonType &gt;</h3>
 
 <p>Class to provide iterator access to a <a class="el" href="classfly_1_1_json.html">Json</a> instance. Both const and non-const iterators are supported.</p>
@@ -197,7 +197,7 @@ bool b = it-&gt;empty(); // Undefined behavior
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">using <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::<a class="el" href="classfly_1_1detail_1_1_json_iterator.html#a246525d0706b79439db3e7d8ada5e4ce">iterator_category</a> =  std::bidirectional_iterator_tag</td>
@@ -215,7 +215,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -241,7 +241,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -269,7 +269,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -321,7 +321,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -357,7 +357,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">const json_object_type::key_type &amp; <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::key</td>
@@ -382,7 +382,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator!= </td>
@@ -417,7 +417,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator*</td>
@@ -441,7 +441,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator+ </td>
@@ -477,7 +477,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator++</td>
@@ -502,7 +502,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator++ </td>
@@ -531,7 +531,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator+= </td>
@@ -567,7 +567,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator- </td>
@@ -603,7 +603,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator- </td>
@@ -639,7 +639,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator--</td>
@@ -664,7 +664,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator-- </td>
@@ -693,7 +693,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator-= </td>
@@ -729,7 +729,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator-&gt;</td>
@@ -753,7 +753,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator&lt; </td>
@@ -789,7 +789,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator&lt;= </td>
@@ -825,7 +825,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -861,7 +861,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator== </td>
@@ -896,7 +896,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator&gt; </td>
@@ -932,7 +932,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">bool <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator&gt;= </td>
@@ -968,7 +968,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::operator[] </td>
@@ -1004,7 +1004,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">auto <a class="el" href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a>&lt; JsonType &gt;::value</td>
@@ -1029,7 +1029,7 @@ template&lt;typename JsonType &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename JsonType &gt; </div>
+template&lt;fly::SameAs&lt; Json &gt; JsonType&gt; </div>
 <div class="memtemplate">
 template&lt;typename J &gt; </div>
 <table class="mlabels">

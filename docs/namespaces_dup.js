@@ -37,7 +37,6 @@ var namespaces_dup =
         [ "IsFixedArray< std::array< T, N > >", "structfly_1_1detail_1_1_is_fixed_array_3_01std_1_1array_3_01_t_00_01_n_01_4_01_4.html", null ],
         [ "JsonReverseIterator", "classfly_1_1detail_1_1_json_reverse_iterator.html", "classfly_1_1detail_1_1_json_reverse_iterator" ],
         [ "JsonIterator", "classfly_1_1detail_1_1_json_iterator.html", "classfly_1_1detail_1_1_json_iterator" ],
-        [ "Aggregator", "structfly_1_1detail_1_1_aggregator.html", null ],
         [ "Aggregator< T, Base, Digit, Literals... >", "structfly_1_1detail_1_1_aggregator_3_01_t_00_01_base_00_01_digit_00_01_literals_8_8_8_01_4.html", null ],
         [ "Aggregator< T, Base, '\\'', Literals... >", "structfly_1_1detail_1_1_aggregator_3_01_t_00_01_base_00_01'_0c''_00_01_literals_8_8_8_01_4.html", null ],
         [ "Aggregator< T, Base >", "structfly_1_1detail_1_1_aggregator_3_01_t_00_01_base_01_4.html", null ],
@@ -120,7 +119,8 @@ var namespaces_dup =
         [ "make_format_parameters", "format__parameters_8hpp.html#a7100e0b1ecf4f170cd9a75c37442bd4b", null ],
         [ "operator+", "json__iterator_8hpp.html#a12ae62f0498e7da313c81bbc736da329", null ],
         [ "operator==", "format__specifier_8hpp.html#a4cd29face9b23760fb1bdc926b5cf8b6", null ],
-        [ "validate_and_convert", "literal__parser_8hpp.html#a73c17515365bc699c47912a09039a0af", null ],
+        [ "requires", "literal__parser_8hpp.html#a21b18eec31425380ed960587c69abba5", null ],
+        [ "validate_and_convert", "literal__parser_8hpp.html#a7a32815cb34216bcbb3754039f0e4b00", null ],
         [ "BitStreamBuffer", "types_2bit__stream_2detail_2concepts_8hpp.html#a9e6cbedf2e8a4adde16f3dcf248b9c6a", null ],
         [ "BitStreamInteger", "types_2bit__stream_2detail_2concepts_8hpp.html#a6343ba643ac373c0d903959f45d31bdc", null ],
         [ "EndianInteger", "endian__concepts_8hpp.html#a91d119a6fcded2dcfd1dcf6df585f3da", null ],
@@ -136,7 +136,9 @@ var namespaces_dup =
         [ "s_remainder_mask", "constants_8hpp.html#a0efec74e4bd5f79a72d97e7f92998305", null ],
         [ "s_remainder_shift", "constants_8hpp.html#a4bedf9afdb3f058e07dbb5871d0ff84c", null ],
         [ "SameAsContainerType", "types_2json_2detail_2concepts_8hpp.html#ab5a48ee53f6818f2261109e9692466b1", null ],
-        [ "SameAsFixedArray", "types_2json_2detail_2concepts_8hpp.html#a3be01e64ab86296249aaf5cb0eabc914", null ]
+        [ "SameAsFixedArray", "types_2json_2detail_2concepts_8hpp.html#a3be01e64ab86296249aaf5cb0eabc914", null ],
+        [ "ValidLiteralForBase", "literal__parser_8hpp.html#a9494f267b74d8ac9e1ed55dd14bc4584", null ],
+        [ "ValueWithinLimits", "literal__parser_8hpp.html#a6a2c43c7b7fbbcd4a9241228d0a00ef7", null ]
       ] ],
       [ "literals", "namespacefly_1_1literals.html", [
         [ "operator\"\"_c", "namespacefly_1_1literals.html#aab73da5383b956458ae369bf8b790c6b", null ],
@@ -257,7 +259,8 @@ var namespaces_dup =
         ] ],
         [ "IPAddress", "net_2socket_2concepts_8hpp.html#a4052019912d91a567c049b310eedcb02", null ],
         [ "IPEndpoint", "net_2socket_2concepts_8hpp.html#a8d173ff55ba4633106e6f01d23c8e0de", null ],
-        [ "Socket", "net_2socket_2concepts_8hpp.html#a534dfc945892abf945598e1be2d92bb6", null ]
+        [ "Socket", "net_2socket_2concepts_8hpp.html#a534dfc945892abf945598e1be2d92bb6", null ],
+        [ "SocketNotification", "net_2socket_2concepts_8hpp.html#a3657cdbd7108d663b3939934de20bb14", null ]
       ] ],
       [ "parser", null, [
         [ "IniParser", "classfly_1_1parser_1_1_ini_parser.html", "classfly_1_1parser_1_1_ini_parser" ],
@@ -413,6 +416,7 @@ var namespaces_dup =
       [ "StandardCharacter", "types_2string_2concepts_8hpp.html#aaa56f1f1afe2c92d4ddfa7b19d168866", null ],
       [ "StandardString", "types_2string_2concepts_8hpp.html#a422ed510e9e68d36edbec8a2165be94d", null ],
       [ "StandardStringLike", "types_2string_2concepts_8hpp.html#a0d442b6ee591489a6b66338ba835b0b2", null ],
+      [ "UnicodePrefixCharacter", "types_2string_2concepts_8hpp.html#a8cecd332527aa89e977aca8ca78c5de5", null ],
       [ "UnsignedIntegral", "concepts_2concepts_8hpp.html#a01606a5055cd273307088087ca98ed1c", null ]
     ] ],
     [ "std", null, [

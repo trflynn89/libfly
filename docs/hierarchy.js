@@ -1,6 +1,5 @@
 var hierarchy =
 [
-    [ "fly::detail::Aggregator< T, Base, Literals >", "structfly_1_1detail_1_1_aggregator.html", null ],
     [ "fly::detail::Aggregator< T, Base >", "structfly_1_1detail_1_1_aggregator_3_01_t_00_01_base_01_4.html", null ],
     [ "fly::detail::Aggregator< T, Base, '\\'', Literals... >", "structfly_1_1detail_1_1_aggregator_3_01_t_00_01_base_00_01'_0c''_00_01_literals_8_8_8_01_4.html", null ],
     [ "fly::detail::Aggregator< T, Base, Digit, Literals... >", "structfly_1_1detail_1_1_aggregator_3_01_t_00_01_base_00_01_digit_00_01_literals_8_8_8_01_4.html", null ],

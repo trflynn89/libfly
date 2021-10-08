@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">6.1.0</span>
+   &#160;<span id="projectnumber">6.2.0</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -102,22 +102,22 @@ Public Member Functions</h2></td></tr>
 template&lt;typename IteratorType &gt; </td></tr>
 <tr class="memitem:ae35c41cd4bf439d292942e325cd4eb94"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>decode_codepoint</b> (IteratorType &amp;it, const IteratorType &amp;end) -&gt; std::optional&lt; codepoint_type &gt;</td></tr>
 <tr class="separator:ae35c41cd4bf439d292942e325cd4eb94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94079ad04c17abdcb71bd4a0f7b32bd0"><td class="memTemplParams" colspan="2"><a id="a94079ad04c17abdcb71bd4a0f7b32bd0"></a>
+<tr class="memitem:a41bad0db65def83e20cc9aabf0cf9cab"><td class="memTemplParams" colspan="2"><a id="a41bad0db65def83e20cc9aabf0cf9cab"></a>
 template&lt;char UnicodePrefix, typename IteratorType &gt; </td></tr>
-<tr class="memitem:a94079ad04c17abdcb71bd4a0f7b32bd0"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>escape_codepoint</b> (IteratorType &amp;it, const IteratorType &amp;end) -&gt; std::optional&lt; string_type &gt;</td></tr>
-<tr class="separator:a94079ad04c17abdcb71bd4a0f7b32bd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41bad0db65def83e20cc9aabf0cf9cab"><td class="memTemplItemLeft" align="right" valign="top">requires fly::UnicodePrefixCharacter&lt; UnicodePrefix &gt; auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>escape_codepoint</b> (IteratorType &amp;it, const IteratorType &amp;end) -&gt; std::optional&lt; string_type &gt;</td></tr>
+<tr class="separator:a41bad0db65def83e20cc9aabf0cf9cab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5c3d960930dd369862b50862815cdbed"><td class="memTemplParams" colspan="2"><a id="a5c3d960930dd369862b50862815cdbed"></a>
 template&lt;typename IteratorType &gt; </td></tr>
 <tr class="memitem:a5c3d960930dd369862b50862815cdbed"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>unescape_codepoint</b> (IteratorType &amp;it, const IteratorType &amp;end) -&gt; std::optional&lt; string_type &gt;</td></tr>
 <tr class="separator:a5c3d960930dd369862b50862815cdbed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17586f487c378cff9c7758957043a494"><td class="memTemplParams" colspan="2"><a id="a17586f487c378cff9c7758957043a494"></a>
+<tr class="memitem:a72e22bde8abfc385b24f5ded765c7c31"><td class="memTemplParams" colspan="2"><a id="a72e22bde8abfc385b24f5ded765c7c31"></a>
 template&lt;char UnicodePrefix&gt; </td></tr>
-<tr class="memitem:a17586f487c378cff9c7758957043a494"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>escape_codepoint</b> (codepoint_type codepoint) -&gt; string_type</td></tr>
-<tr class="separator:a17586f487c378cff9c7758957043a494"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7929fe92823791325f4e31eda8949b1"><td class="memTemplParams" colspan="2"><a id="ab7929fe92823791325f4e31eda8949b1"></a>
+<tr class="memitem:a72e22bde8abfc385b24f5ded765c7c31"><td class="memTemplItemLeft" align="right" valign="top">requires fly::UnicodePrefixCharacter&lt; UnicodePrefix &gt; auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>escape_codepoint</b> (codepoint_type codepoint) -&gt; string_type</td></tr>
+<tr class="separator:a72e22bde8abfc385b24f5ded765c7c31"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7486699804cbe813896b65558ce8ebdf"><td class="memTemplParams" colspan="2"><a id="a7486699804cbe813896b65558ce8ebdf"></a>
 template&lt;char UnicodePrefix, typename IteratorType &gt; </td></tr>
-<tr class="memitem:ab7929fe92823791325f4e31eda8949b1"><td class="memTemplItemLeft" align="right" valign="top">auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>unescape_codepoint</b> (IteratorType &amp;it, const IteratorType &amp;end) -&gt; codepoint_type</td></tr>
-<tr class="separator:ab7929fe92823791325f4e31eda8949b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7486699804cbe813896b65558ce8ebdf"><td class="memTemplItemLeft" align="right" valign="top">requires fly::UnicodePrefixCharacter&lt; UnicodePrefix &gt; auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>unescape_codepoint</b> (IteratorType &amp;it, const IteratorType &amp;end) -&gt; codepoint_type</td></tr>
+<tr class="separator:a7486699804cbe813896b65558ce8ebdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a505592167acf889fac16844df6800d39"><td class="memTemplParams" colspan="2"><a id="a505592167acf889fac16844df6800d39"></a>
 template&lt;typename IteratorType &gt; </td></tr>
 <tr class="memitem:a505592167acf889fac16844df6800d39"><td class="memTemplItemLeft" align="right" valign="top">requires fly::SizeOfTypeIs&lt; CharType, 1 &gt; auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>codepoint_from_string</b> (IteratorType &amp;it, const IteratorType &amp;end) -&gt; codepoint_type</td></tr>
@@ -163,9 +163,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a1f7c3f447e2f3354a4817ccbaa23b119"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43394c4174b6ffad41a5387652e823d0"><td class="memItemLeft" align="right" valign="top">static std::optional&lt; string_type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_unicode.html#a43394c4174b6ffad41a5387652e823d0">encode_codepoint</a> (codepoint_type codepoint)</td></tr>
 <tr class="separator:a43394c4174b6ffad41a5387652e823d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aded0550abfc66760e5c8a012f974d92c"><td class="memTemplParams" colspan="2">template&lt;char UnicodePrefix = 'U', typename IteratorType &gt; </td></tr>
-<tr class="memitem:aded0550abfc66760e5c8a012f974d92c"><td class="memTemplItemLeft" align="right" valign="top">static std::optional&lt; string_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_unicode.html#aded0550abfc66760e5c8a012f974d92c">escape_codepoint</a> (IteratorType &amp;it, const IteratorType &amp;end)</td></tr>
-<tr class="separator:aded0550abfc66760e5c8a012f974d92c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1a3de5ab437ceef30b0a71c5bcbb079"><td class="memTemplParams" colspan="2">template&lt;char UnicodePrefix = 'U', typename IteratorType &gt; </td></tr>
+<tr class="memitem:ac1a3de5ab437ceef30b0a71c5bcbb079"><td class="memTemplItemLeft" align="right" valign="top">requires static fly::UnicodePrefixCharacter&lt; UnicodePrefix &gt; std::optional&lt; string_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_unicode.html#ac1a3de5ab437ceef30b0a71c5bcbb079">escape_codepoint</a> (IteratorType &amp;it, const IteratorType &amp;end)</td></tr>
+<tr class="separator:ac1a3de5ab437ceef30b0a71c5bcbb079"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6eb7c49f7fd741268f59b74e21ba09f2"><td class="memTemplParams" colspan="2">template&lt;typename IteratorType &gt; </td></tr>
 <tr class="memitem:a6eb7c49f7fd741268f59b74e21ba09f2"><td class="memTemplItemLeft" align="right" valign="top">static std::optional&lt; string_type &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classfly_1_1detail_1_1_basic_unicode.html#a6eb7c49f7fd741268f59b74e21ba09f2">unescape_codepoint</a> (IteratorType &amp;it, const IteratorType &amp;end)</td></tr>
 <tr class="separator:a6eb7c49f7fd741268f59b74e21ba09f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -370,8 +370,8 @@ If successful, a string containing the encoded Unicode codepoint. Otherwise, an 
 
 </div>
 </div>
-<a id="aded0550abfc66760e5c8a012f974d92c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aded0550abfc66760e5c8a012f974d92c">&#9670;&nbsp;</a></span>escape_codepoint()</h2>
+<a id="ac1a3de5ab437ceef30b0a71c5bcbb079"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1a3de5ab437ceef30b0a71c5bcbb079">&#9670;&nbsp;</a></span>escape_codepoint()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -384,7 +384,7 @@ template&lt;char UnicodePrefix = 'U', typename IteratorType &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static std::optional&lt;string_type&gt; <a class="el" href="classfly_1_1detail_1_1_basic_unicode.html">fly::detail::BasicUnicode</a>&lt; CharType &gt;::escape_codepoint </td>
+          <td class="memname">requires static fly::UnicodePrefixCharacter&lt;UnicodePrefix&gt; std::optional&lt;string_type&gt; <a class="el" href="classfly_1_1detail_1_1_basic_unicode.html">fly::detail::BasicUnicode</a>&lt; CharType &gt;::escape_codepoint </td>
           <td>(</td>
           <td class="paramtype">IteratorType &amp;&#160;</td>
           <td class="paramname"><em>it</em>, </td>
