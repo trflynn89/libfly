@@ -1,8 +1,18 @@
+parameters:
+  with_catch2: true
+
 steps:
   - checkout: self
     persistCredentials: true
+    fetchDepth: 1
 
-  - script: |
-      git submodule update --init -- extern/catchorg/Catch2
-      git submodule update --init -- extern/trflynn89/flymake
-    displayName: 'Submodules'
+  - ${{ if eq(parameters.with_catch2, true) }}:
+    - script: |
+        git submodule update --init -- extern/catchorg/Catch2
+        git submodule update --init -- extern/trflynn89/flymake
+      displayName: 'Submodules'
+
+  - ${{ if eq(parameters.with_catch2, false) }}:
+    - script: |
+        git submodule update --init -- extern/trflynn89/flymake
+      displayName: 'Submodules'

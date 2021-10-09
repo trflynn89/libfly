@@ -8,8 +8,25 @@ trigger:
     - '*'
 
 stages:
+  - stage: Lint
+    jobs:
+    - job: 'Lint'
+
+      pool:
+        vmImage: ubuntu-20.04
+
+      steps:
+      - template: build/ci/setup.yml
+        parameters:
+          with_catch2: false
+
+      - script: |
+          make style formatter=clang-format-12 check=1
+        displayName: 'Style'
+
   - stage: Linux
-    dependsOn: []
+    dependsOn:
+      - Lint
 
     jobs:
       - template: build/ci/linux.yml
@@ -62,7 +79,8 @@ stages:
           arch: 'x64'
 
   - stage: macOS
-    dependsOn: []
+    dependsOn:
+      - Lint
 
     jobs:
       - template: build/ci/macos.yml
@@ -74,7 +92,8 @@ stages:
           mode: 'release'
 
   - stage: Windows
-    dependsOn: []
+    dependsOn:
+      - Lint
 
     jobs:
       - template: build/ci/windows.yml
