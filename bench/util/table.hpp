@@ -5,6 +5,7 @@
 #include "fly/logger/styler.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/concepts.hpp"
+#include "fly/types/string/detail/stream_util.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <array>
