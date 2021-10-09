@@ -5,18 +5,24 @@
 #include "fly/types/string/concepts.hpp"
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/format_specifier.hpp"
-#include "fly/types/string/detail/stream_util.hpp"
 #include "fly/types/string/detail/unicode.hpp"
+
+#if !defined(FLY_COMPILER_SUPPORTS_FP_CHARCONV)
+#    include "fly/types/string/detail/stream_util.hpp"
+#endif
 
 #include <array>
 #include <charconv>
 #include <cmath>
-#include <iomanip>
 #include <limits>
-#include <sstream>
 #include <string>
 #include <system_error>
 #include <type_traits>
+
+#if !defined(FLY_COMPILER_SUPPORTS_FP_CHARCONV)
+#    include <iomanip>
+#    include <sstream>
+#endif
 
 namespace fly {
 
