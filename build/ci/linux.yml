@@ -28,11 +28,6 @@ jobs:
         mode: ${{ parameters.mode }}
         arch: ${{ parameters.arch }}
 
-    - ${{ if eq(parameters.mode, 'release') }}:
-      - script: |
-          make style check=1
-        displayName: 'Style'
-
     - script: |
         echo "##vso[task.setvariable variable=config]mode=${{ parameters.mode }} toolchain=${{ parameters.toolchain }} arch=${{ parameters.arch }} cacher=ccache coverage=${{ parameters.coverage }}"
       displayName: 'Configure'
