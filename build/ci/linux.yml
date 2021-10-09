@@ -49,6 +49,11 @@ jobs:
 
     - ${{ if eq(parameters.coverage, '1') }}:
       - script: |
-          make $(config) coverage report=/tmp/coverage
-          bash <(curl -s https://codecov.io/bash) -f /tmp/coverage
+          make $(config) coverage report=$(Build.ArtifactStagingDirectory)/coverage
         displayName: 'Coverage'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: $(Build.ArtifactStagingDirectory)/coverage
+          artifactName: coverage
+        displayName: 'Publish'
