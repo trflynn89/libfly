@@ -11,7 +11,6 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         bzip2 \
         ccache \
-        curl \
         git \
         lcov \
         make \
