@@ -116,15 +116,17 @@ stages:
           mode: 'Release'
           arch: 'x64'
 
-  - stage: Coverage
+  - stage: Complete
     dependsOn:
       - Linux
+      - macOS
+      - Windows
+
+    pool:
+      vmImage: ubuntu-20.04
 
     jobs:
     - job: 'Coverage'
-
-      pool:
-        vmImage: ubuntu-20.04
 
       steps:
       - task: DownloadBuildArtifacts@0
@@ -137,19 +139,11 @@ stages:
 
       - script: |
           bash <(curl -s https://codecov.io/bash) -f $(System.ArtifactsDirectory)/coverage/coverage
-        displayName: Publish
+        displayName: Upload
 
-  - stage: Release
+    - job: 'Publish'
+      condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
 
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
-
-    dependsOn:
-      - Linux
-      - macOS
-      - Windows
-
-    jobs:
-    - job: 'Release'
       steps:
       - task: DownloadBuildArtifacts@0
         inputs:
