@@ -67,8 +67,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
         const std::size_t padding_size = std::max(value_size, min_width) - value_size;
         const auto padding_char = m_fill.value_or(s_space);
 
-        auto append_padding = [&context, padding_char](std::size_t count)
-        {
+        auto append_padding = [&context, padding_char](std::size_t count) {
             for (std::size_t i = 0; i < count; ++i)
             {
                 *context.out()++ = padding_char;
@@ -267,8 +266,7 @@ private:
         const std::size_t padding_size = std::max(value_size, width) - value_size;
         const auto padding_char = m_fill.value_or(s_space);
 
-        auto append_prefix = [this, is_negative, &context]()
-        {
+        auto append_prefix = [this, is_negative, &context]() {
             if (is_negative)
             {
                 *context.out()++ = s_minus_sign;
@@ -298,8 +296,7 @@ private:
             }
         };
 
-        auto append_padding = [&context](std::size_t count, CharType pad)
-        {
+        auto append_padding = [&context](std::size_t count, CharType pad) {
             for (std::size_t i = 0; i < count; ++i)
             {
                 *context.out()++ = pad;
@@ -375,8 +372,7 @@ private:
         const std::size_t padding_size = width > 1 ? width - 1 : 0;
         const auto padding_char = m_fill.value_or(s_space);
 
-        auto append_padding = [&context, padding_char](std::size_t count)
-        {
+        auto append_padding = [&context, padding_char](std::size_t count) {
             for (std::size_t i = 0; i < count; ++i)
             {
                 *context.out()++ = padding_char;
@@ -539,8 +535,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
         const int precision = static_cast<int>(FormatSpecifier::precision(context, 6));
         const FloatConversionResult result = convert_value(value, precision);
 
-        auto append_prefix = [this, &is_negative, &context]()
-        {
+        auto append_prefix = [this, &is_negative, &context]() {
             if (is_negative)
             {
                 *context.out()++ = s_minus_sign;
@@ -555,16 +550,14 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
             }
         };
 
-        auto append_padding = [&context](std::size_t count, CharType pad)
-        {
+        auto append_padding = [&context](std::size_t count, CharType pad) {
             for (std::size_t i = 0; i < count; ++i)
             {
                 *context.out()++ = pad;
             }
         };
 
-        auto append_number = [this, &context, &result]()
-        {
+        auto append_number = [this, &context, &result]() {
             if constexpr (fly::SameAs<string_type, std::string>)
             {
                 for (auto ch : result.m_digits)

@@ -297,8 +297,7 @@ void Table<Args...>::print_row(std::ostream &stream, const Row &row) const
 {
     std::size_t index = 0;
 
-    auto print_value = [this, &stream, &index](const auto &value)
-    {
+    auto print_value = [this, &stream, &index](const auto &value) {
         print_column_separator(stream, index == 0 ? s_border_style : fly::logger::Style::Default);
 
         const auto style = fly::logger::Styler(s_data_style, s_data_color);
@@ -317,13 +316,7 @@ void Table<Args...>::print_row(std::ostream &stream, const Row &row) const
         ++index;
     };
 
-    std::apply(
-        [&print_value](const auto &...e)
-        {
-            (print_value(e), ...);
-        },
-        row);
-
+    std::apply([&print_value](const auto &...e) { (print_value(e), ...); }, row);
     print_column_separator(stream, s_border_style) << '\n';
 }
 
@@ -355,8 +348,7 @@ auto Table<Args...>::column_widths_for_row(const Row &row) -> RowSizedArray<std:
     RowSizedArray<std::size_t> widths;
     std::size_t index = 0;
 
-    auto size_of_value = [&widths, &index](const auto &value)
-    {
+    auto size_of_value = [&widths, &index](const auto &value) {
         using T = std::decay_t<decltype(value)>;
 
         if constexpr (fly::StandardStringLike<T>)
@@ -389,13 +381,7 @@ auto Table<Args...>::column_widths_for_row(const Row &row) -> RowSizedArray<std:
         ++index;
     };
 
-    std::apply(
-        [&size_of_value](const auto &...e)
-        {
-            (size_of_value(e), ...);
-        },
-        row);
-
+    std::apply([&size_of_value](const auto &...e) { (size_of_value(e), ...); }, row);
     return widths;
 }
 

@@ -234,8 +234,7 @@ void PathMonitorImpl::handle_event(EventInfo &&event) const
     auto path_it = std::find_if(
         m_path_info.begin(),
         m_path_info.end(),
-        [&inode_id](const PathInfoMap::value_type &value) -> bool
-        {
+        [&inode_id](const PathInfoMap::value_type &value) -> bool {
             const auto *info = static_cast<PathInfoImpl *>(value.second.get());
             return info->m_inode_id == inode_id;
         });

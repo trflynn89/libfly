@@ -653,8 +653,7 @@ Task TaskRunner::wrap_task(TaskType &&task)
 
     TaskHolder<TaskType> holder {std::forward<TaskType>(task)};
 
-    return [holder = std::move(holder)](TaskRunner *, TaskLocation) mutable
-    {
+    return [holder = std::move(holder)](TaskRunner *, TaskLocation) mutable {
         FLY_UNUSED(std::invoke(std::move(holder.m_task)));
     };
 }
@@ -672,8 +671,7 @@ Task TaskRunner::wrap_task(std::weak_ptr<OwnerType> weak_owner, TaskType &&task)
     TaskHolder<TaskType> holder {std::forward<TaskType>(task)};
 
     return [weak_owner = std::move(weak_owner),
-            holder = std::move(holder)](TaskRunner *, TaskLocation) mutable
-    {
+            holder = std::move(holder)](TaskRunner *, TaskLocation) mutable {
         if (StrongOwnerType owner = weak_owner.lock(); owner)
         {
             FLY_UNUSED(std::invoke(std::move(holder.m_task), std::move(owner)));
@@ -700,10 +698,9 @@ Task TaskRunner::wrap_task(TaskType &&task, ReplyType &&reply)
     TaskHolder<TaskType> task_holder {std::forward<TaskType>(task)};
     TaskHolder<ReplyType> reply_holder {std::forward<ReplyType>(reply)};
 
-    return
-        [task_holder = std::move(task_holder),
-         reply_holder = std::move(reply_holder)](TaskRunner *runner, TaskLocation location) mutable
-    {
+    return [task_holder = std::move(task_holder),
+            reply_holder =
+                std::move(reply_holder)](TaskRunner *runner, TaskLocation location) mutable {
         if constexpr (s_result_is_void)
         {
             std::invoke(std::move(task_holder.m_task));
@@ -743,11 +740,10 @@ Task TaskRunner::wrap_task(std::weak_ptr<OwnerType> weak_owner, TaskType &&task,
     TaskHolder<TaskType> task_holder {std::forward<TaskType>(task)};
     TaskHolder<ReplyType> reply_holder {std::forward<ReplyType>(reply)};
 
-    return
-        [weak_owner = std::move(weak_owner),
-         task_holder = std::move(task_holder),
-         reply_holder = std::move(reply_holder)](TaskRunner *runner, TaskLocation location) mutable
-    {
+    return [weak_owner = std::move(weak_owner),
+            task_holder = std::move(task_holder),
+            reply_holder =
+                std::move(reply_holder)](TaskRunner *runner, TaskLocation location) mutable {
         if (StrongOwnerType owner = weak_owner.lock(); owner)
         {
             if constexpr (s_result_is_void)

@@ -114,8 +114,7 @@ bool UdpSocket<EndpointType>::send_async(
         service->notify_when_writable(
             this->shared_from_this(),
             [endpoint, message, callback = std::move(callback)](
-                std::shared_ptr<UdpSocket> self) mutable
-            {
+                std::shared_ptr<UdpSocket> self) mutable {
                 self->ready_to_send(endpoint, message, std::move(callback), 0, message.size());
             });
 
@@ -174,8 +173,7 @@ bool UdpSocket<EndpointType>::receive_async(ReceiveCompletion &&callback)
     {
         service->notify_when_readable(
             this->shared_from_this(),
-            [callback = std::move(callback)](std::shared_ptr<UdpSocket> self) mutable
-            {
+            [callback = std::move(callback)](std::shared_ptr<UdpSocket> self) mutable {
                 self->ready_to_receive(std::move(callback), std::string());
             });
 
@@ -213,8 +211,7 @@ void UdpSocket<EndpointType>::ready_to_send(
         socket_service()->notify_when_writable(
             this->shared_from_this(),
             [endpoint, message, callback = std::move(callback), bytes_sent, total_bytes](
-                std::shared_ptr<UdpSocket> self) mutable
-            {
+                std::shared_ptr<UdpSocket> self) mutable {
                 self->ready_to_send(
                     endpoint,
                     message,
@@ -255,8 +252,7 @@ void UdpSocket<EndpointType>::ready_to_receive(ReceiveCompletion &&callback, std
         socket_service()->notify_when_readable(
             this->shared_from_this(),
             [callback = std::move(callback),
-             received = std::move(received)](std::shared_ptr<UdpSocket> self) mutable
-            {
+             received = std::move(received)](std::shared_ptr<UdpSocket> self) mutable {
                 self->ready_to_receive(std::move(callback), std::move(received));
             });
     }

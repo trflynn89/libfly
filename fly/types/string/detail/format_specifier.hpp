@@ -887,26 +887,24 @@ template <typename FormatContext>
 inline std::optional<std::size_t>
 BasicFormatSpecifier<CharType>::resolve(FormatContext &context, std::size_t position)
 {
-    return context.arg(position).visit(
-        [](auto value) -> std::optional<std::size_t>
-        {
-            using T = std::remove_cvref_t<decltype(value)>;
-            std::optional<std::size_t> resolved;
+    return context.arg(position).visit([](auto value) -> std::optional<std::size_t> {
+        using T = std::remove_cvref_t<decltype(value)>;
+        std::optional<std::size_t> resolved;
 
-            if constexpr (fly::UnsignedIntegral<T>)
+        if constexpr (fly::UnsignedIntegral<T>)
+        {
+            resolved = static_cast<std::size_t>(value);
+        }
+        else if constexpr (fly::SignedIntegral<T>)
+        {
+            if (value >= 0)
             {
                 resolved = static_cast<std::size_t>(value);
             }
-            else if constexpr (fly::SignedIntegral<T>)
-            {
-                if (value >= 0)
-                {
-                    resolved = static_cast<std::size_t>(value);
-                }
-            }
+        }
 
-            return resolved;
-        });
+        return resolved;
+    });
 }
 
 //==================================================================================================
@@ -926,13 +924,9 @@ BasicFormatSpecifier<CharType>::resolve_parameter_type(FormatParseContext &conte
 template <fly::StandardCharacter CharType>
 constexpr auto BasicFormatSpecifier<CharType>::type_of(CharType ch) -> std::optional<Type>
 {
-    auto it = std::find_if(
-        s_type_map.begin(),
-        s_type_map.end(),
-        [&ch](const auto &item)
-        {
-            return item.first == ch;
-        });
+    auto it = std::find_if(s_type_map.begin(), s_type_map.end(), [&ch](const auto &item) {
+        return item.first == ch;
+    });
 
     if (it == s_type_map.end())
     {

@@ -53,8 +53,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
     using char_type = typename BasicString::char_type;
     using codepoint_type = typename BasicString::codepoint_type;
 
-    auto out_of_range_codepoint = []() -> string_type
-    {
+    auto out_of_range_codepoint = []() -> string_type {
         static constexpr const codepoint_type s_out_of_range = 0x110000;
         string_type result;
 

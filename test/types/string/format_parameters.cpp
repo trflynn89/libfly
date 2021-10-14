@@ -62,11 +62,9 @@ CATCH_TEMPLATE_TEST_CASE(
         auto parameter = context.arg(0);
         CATCH_CHECK_FALSE(parameter);
 
-        parameter.visit(
-            [](auto value)
-            {
-                CATCH_CHECK(std::is_same_v<decltype(value), fly::detail::MonoState>);
-            });
+        parameter.visit([](auto value) {
+            CATCH_CHECK(std::is_same_v<decltype(value), fly::detail::MonoState>);
+        });
 
         parameter.format(parse_context, context, {});
     }
@@ -80,20 +78,15 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK(parameter);
 
             parameter.visit(
-                [](auto value)
-                {
-                    CATCH_CHECK(std::is_same_v<decltype(value), std::int64_t>);
-                });
+                [](auto value) { CATCH_CHECK(std::is_same_v<decltype(value), std::int64_t>); });
         }
         {
             auto parameter = context.arg(1);
             CATCH_CHECK_FALSE(parameter);
 
-            parameter.visit(
-                [](auto value)
-                {
-                    CATCH_CHECK(std::is_same_v<decltype(value), fly::detail::MonoState>);
-                });
+            parameter.visit([](auto value) {
+                CATCH_CHECK(std::is_same_v<decltype(value), fly::detail::MonoState>);
+            });
         }
     }
 
@@ -101,8 +94,7 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         UserDefinedType user_defined {};
 
-        auto verify = [&user_defined](auto value)
-        {
+        auto verify = [&user_defined](auto value) {
             CATCH_CHECK(std::is_same_v<decltype(value), UserDefinedValue>);
 
             if constexpr (std::is_same_v<decltype(value), UserDefinedValue>)
@@ -125,8 +117,7 @@ CATCH_TEMPLATE_TEST_CASE(
         const auto &arr = FLY_ARR(char_type, "str");
         string_type str(FLY_STR(char_type, "str"));
 
-        auto verify = [&str](auto value)
-        {
+        auto verify = [&str](auto value) {
             CATCH_CHECK(std::is_same_v<decltype(value), StringValue>);
 
             if constexpr (std::is_same_v<decltype(value), StringValue>)
@@ -158,8 +149,7 @@ CATCH_TEMPLATE_TEST_CASE(
         auto params = fly::detail::make_format_parameters<FormatContext>(p1, p2, p3);
         FormatContext context(out, params);
 
-        auto verify = [](auto expected_value, auto actual_value)
-        {
+        auto verify = [](auto expected_value, auto actual_value) {
             CATCH_CHECK(std::is_same_v<decltype(actual_value), const void *>);
 
             if constexpr (std::is_same_v<decltype(actual_value), const void *>)
@@ -184,8 +174,7 @@ CATCH_TEMPLATE_TEST_CASE(
         auto params = fly::detail::make_format_parameters<FormatContext>(f, d, dd);
         FormatContext context(out, params);
 
-        auto verify = [](auto expected_value, auto actual_value)
-        {
+        auto verify = [](auto expected_value, auto actual_value) {
             CATCH_CHECK(std::is_same_v<decltype(expected_value), decltype(actual_value)>);
 
             if constexpr (std::is_same_v<decltype(expected_value), decltype(actual_value)>)
@@ -208,18 +197,16 @@ CATCH_TEMPLATE_TEST_CASE(
         auto params = fly::detail::make_format_parameters<FormatContext>(c);
         FormatContext context(out, params);
 
-        context.arg(0).visit(
-            [c](auto value)
-            {
-                constexpr bool is_int = std::is_same_v<decltype(value), std::int64_t> ||
-                    std::is_same_v<decltype(value), std::uint64_t>;
-                CATCH_CHECK(is_int);
+        context.arg(0).visit([c](auto value) {
+            constexpr bool is_int = std::is_same_v<decltype(value), std::int64_t> ||
+                std::is_same_v<decltype(value), std::uint64_t>;
+            CATCH_CHECK(is_int);
 
-                if constexpr (is_int)
-                {
-                    CATCH_CHECK(static_cast<char_type>(value) == c);
-                }
-            });
+            if constexpr (is_int)
+            {
+                CATCH_CHECK(static_cast<char_type>(value) == c);
+            }
+        });
 
         CATCH_CHECK_FALSE(context.arg(1));
     }
@@ -234,8 +221,7 @@ CATCH_TEMPLATE_TEST_CASE(
         auto params = fly::detail::make_format_parameters<FormatContext>(i1, i2, i3, i4);
         FormatContext context(out, params);
 
-        auto verify = [](auto expected_value, auto actual_value)
-        {
+        auto verify = [](auto expected_value, auto actual_value) {
             CATCH_CHECK(std::is_same_v<decltype(actual_value), std::int64_t>);
 
             if constexpr (std::is_same_v<decltype(actual_value), std::int64_t>)
@@ -262,8 +248,7 @@ CATCH_TEMPLATE_TEST_CASE(
         auto params = fly::detail::make_format_parameters<FormatContext>(u1, u2, u3, u4);
         FormatContext context(out, params);
 
-        auto verify = [](auto expected_value, auto actual_value)
-        {
+        auto verify = [](auto expected_value, auto actual_value) {
             CATCH_CHECK(std::is_same_v<decltype(actual_value), std::uint64_t>);
 
             if constexpr (std::is_same_v<decltype(actual_value), std::uint64_t>)
@@ -288,8 +273,7 @@ CATCH_TEMPLATE_TEST_CASE(
         auto params = fly::detail::make_format_parameters<FormatContext>(b1, b2);
         FormatContext context(out, params);
 
-        auto verify = [](auto expected_value, auto actual_value)
-        {
+        auto verify = [](auto expected_value, auto actual_value) {
             CATCH_CHECK(std::is_same_v<decltype(actual_value), bool>);
 
             if constexpr (std::is_same_v<decltype(actual_value), bool>)

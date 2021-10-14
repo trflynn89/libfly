@@ -1638,8 +1638,7 @@ Json::Json(T value) noexcept : m_value(static_cast<json_floating_point_type>(val
 template <JsonString T>
 Json::operator T() const &noexcept(false)
 {
-    auto visitor = [this](const auto &storage) -> T
-    {
+    auto visitor = [this](const auto &storage) -> T {
         using S = decltype(storage);
 
         if constexpr (JsonString<S>)
@@ -1721,8 +1720,7 @@ Json::operator std::array<T, N>() const noexcept(false)
 template <JsonBoolean T>
 Json::operator T() const noexcept
 {
-    auto visitor = [](const auto &storage) noexcept -> T
-    {
+    auto visitor = [](const auto &storage) noexcept -> T {
         using S = decltype(storage);
 
         if constexpr (JsonContainer<S>)
@@ -1750,8 +1748,7 @@ Json::operator T() const noexcept
 template <JsonNumber T>
 Json::operator T() const noexcept(false)
 {
-    auto visitor = [this](const auto &storage) -> T
-    {
+    auto visitor = [this](const auto &storage) -> T {
         using S = decltype(storage);
 
         if constexpr (JsonString<S>)
@@ -2158,8 +2155,7 @@ struct std::hash<fly::Json>
     {
         std::size_t type = json.m_value.index();
 
-        auto visitor = [type](const auto &storage) -> std::size_t
-        {
+        auto visitor = [type](const auto &storage) -> std::size_t {
             using S = decltype(storage);
 
             if constexpr (fly::JsonNull<S>)

@@ -28,8 +28,7 @@ Json::Json(Json &&json) noexcept : m_value(std::move(json.m_value))
 //==================================================================================================
 Json::Json(std::initializer_list<Json> initializer) noexcept : m_value()
 {
-    auto object_test = [](const_reference json)
-    {
+    auto object_test = [](const_reference json) {
         return json.is_object_like();
     };
 
@@ -66,8 +65,7 @@ json_string_type Json::serialize() const
 {
     json_string_type serialized;
 
-    auto serialize_string = [&serialized](const json_string_type &value)
-    {
+    auto serialize_string = [&serialized](const json_string_type &value) {
         const auto end = value.cend();
         serialized += FLY_JSON_CHR('"');
 
@@ -79,8 +77,7 @@ json_string_type Json::serialize() const
         serialized += FLY_JSON_CHR('"');
     };
 
-    auto visitor = [&serialized, &serialize_string](const auto &storage)
-    {
+    auto visitor = [&serialized, &serialize_string](const auto &storage) {
         using S = decltype(storage);
 
         if constexpr (JsonNull<S>)
@@ -136,7 +133,6 @@ json_string_type Json::serialize() const
     };
 
     std::visit(std::move(visitor), m_value);
-
     return serialized;
 }
 
@@ -391,8 +387,7 @@ Json::const_reverse_iterator Json::crend() const
 //==================================================================================================
 bool Json::empty() const
 {
-    auto visitor = [](const auto &storage) -> bool
-    {
+    auto visitor = [](const auto &storage) -> bool {
         using S = decltype(storage);
 
         if constexpr (JsonNull<S>)
@@ -415,8 +410,7 @@ bool Json::empty() const
 //==================================================================================================
 Json::size_type Json::size() const
 {
-    auto visitor = [](const auto &storage) -> size_type
-    {
+    auto visitor = [](const auto &storage) -> size_type {
         using S = decltype(storage);
 
         if constexpr (JsonNull<S>)
@@ -439,8 +433,7 @@ Json::size_type Json::size() const
 //==================================================================================================
 void Json::resize(size_type size)
 {
-    auto visitor = [this, &size](auto &storage)
-    {
+    auto visitor = [this, &size](auto &storage) {
         using S = decltype(storage);
 
         if constexpr (fly::SameAsAny<S, json_string_type, json_array_type>)
@@ -459,8 +452,7 @@ void Json::resize(size_type size)
 //==================================================================================================
 Json::size_type Json::capacity() const
 {
-    auto visitor = [](const auto &storage) -> size_type
-    {
+    auto visitor = [](const auto &storage) -> size_type {
         using S = decltype(storage);
 
         if constexpr (JsonNull<S>)
@@ -487,8 +479,7 @@ Json::size_type Json::capacity() const
 //==================================================================================================
 void Json::reserve(size_type capacity)
 {
-    auto visitor = [this, &capacity](auto &storage)
-    {
+    auto visitor = [this, &capacity](auto &storage) {
         using S = decltype(storage);
 
         if constexpr (fly::SameAsAny<S, json_string_type, json_array_type>)
@@ -515,8 +506,7 @@ void Json::reserve(size_type capacity)
 //==================================================================================================
 void Json::clear()
 {
-    auto visitor = [](auto &storage)
-    {
+    auto visitor = [](auto &storage) {
         using S = decltype(storage);
 
         if constexpr (JsonContainer<S>)
@@ -627,8 +617,7 @@ void Json::pop_back()
 //==================================================================================================
 Json::iterator Json::erase(const_iterator position)
 {
-    auto visitor = [this, &position](auto &storage) -> iterator
-    {
+    auto visitor = [this, &position](auto &storage) -> iterator {
         using S = decltype(storage);
 
         if constexpr (fly::SameAsAny<S, json_object_type, json_array_type>)
@@ -666,8 +655,7 @@ Json::iterator Json::erase(const_iterator position)
 //==================================================================================================
 Json::iterator Json::erase(const_iterator first, const_iterator last)
 {
-    auto visitor = [this, &first, &last](auto &storage) -> iterator
-    {
+    auto visitor = [this, &first, &last](auto &storage) -> iterator {
         using S = decltype(storage);
 
         if constexpr (fly::SameAsAny<S, json_object_type, json_array_type>)
@@ -739,8 +727,7 @@ void Json::merge(fly::Json &&other)
 //==================================================================================================
 bool operator==(Json::const_reference json1, Json::const_reference json2)
 {
-    auto visitor = [](const auto &value1, const auto &value2) -> bool
-    {
+    auto visitor = [](const auto &value1, const auto &value2) -> bool {
         using S1 = decltype(value1);
         using S2 = decltype(value2);
 
@@ -780,8 +767,7 @@ bool operator!=(Json::const_reference json1, Json::const_reference json2)
 //==================================================================================================
 bool operator<(Json::const_reference json1, Json::const_reference json2)
 {
-    auto visitor = [&json1, &json2](const auto &value1, const auto &value2) -> bool
-    {
+    auto visitor = [&json1, &json2](const auto &value1, const auto &value2) -> bool {
         using S1 = decltype(value1);
         using S2 = decltype(value2);
 

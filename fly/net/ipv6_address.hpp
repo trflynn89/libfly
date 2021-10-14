@@ -270,8 +270,7 @@ struct fly::Formatter<fly::net::IPv6Address>
         fly::net::IPv6Address::address_type::value_type parts[s_address_size] {};
         address.copy(parts);
 
-        auto join_segments = [&parts](std::size_t index) -> std::uint16_t
-        {
+        auto join_segments = [&parts](std::size_t index) -> std::uint16_t {
             return (parts[index] << 8) | parts[index + 1];
         };
 

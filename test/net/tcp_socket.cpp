@@ -108,8 +108,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
     {
         fly::test::Signal signal;
 
-        auto server_thread = [&signal, &in_addr_loopback]()
-        {
+        auto server_thread = [&signal, &in_addr_loopback]() {
             auto listen_socket =
                 fly::test::create_socket<ListenSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(listen_socket);
@@ -129,8 +128,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
             CATCH_CHECK(endpoint->port() > 0);
         };
 
-        auto client_thread = [&signal, &in_addr_loopback]()
-        {
+        auto client_thread = [&signal, &in_addr_loopback]() {
             auto client_socket = fly::test::create_socket<TcpSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(client_socket);
             signal.wait();
@@ -170,8 +168,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
     {
         fly::test::Signal signal;
 
-        auto server_thread = [&signal, &message]()
-        {
+        auto server_thread = [&signal, &message]() {
             auto listen_socket =
                 fly::test::create_socket<ListenSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(listen_socket);
@@ -188,8 +185,7 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
             CATCH_CHECK(connected_socket->send(message) == message.size());
         };
 
-        auto client_thread = [&signal, &message]()
-        {
+        auto client_thread = [&signal, &message]() {
             auto client_socket = fly::test::create_socket<TcpSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(client_socket);
             signal.wait();
@@ -340,15 +336,15 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
     {
         auto socket1 = fly::test::create_socket<TcpSocket>(fly::net::IOMode::Synchronous);
         CATCH_REQUIRE(socket1);
-        CATCH_CHECK(
-            socket1->connect_async(s_localhost, s_port, [](auto) {}) ==
-            fly::net::ConnectedState::Disconnected);
+
+        auto state1 = socket1->connect_async(s_localhost, s_port, [](auto) {});
+        CATCH_CHECK(state1 == fly::net::ConnectedState::Disconnected);
 
         auto socket2 = fly::test::create_socket<TcpSocket>(fly::net::IOMode::Asynchronous);
         CATCH_REQUIRE(socket2);
-        CATCH_CHECK(
-            socket2->connect_async(s_localhost, s_port, [](auto) {}) ==
-            fly::net::ConnectedState::Disconnected);
+
+        auto state2 = socket2->connect_async(s_localhost, s_port, [](auto) {});
+        CATCH_CHECK(state2 == fly::net::ConnectedState::Disconnected);
     }
 
     CATCH_SECTION("Sockets created without socket service may not send asynchronously")
@@ -398,8 +394,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
 
     CATCH_SECTION("Sockets may connect asynchronously")
     {
-        auto server_thread = [&signal]()
-        {
+        auto server_thread = [&signal]() {
             auto listen_socket =
                 fly::test::create_socket<ListenSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(listen_socket);
@@ -412,8 +407,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_REQUIRE(connected_socket);
         };
 
-        auto client_thread = [&socket_service, &signal]()
-        {
+        auto client_thread = [&socket_service, &signal]() {
             fly::test::Signal client_signal;
 
             auto client_socket = socket_service->create_socket<TcpSocket>();
@@ -423,8 +417,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             fly::net::ConnectedState state = client_socket->connect_async(
                 s_localhost,
                 s_port,
-                [&client_signal](fly::net::ConnectedState new_state)
-                {
+                [&client_signal](fly::net::ConnectedState new_state) {
                     CATCH_CHECK(new_state == fly::net::ConnectedState::Connected);
                     client_signal.notify();
                 });
@@ -441,8 +434,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
 
     CATCH_SECTION("Sockets may send asynchronously")
     {
-        auto server_thread = [&signal, &message]()
-        {
+        auto server_thread = [&signal, &message]() {
             auto listen_socket =
                 fly::test::create_socket<ListenSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(listen_socket);
@@ -463,8 +455,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_CHECK(received == message);
         };
 
-        auto client_thread = [&socket_service, &signal, &message]()
-        {
+        auto client_thread = [&socket_service, &signal, &message]() {
             fly::test::Signal client_signal;
 
             auto client_socket = socket_service->create_socket<TcpSocket>();
@@ -474,8 +465,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             fly::net::ConnectedState state = client_socket->connect_async(
                 s_localhost,
                 s_port,
-                [&client_signal](fly::net::ConnectedState new_state)
-                {
+                [&client_signal](fly::net::ConnectedState new_state) {
                     CATCH_CHECK(new_state == fly::net::ConnectedState::Connected);
                     client_signal.notify();
                 });
@@ -488,8 +478,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
 
             CATCH_CHECK(client_socket->send_async(
                 message,
-                [&client_signal, &message](std::size_t bytes_sent)
-                {
+                [&client_signal, &message](std::size_t bytes_sent) {
                     CATCH_CHECK(bytes_sent == message.size());
                     client_signal.notify();
                 }));
@@ -502,8 +491,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
 
     CATCH_SECTION("Sockets may receive asynchronously")
     {
-        auto server_thread = [&socket_service, &signal, &message]()
-        {
+        auto server_thread = [&socket_service, &signal, &message]() {
             fly::test::Signal server_signal;
 
             auto listen_socket = socket_service->create_socket<ListenSocket>();
@@ -515,8 +503,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             std::shared_ptr<TcpSocket> connected_socket;
 
             CATCH_CHECK(listen_socket->accept_async(
-                [&server_signal, &connected_socket](std::shared_ptr<TcpSocket> client)
-                {
+                [&server_signal, &connected_socket](std::shared_ptr<TcpSocket> client) {
                     connected_socket = std::move(client);
                     server_signal.notify();
                 }));
@@ -530,8 +517,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             while (connected_socket->is_open() && (received.size() != message.size()))
             {
                 CATCH_CHECK(connected_socket->receive_async(
-                    [&server_signal, &received](std::string fragment)
-                    {
+                    [&server_signal, &received](std::string fragment) {
                         received.append(fragment);
                         server_signal.notify();
                     }));
@@ -543,8 +529,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_CHECK(received == message);
         };
 
-        auto client_thread = [&signal, &message]()
-        {
+        auto client_thread = [&signal, &message]() {
             auto client_socket = fly::test::create_socket<TcpSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(client_socket);
             signal.wait();
@@ -605,8 +590,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
         fly::net::ConnectedState state = socket->connect_async(
             s_localhost,
             s_port,
-            [&signal](fly::net::ConnectedState new_state)
-            {
+            [&signal](fly::net::ConnectedState new_state) {
                 CATCH_CHECK(new_state == fly::net::ConnectedState::Disconnected);
                 signal.notify();
             });
@@ -624,13 +608,10 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
         auto socket = socket_service->create_socket<TcpSocket>();
         CATCH_REQUIRE(socket);
 
-        CATCH_CHECK(socket->send_async(
-            message,
-            [&signal](std::size_t bytes_sent)
-            {
-                CATCH_CHECK(bytes_sent == 0);
-                signal.notify();
-            }));
+        CATCH_CHECK(socket->send_async(message, [&signal](std::size_t bytes_sent) {
+            CATCH_CHECK(bytes_sent == 0);
+            signal.notify();
+        }));
 
         signal.wait();
         CATCH_CHECK_FALSE(socket->is_open());
@@ -638,8 +619,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
 
     CATCH_SECTION("Socket sending blocks due to ::send() system call")
     {
-        auto server_thread = [&signal, &message]()
-        {
+        auto server_thread = [&signal, &message]() {
             auto listen_socket =
                 fly::test::create_socket<ListenSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(listen_socket);
@@ -660,8 +640,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_CHECK(received == message);
         };
 
-        auto client_thread = [&socket_service, &signal, &message]()
-        {
+        auto client_thread = [&socket_service, &signal, &message]() {
             fly::test::MockSystem mock(fly::test::MockCall::SendBlocking);
             fly::test::Signal client_signal;
 
@@ -672,8 +651,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             fly::net::ConnectedState state = client_socket->connect_async(
                 s_localhost,
                 s_port,
-                [&client_signal](fly::net::ConnectedState new_state)
-                {
+                [&client_signal](fly::net::ConnectedState new_state) {
                     CATCH_CHECK(new_state == fly::net::ConnectedState::Connected);
                     client_signal.notify();
                 });
@@ -686,8 +664,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
 
             CATCH_CHECK(client_socket->send_async(
                 message,
-                [&client_signal, &message](std::size_t bytes_sent)
-                {
+                [&client_signal, &message](std::size_t bytes_sent) {
                     CATCH_CHECK(bytes_sent == message.size());
                     client_signal.notify();
                 }));
@@ -705,12 +682,10 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
         auto socket = socket_service->create_socket<TcpSocket>();
         CATCH_REQUIRE(socket);
 
-        CATCH_CHECK(socket->receive_async(
-            [&signal](std::string received)
-            {
-                CATCH_CHECK(received.empty());
-                signal.notify();
-            }));
+        CATCH_CHECK(socket->receive_async([&signal](std::string received) {
+            CATCH_CHECK(received.empty());
+            signal.notify();
+        }));
 
         signal.wait();
         CATCH_CHECK_FALSE(socket->is_open());
@@ -718,8 +693,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
 
     CATCH_SECTION("Socket receiving blocks due to ::recv() system call")
     {
-        auto server_thread = [&socket_service, &signal, &message]()
-        {
+        auto server_thread = [&socket_service, &signal, &message]() {
             fly::test::MockSystem mock(fly::test::MockCall::RecvBlocking);
             fly::test::Signal server_signal;
 
@@ -732,8 +706,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             std::shared_ptr<TcpSocket> connected_socket;
 
             CATCH_CHECK(listen_socket->accept_async(
-                [&server_signal, &connected_socket](std::shared_ptr<TcpSocket> client)
-                {
+                [&server_signal, &connected_socket](std::shared_ptr<TcpSocket> client) {
                     connected_socket = std::move(client);
                     server_signal.notify();
                 }));
@@ -747,8 +720,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             while (connected_socket->is_open() && (received.size() != message.size()))
             {
                 CATCH_CHECK(connected_socket->receive_async(
-                    [&server_signal, &received](std::string fragment)
-                    {
+                    [&server_signal, &received](std::string fragment) {
                         received.append(fragment);
                         server_signal.notify();
                     }));
@@ -760,8 +732,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_CHECK(received == message);
         };
 
-        auto client_thread = [&signal, &message]()
-        {
+        auto client_thread = [&signal, &message]() {
             auto client_socket = fly::test::create_socket<TcpSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(client_socket);
             signal.wait();

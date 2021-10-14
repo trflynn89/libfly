@@ -486,8 +486,7 @@ private:
 template <fly::SameAs<Json> JsonType>
 JsonIterator<JsonType>::JsonIterator(pointer json, Position position) noexcept(false) : m_json(json)
 {
-    auto visitor = [this, &position](auto &value) noexcept(JsonIterable<decltype(value)>)
-    {
+    auto visitor = [this, &position](auto &value) noexcept(JsonIterable<decltype(value)>) {
         if constexpr (JsonIterable<decltype(value)>)
         {
             switch (position)
@@ -517,8 +516,7 @@ template <fly::SameAs<Json> JsonType>
 JsonIterator<JsonType>::JsonIterator(const NonConstJsonIterator &iterator) noexcept :
     m_json(iterator.m_json)
 {
-    auto visitor = [this](const auto &it) noexcept
-    {
+    auto visitor = [this](const auto &it) noexcept {
         m_iterator = it;
     };
 
@@ -532,8 +530,7 @@ JsonIterator<JsonType>::operator=(const NonConstJsonIterator &iterator) noexcept
 {
     m_json = iterator.m_json;
 
-    auto visitor = [this](const auto &it) noexcept
-    {
+    auto visitor = [this](const auto &it) noexcept {
         m_iterator = it;
     };
 
@@ -547,8 +544,7 @@ auto JsonIterator<JsonType>::operator*() const -> reference
 {
     validate_iterator();
 
-    auto visitor = [this](const auto &it) -> reference
-    {
+    auto visitor = [this](const auto &it) -> reference {
         this->validate_dereference(it);
 
         if constexpr (is_object_iterator<decltype(it)>)
@@ -570,8 +566,7 @@ auto JsonIterator<JsonType>::operator->() const -> pointer
 {
     validate_iterator();
 
-    auto visitor = [this](const auto &it) -> pointer
-    {
+    auto visitor = [this](const auto &it) -> pointer {
         this->validate_dereference(it);
 
         if constexpr (is_object_iterator<decltype(it)>)
@@ -593,8 +588,7 @@ auto JsonIterator<JsonType>::operator[](difference_type offset) const -> referen
 {
     validate_iterator();
 
-    auto visitor = [&](const auto &it) -> reference
-    {
+    auto visitor = [&](const auto &it) -> reference {
         if constexpr (is_array_iterator<decltype(it)>)
         {
             validate_offset(it, offset);
@@ -634,8 +628,7 @@ bool JsonIterator<JsonType>::operator<(const JsonIterator &iterator) const
 {
     validate_iterator(iterator);
 
-    auto visitor = [this](const auto &it1, const auto &it2) -> bool
-    {
+    auto visitor = [this](const auto &it1, const auto &it2) -> bool {
         if constexpr (is_array_iterator<decltype(it1), decltype(it2)>)
         {
             return it1 < it2;
@@ -686,8 +679,7 @@ auto JsonIterator<JsonType>::operator++() -> JsonIterator &
 {
     validate_iterator();
 
-    auto visitor = [this](auto &it) -> JsonIterator &
-    {
+    auto visitor = [this](auto &it) -> JsonIterator & {
         validate_offset(it, 1);
         std::advance(it, 1);
 
@@ -713,8 +705,7 @@ auto JsonIterator<JsonType>::operator--() -> JsonIterator &
 {
     validate_iterator();
 
-    auto visitor = [this](auto &it) -> JsonIterator &
-    {
+    auto visitor = [this](auto &it) -> JsonIterator & {
         validate_offset(it, -1);
         std::advance(it, -1);
 
@@ -730,8 +721,7 @@ auto JsonIterator<JsonType>::operator+=(difference_type offset) -> JsonIterator 
 {
     validate_iterator();
 
-    auto visitor = [this, &offset](auto &it)
-    {
+    auto visitor = [this, &offset](auto &it) {
         if constexpr (is_array_iterator<decltype(it)>)
         {
             validate_offset(it, offset);
@@ -792,8 +782,7 @@ auto JsonIterator<JsonType>::operator-(const JsonIterator &iterator) const -> di
 {
     validate_iterator(iterator);
 
-    auto visitor = [this](const auto &it1, const auto &it2) -> difference_type
-    {
+    auto visitor = [this](const auto &it1, const auto &it2) -> difference_type {
         if constexpr (is_array_iterator<decltype(it1), decltype(it2)>)
         {
             return std::distance(it2, it1);
@@ -813,8 +802,7 @@ const typename json_object_type::key_type &JsonIterator<JsonType>::key() const
 {
     validate_iterator();
 
-    auto visitor = [this](const auto &it) -> const typename json_object_type::key_type &
-    {
+    auto visitor = [this](const auto &it) -> const typename json_object_type::key_type & {
         if constexpr (is_object_iterator<decltype(it)>)
         {
             validate_dereference(it);

@@ -37,8 +37,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
     CATCH_SECTION("Convert a JSON instance to object-like types")
     {
-        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name)
-        {
+        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name) {
             CATCH_CAPTURE(name);
 
             auto test1 = T1 {{J_STR("a"), 2}, {J_STR("b"), 4}};
@@ -65,8 +64,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
             CATCH_CHECK_THROWS_JSON(T1(json), "JSON type is not numeric: ({})", json["a"]);
         };
 
-        auto invalidate = [&json]<typename T>(const char *name)
-        {
+        auto invalidate = [&json]<typename T>(const char *name) {
             CATCH_CAPTURE(name);
 
             CATCH_CHECK_THROWS_JSON(
@@ -82,8 +80,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
 
     CATCH_SECTION("Convert a JSON instance to array-like types")
     {
-        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name)
-        {
+        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name) {
             CATCH_CAPTURE(name);
 
             auto test1 = T1 {50, 60, 70, 80};
@@ -116,8 +113,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonConversion")
                 json[0]);
         };
 
-        auto invalidate = [&json]<typename T>(const char *name)
-        {
+        auto invalidate = [&json]<typename T>(const char *name) {
             CATCH_CAPTURE(name);
 
             CATCH_CHECK_THROWS_JSON(FLY_UNUSED((T(json))), "JSON type is not an array: ({})", json);

@@ -182,8 +182,7 @@ void HuffmanEncoder::insert_code(HuffmanCode &&code)
 //==================================================================================================
 void HuffmanEncoder::limit_code_lengths()
 {
-    auto compute_kraft = [this](const HuffmanCode &code) -> code_type
-    {
+    auto compute_kraft = [this](const HuffmanCode &code) -> code_type {
         return 1_u16 << (m_max_code_length - code.m_length);
     };
 

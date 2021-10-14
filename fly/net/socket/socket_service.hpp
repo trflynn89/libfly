@@ -214,8 +214,7 @@ auto SocketService::wrap_callback(const std::shared_ptr<SocketType> &socket, Cal
     std::weak_ptr<SocketType> weak_socket = socket;
     CallbackHolder holder {std::forward<Callback>(callback)};
 
-    return [weak_socket = std::move(weak_socket), holder = std::move(holder)]() mutable
-    {
+    return [weak_socket = std::move(weak_socket), holder = std::move(holder)]() mutable {
         if (std::shared_ptr<SocketType> strong_socket = weak_socket.lock(); strong_socket)
         {
             std::invoke(std::move(holder.m_callback), std::move(strong_socket));

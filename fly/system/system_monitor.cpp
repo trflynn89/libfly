@@ -87,8 +87,7 @@ bool SystemMonitor::poll_system_later()
         return false;
     }
 
-    auto task = [](std::shared_ptr<SystemMonitor> self)
-    {
+    auto task = [](std::shared_ptr<SystemMonitor> self) {
         self->update_system_cpu_count();
         self->update_system_cpu_usage();
         self->update_process_cpu_usage();

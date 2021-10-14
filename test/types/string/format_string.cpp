@@ -93,8 +93,7 @@ FLY_CONSTEVAL auto make_format(const CharType (&format)[N], Types &&...)
 template <typename FormatStringType, typename... SpecifierType>
 void test_format(FormatStringType &&format, const SpecifierType &...specifiers)
 {
-    [[maybe_unused]] auto equals = [&format](const auto &specifier)
-    {
+    [[maybe_unused]] auto equals = [&format](const auto &specifier) {
         auto actual_specifier = format.next_specifier();
         CATCH_REQUIRE(actual_specifier);
         CATCH_CHECK(actual_specifier == specifier);

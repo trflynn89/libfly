@@ -470,8 +470,7 @@ template <typename IteratorType>
 auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
     -> std::optional<string_type>
 {
-    auto escaped_with = [&it, &end](const CharType ch) -> bool
-    {
+    auto escaped_with = [&it, &end](const CharType ch) -> bool {
         if ((it == end) || ((it + 1) == end))
         {
             return false;
@@ -484,8 +483,7 @@ auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const Iterator
 
     if (escaped_with(s_lower_u))
     {
-        auto next_codepoint = [&it, &end]() -> codepoint_type
-        {
+        auto next_codepoint = [&it, &end]() -> codepoint_type {
             return unescape_codepoint<s_lower_u>(it, end);
         };
 
@@ -508,8 +506,7 @@ auto BasicUnicode<CharType>::escape_codepoint(codepoint_type codepoint) -> strin
     string_type result;
 
     // TODO: Replace this with BasicString::format without actually including formatters.hpp.
-    auto to_hex = [&codepoint](std::size_t length) -> string_type
-    {
+    auto to_hex = [&codepoint](std::size_t length) -> string_type {
         static const auto *s_digits = FLY_STR(CharType, "0123456789abcdef");
         string_type hex(length, FLY_CHR(CharType, '0'));
 
@@ -611,8 +608,7 @@ auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const Itera
     auto utf8_it = std::find_if(
         s_utf8_leading_bytes.begin(),
         s_utf8_leading_bytes.end(),
-        [&leading_byte](const auto &candidate)
-        {
+        [&leading_byte](const auto &candidate) {
             return (leading_byte & candidate.m_encoding_mask) == candidate.m_leading_byte;
         });
 
@@ -659,8 +655,7 @@ requires fly::SizeOfTypeIs<CharType, 2>
 auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
     -> codepoint_type
 {
-    auto next_codepoint = [&it, &end]() -> codepoint_type
-    {
+    auto next_codepoint = [&it, &end]() -> codepoint_type {
         return next_encoded_byte(it, end);
     };
 
@@ -739,12 +734,10 @@ template <fly::StandardCharacter CharType>
 auto BasicUnicode<CharType>::create_codepoint_from_surrogates(
     std::function<codepoint_type()> next_codepoint) -> codepoint_type
 {
-    auto is_high_surrogate = [](codepoint_type c) -> bool
-    {
+    auto is_high_surrogate = [](codepoint_type c) -> bool {
         return (c >= s_high_surrogate_min) && (c <= s_high_surrogate_max);
     };
-    auto is_low_surrogate = [](codepoint_type c) -> bool
-    {
+    auto is_low_surrogate = [](codepoint_type c) -> bool {
         return (c >= s_low_surrogate_min) && (c <= s_low_surrogate_max);
     };
 

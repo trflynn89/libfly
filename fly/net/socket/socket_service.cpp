@@ -47,10 +47,8 @@ SocketService::~SocketService() noexcept
 //==================================================================================================
 void SocketService::remove_socket(socket_type handle)
 {
-    auto task = [handle](std::shared_ptr<SocketService> self)
-    {
-        auto compare_handles = [handle](const Request &request)
-        {
+    auto task = [handle](std::shared_ptr<SocketService> self) {
+        auto compare_handles = [handle](const Request &request) {
             return handle == request.m_handle;
         };
 
@@ -65,8 +63,7 @@ void SocketService::remove_socket(socket_type handle)
 //==================================================================================================
 void SocketService::notify_when_writable(socket_type handle, Notification &&callback)
 {
-    auto task = [handle, callback = std::move(callback)](std::shared_ptr<SocketService> self)
-    {
+    auto task = [handle, callback = std::move(callback)](std::shared_ptr<SocketService> self) {
         const bool should_poll = self->m_write_requests.empty() && self->m_read_requests.empty();
         self->m_write_requests.emplace_back(handle, std::move(callback));
 
@@ -83,8 +80,7 @@ void SocketService::notify_when_writable(socket_type handle, Notification &&call
 //==================================================================================================
 void SocketService::notify_when_readable(socket_type handle, Notification &&callback)
 {
-    auto task = [handle, callback = std::move(callback)](std::shared_ptr<SocketService> self)
-    {
+    auto task = [handle, callback = std::move(callback)](std::shared_ptr<SocketService> self) {
         const bool should_poll = self->m_write_requests.empty() && self->m_read_requests.empty();
         self->m_read_requests.emplace_back(handle, std::move(callback));
 
@@ -115,15 +111,11 @@ void SocketService::poll()
 
     detail::select(m_config->socket_io_wait_time(), writable, readable);
 
-    auto invoke = [](const std::set<socket_type> &ready, std::vector<Request> &pending)
-    {
+    auto invoke = [](const std::set<socket_type> &ready, std::vector<Request> &pending) {
         for (socket_type handle : ready)
         {
-            auto it = std::find_if(
-                pending.begin(),
-                pending.end(),
-                [handle](const Request &request)
-                {
+            auto it =
+                std::find_if(pending.begin(), pending.end(), [handle](const Request &request) {
                     return handle == request.m_handle;
                 });
 
@@ -137,8 +129,7 @@ void SocketService::poll()
 
     if (!m_write_requests.empty() || !m_read_requests.empty())
     {
-        auto task = [](std::shared_ptr<SocketService> self)
-        {
+        auto task = [](std::shared_ptr<SocketService> self) {
             self->poll();
         };
 

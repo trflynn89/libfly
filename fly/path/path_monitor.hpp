@@ -220,8 +220,7 @@ struct fly::Formatter<fly::path::PathEvent>
     template <typename FormatContext>
     void format(fly::path::PathEvent event, FormatContext &context)
     {
-        auto append = [&context](std::string_view value)
-        {
+        auto append = [&context](std::string_view value) {
             for (auto ch : value)
             {
                 context.out()++ = ch;

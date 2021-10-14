@@ -174,11 +174,7 @@ CATCH_TEST_CASE("System", "[system]")
     CATCH_SECTION("Setup a custom signal handler with lambda")
     {
         int last_signal = 0;
-        fly::system::set_signal_handler(
-            [&last_signal](int signal)
-            {
-                last_signal = signal;
-            });
+        fly::system::set_signal_handler([&last_signal](int signal) { last_signal = signal; });
 
         std::raise(SIGINT);
         CATCH_CHECK(last_signal == SIGINT);

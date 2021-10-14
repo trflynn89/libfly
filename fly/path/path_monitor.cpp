@@ -191,8 +191,7 @@ bool PathMonitor::poll_paths_later()
         return false;
     }
 
-    auto task = [](std::shared_ptr<PathMonitor> self)
-    {
+    auto task = [](std::shared_ptr<PathMonitor> self) {
         self->poll(self->m_config->poll_interval());
         self->poll_paths_later();
     };

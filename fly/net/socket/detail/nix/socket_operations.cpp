@@ -555,8 +555,7 @@ void select(
 
     if (status > 0)
     {
-        auto is_not_set = [](fd_set *set, socket_type handle)
-        {
+        auto is_not_set = [](fd_set *set, socket_type handle) {
             return !FD_ISSET(handle, set);
         };
 
