@@ -447,7 +447,7 @@ template <typename FormatContext>
 template <fly::FormattablePointer T>
 constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept :
     m_type(Type::Pointer),
-    m_value {.m_standard {.m_pointer {value}, .m_format {format_standard_value<FormatContext, T>}}}
+    m_value {.m_standard {.m_pointer = value, .m_format {format_standard_value<FormatContext, T>}}}
 {
 }
 
@@ -499,7 +499,7 @@ template <typename FormatContext>
 template <fly::FormattableBoolean T>
 constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(T value) noexcept :
     m_type(Type::Bool),
-    m_value {.m_standard {.m_bool {value}, .m_format {format_standard_value<FormatContext, T>}}}
+    m_value {.m_standard {.m_bool = value, .m_format {format_standard_value<FormatContext, T>}}}
 {
 }
 
