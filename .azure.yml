@@ -21,7 +21,15 @@ stages:
           with_catch2: false
 
       - script: |
-          make style formatter=clang-format-12 check=1
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main" | sudo tee -a /etc/apt/sources.list.d/llvm.list
+
+          sudo apt-get update
+          sudo apt-get install -y clang-format-13
+        displayName: 'Dependencies'
+
+      - script: |
+          make style formatter=clang-format-13 check=1
         displayName: 'Style'
 
   - stage: Linux
