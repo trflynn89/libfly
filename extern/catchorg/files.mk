@@ -67,4 +67,5 @@ SRC_$(d) := \
 
 CXXFLAGS_$(d) += \
     -Wno-float-equal \
-    -Wno-sign-conversion
+    -Wno-sign-conversion \
+    -Wno-unused-variable
