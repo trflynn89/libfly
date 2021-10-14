@@ -54,8 +54,7 @@ CATCH_TEST_CASE("SystemMonitor", "[system]")
     // Thread to spin indefinitely until signaled to stop.
     std::atomic_bool keep_running(true);
 
-    auto spin_thread = [&keep_running]()
-    {
+    auto spin_thread = [&keep_running]() {
         while (keep_running.load())
         {
         }

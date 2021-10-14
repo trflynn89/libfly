@@ -57,8 +57,7 @@ CATCH_TEST_CASE("Parser", "[parser]")
     fly::test::PathUtil::ScopedTempDirectory path;
     std::filesystem::path file = path.file();
 
-    auto parse_bytes = [&parser, &file](std::vector<int> &&bytes, std::vector<int> &&compare)
-    {
+    auto parse_bytes = [&parser, &file](std::vector<int> &&bytes, std::vector<int> &&compare) {
         CATCH_CAPTURE(bytes);
 
         std::string contents;

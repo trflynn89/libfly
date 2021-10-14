@@ -27,8 +27,7 @@ CATCH_TEMPLATE_TEST_CASE(
     using string_type = TestType;
     using char_type = typename string_type::value_type;
 
-    auto reserved_codepoint = []() -> string_type
-    {
+    auto reserved_codepoint = []() -> string_type {
         static constexpr const std::uint32_t s_reserved = 0xd800;
         string_type result;
 

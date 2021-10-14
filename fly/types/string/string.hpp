@@ -660,8 +660,7 @@ auto BasicString<CharType>::split(view_type input, char_type delimiter, size_typ
     size_type start = 0;
     size_type end = input.find(delimiter);
 
-    auto push_item = [&elements, &count, &delimiter](view_type str)
-    {
+    auto push_item = [&elements, &count, &delimiter](view_type str) {
         if (!str.empty())
         {
             if ((count > 0) && (elements.size() == count))
@@ -695,8 +694,7 @@ auto BasicString<CharType>::split(view_type input, char_type delimiter, size_typ
 template <StandardCharacter CharType>
 void BasicString<CharType>::trim(string_type &target)
 {
-    auto is_non_space = [](auto ch)
-    {
+    auto is_non_space = [](auto ch) {
         return !is_space(ch);
     };
 

@@ -42,9 +42,7 @@ CATCH_TEMPLATE_TEST_CASE("SocketService", "[net]", fly::net::IPv4Address, fly::n
         fly::net::SocketService::create(task_runner, std::make_shared<fly::net::NetworkConfig>());
 
     fly::test::Signal signal;
-
-    auto notify = [&signal](auto)
-    {
+    auto notify = [&signal](auto) {
         signal.notify();
     };
 
@@ -70,8 +68,7 @@ CATCH_TEMPLATE_TEST_CASE("SocketService", "[net]", fly::net::IPv4Address, fly::n
     {
         fly::test::Signal client_signal;
 
-        auto server_thread = [&socket_service, &notify, &signal, &client_signal]()
-        {
+        auto server_thread = [&socket_service, &notify, &signal, &client_signal]() {
             auto server_socket = socket_service->create_socket<UdpSocket>();
             CATCH_REQUIRE(server_socket);
 
@@ -82,8 +79,7 @@ CATCH_TEMPLATE_TEST_CASE("SocketService", "[net]", fly::net::IPv4Address, fly::n
             signal.wait();
         };
 
-        auto client_thread = [&client_signal]()
-        {
+        auto client_thread = [&client_signal]() {
             auto client_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(client_socket);
             client_signal.wait();
@@ -97,16 +93,10 @@ CATCH_TEMPLATE_TEST_CASE("SocketService", "[net]", fly::net::IPv4Address, fly::n
 
 #if defined(FLY_LINUX)
 
-    auto flush = [&task_runner, &signal]()
-    {
+    auto flush = [&task_runner, &signal]() {
         for (std::size_t i = 0; i < 2; ++i)
         {
-            task_runner->post_task(
-                FROM_HERE,
-                [&signal]()
-                {
-                    signal.notify();
-                });
+            task_runner->post_task(FROM_HERE, [&signal]() { signal.notify(); });
             signal.wait();
         }
     };
@@ -145,12 +135,9 @@ CATCH_TEMPLATE_TEST_CASE("SocketService", "[net]", fly::net::IPv4Address, fly::n
 
         bool was_readable = false;
 
-        socket_service->notify_when_writable(
-            socket,
-            [&was_readable](auto)
-            {
-                was_readable = true;
-            });
+        socket_service->notify_when_writable(socket, [&was_readable](auto) {
+            was_readable = true;
+        });
 
         socket_service->remove_socket(socket->handle());
         flush();
@@ -167,12 +154,9 @@ CATCH_TEMPLATE_TEST_CASE("SocketService", "[net]", fly::net::IPv4Address, fly::n
 
         bool was_readable = false;
 
-        socket_service->notify_when_writable(
-            socket,
-            [&was_readable](auto)
-            {
-                was_readable = true;
-            });
+        socket_service->notify_when_writable(socket, [&was_readable](auto) {
+            was_readable = true;
+        });
 
         flush();
 

@@ -106,8 +106,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
 
     auto validate_log_points = [&](fly::logger::Level expected_level,
                                    const char *expected_function,
-                                   std::vector<std::string> &&expected_messages)
-    {
+                                   std::vector<std::string> &&expected_messages) {
         double last_time = 0.0;
 
         for (std::size_t i = 0; i < expected_messages.size(); ++i)

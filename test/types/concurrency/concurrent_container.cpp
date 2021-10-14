@@ -55,16 +55,14 @@ CATCH_TEMPLATE_PRODUCT_TEST_CASE(
         value_type obj2(2_u32);
         value_type obj3(3_u32);
 
-        auto push = [&container](value_type object, size_type expected_size)
-        {
+        auto push = [&container](value_type object, size_type expected_size) {
             container.push(std::move(object));
 
             CATCH_CHECK(container.size() == expected_size);
             CATCH_CHECK_FALSE(container.empty());
         };
 
-        auto pop = [&container](value_type expected_object, size_type expected_size)
-        {
+        auto pop = [&container](value_type expected_object, size_type expected_size) {
             value_type object;
 
             CATCH_REQUIRE(container.pop(object, std::chrono::milliseconds(0)));
@@ -94,10 +92,8 @@ CATCH_TEMPLATE_PRODUCT_TEST_CASE(
 
     CATCH_SECTION("Push onto and pop from a queue on multiple threads")
     {
-        auto run_multi_threaded_test = [&container](std::size_t writers, std::size_t readers)
-        {
-            auto writer_thread = [&container]() -> std::size_t
-            {
+        auto run_multi_threaded_test = [&container](std::size_t writers, std::size_t readers) {
+            auto writer_thread = [&container]() -> std::size_t {
                 std::size_t writes = 100;
 
                 for (std::size_t i = 0; i < writes; ++i)
@@ -109,8 +105,7 @@ CATCH_TEMPLATE_PRODUCT_TEST_CASE(
                 return writes;
             };
 
-            auto reader_thread = [&container](std::atomic_bool &finished_writes) -> std::size_t
-            {
+            auto reader_thread = [&container](std::atomic_bool &finished_writes) -> std::size_t {
                 std::size_t reads = 0;
 
                 while (!finished_writes.load() || !container.empty())
@@ -170,8 +165,7 @@ CATCH_TEMPLATE_PRODUCT_TEST_CASE(
 
     CATCH_SECTION("Pop from a queue while blocking indefinitely")
     {
-        auto infinite_wait_thread = [&container]() -> value_type
-        {
+        auto infinite_wait_thread = [&container]() -> value_type {
             value_type value;
             container.pop(value);
 

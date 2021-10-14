@@ -117,8 +117,7 @@ bool ListenSocket<EndpointType>::accept_async(AcceptCompletion &&callback)
     {
         service->notify_when_readable(
             this->shared_from_this(),
-            [callback = std::move(callback)](std::shared_ptr<ListenSocket> self) mutable
-            {
+            [callback = std::move(callback)](std::shared_ptr<ListenSocket> self) mutable {
                 self->ready_to_accept(std::move(callback));
             });
 

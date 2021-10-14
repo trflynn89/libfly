@@ -173,8 +173,7 @@ TcpSocket<EndpointType>::connect_async(const EndpointType &endpoint, ConnectComp
         {
             service->notify_when_writable(
                 this->shared_from_this(),
-                [callback = std::move(callback)](std::shared_ptr<TcpSocket> self) mutable
-                {
+                [callback = std::move(callback)](std::shared_ptr<TcpSocket> self) mutable {
                     std::invoke(std::move(callback), self->finish_connect());
                 });
         }
@@ -263,8 +262,7 @@ bool TcpSocket<EndpointType>::send_async(std::string_view message, SendCompletio
     {
         service->notify_when_writable(
             this->shared_from_this(),
-            [message, callback = std::move(callback)](std::shared_ptr<TcpSocket> self) mutable
-            {
+            [message, callback = std::move(callback)](std::shared_ptr<TcpSocket> self) mutable {
                 self->ready_to_send(message, std::move(callback), 0, message.size());
             });
 
@@ -302,8 +300,7 @@ bool TcpSocket<EndpointType>::receive_async(ReceiveCompletion &&callback)
     {
         service->notify_when_readable(
             this->shared_from_this(),
-            [callback = std::move(callback)](std::shared_ptr<TcpSocket> self) mutable
-            {
+            [callback = std::move(callback)](std::shared_ptr<TcpSocket> self) mutable {
                 self->ready_to_receive(std::move(callback), std::string());
             });
 
@@ -339,8 +336,7 @@ void TcpSocket<EndpointType>::ready_to_send(
         socket_service()->notify_when_writable(
             this->shared_from_this(),
             [message, callback = std::move(callback), bytes_sent, total_bytes](
-                std::shared_ptr<TcpSocket> self) mutable
-            {
+                std::shared_ptr<TcpSocket> self) mutable {
                 self->ready_to_send(message, std::move(callback), bytes_sent, total_bytes);
             });
     }
@@ -374,8 +370,7 @@ void TcpSocket<EndpointType>::ready_to_receive(ReceiveCompletion &&callback, std
         socket_service()->notify_when_readable(
             this->shared_from_this(),
             [callback = std::move(callback),
-             received = std::move(received)](std::shared_ptr<TcpSocket> self) mutable
-            {
+             received = std::move(received)](std::shared_ptr<TcpSocket> self) mutable {
                 self->ready_to_receive(std::move(callback), std::move(received));
             });
     }

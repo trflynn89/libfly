@@ -66,8 +66,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
     {
         const fly::Json array = {1, 2, 3};
 
-        auto value = []() -> fly::Json
-        {
+        auto value = []() -> fly::Json {
             return fly::Json(1);
         };
 
@@ -502,8 +501,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Swap a JSON instance with an array-like type")
     {
-        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name)
-        {
+        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name) {
             CATCH_CAPTURE(name);
             json = {1, 2};
 
@@ -540,8 +538,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             CATCH_CHECK(test3 == T3 {nullptr, true});
         };
 
-        auto invalidate = [&json]<typename T>(const char *name)
-        {
+        auto invalidate = [&json]<typename T>(const char *name) {
             CATCH_CAPTURE(name);
             T test {};
 
@@ -812,8 +809,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
 
     CATCH_SECTION("Swap a JSON instance with an object-like type")
     {
-        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name)
-        {
+        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name) {
             CATCH_CAPTURE(name);
             json = {{J_STR("c"), 100}, {J_STR("d"), 200}};
 
@@ -838,8 +834,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
             CATCH_CHECK(test1 == T1 {{J_STR("a"), 5}, {J_STR("b"), 6}});
         };
 
-        auto invalidate = [&json]<typename T>(const char *name)
-        {
+        auto invalidate = [&json]<typename T>(const char *name) {
             CATCH_CAPTURE(name);
             T test {};
 
@@ -856,8 +851,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
 
     CATCH_SECTION("Merge an object-like type into a JSON instance")
     {
-        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name)
-        {
+        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name) {
             json = fly::test::create_json<json_type, string_type>();
             CATCH_CAPTURE(name);
 
@@ -892,8 +886,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
             CATCH_CHECK(json[J_STR("g")] == "8");
         };
 
-        auto invalidate = [&json]<typename T>(const char *name)
-        {
+        auto invalidate = [&json]<typename T>(const char *name) {
             CATCH_CAPTURE(name);
             T test {};
 

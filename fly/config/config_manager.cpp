@@ -81,12 +81,10 @@ bool ConfigManager::start()
 
     std::weak_ptr<ConfigManager> weak_self = shared_from_this();
 
-    auto callback = [weak_self](std::filesystem::path, fly::path::PathEvent)
-    {
+    auto callback = [weak_self](std::filesystem::path, fly::path::PathEvent) {
         if (auto self = weak_self.lock(); self)
         {
-            auto task = [](std::shared_ptr<ConfigManager> nested_self)
-            {
+            auto task = [](std::shared_ptr<ConfigManager> nested_self) {
                 nested_self->update_config();
             };
 

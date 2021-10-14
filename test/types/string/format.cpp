@@ -493,8 +493,7 @@ CATCH_TEMPLATE_TEST_CASE("FormatTypes", "[string]", char, wchar_t, char8_t, char
     using char_type = typename BasicString::char_type;
     using view_type = typename BasicString::view_type;
 
-    auto is_all_hex = [](view_type value)
-    {
+    auto is_all_hex = [](view_type value) {
         if (value.starts_with(FLY_STR(char_type, "0x")))
         {
             value = value.substr(2);

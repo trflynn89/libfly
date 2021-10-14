@@ -309,8 +309,7 @@ fly::json_string_type JsonParser::consume_value()
 {
     fly::json_string_type value;
 
-    auto keep_parsing = [this](Token token) -> bool
-    {
+    auto keep_parsing = [this](Token token) -> bool {
         switch (token)
         {
             case Token::Comma:

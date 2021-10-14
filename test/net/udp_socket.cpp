@@ -109,8 +109,7 @@ CATCH_TEMPLATE_TEST_CASE("UdpSocket", "[net]", fly::net::IPv4Address, fly::net::
     {
         fly::test::Signal signal;
 
-        auto server_thread = [&signal, &message]()
-        {
+        auto server_thread = [&signal, &message]() {
             auto server_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(server_socket);
 
@@ -120,8 +119,7 @@ CATCH_TEMPLATE_TEST_CASE("UdpSocket", "[net]", fly::net::IPv4Address, fly::net::
             CATCH_CHECK(server_socket->receive() == message);
         };
 
-        auto client_thread = [&signal, &message]()
-        {
+        auto client_thread = [&signal, &message]() {
             auto client_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(client_socket);
             signal.wait();
@@ -308,8 +306,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
 
     CATCH_SECTION("Sockets may send asynchronously")
     {
-        auto server_thread = [&signal, &message]()
-        {
+        auto server_thread = [&signal, &message]() {
             auto server_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(server_socket);
 
@@ -326,8 +323,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_CHECK(received == message);
         };
 
-        auto client_thread = [&socket_service, &signal, &message]()
-        {
+        auto client_thread = [&socket_service, &signal, &message]() {
             fly::test::Signal client_signal;
 
             auto client_socket = socket_service->create_socket<UdpSocket>();
@@ -338,8 +334,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
                 s_localhost,
                 s_port,
                 message,
-                [&client_signal, &message](std::size_t bytes_sent)
-                {
+                [&client_signal, &message](std::size_t bytes_sent) {
                     CATCH_CHECK(bytes_sent == message.size());
                     client_signal.notify();
                 }));
@@ -352,8 +347,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
 
     CATCH_SECTION("Sockets may receive asynchronously")
     {
-        auto server_thread = [&socket_service, &signal, &message]()
-        {
+        auto server_thread = [&socket_service, &signal, &message]() {
             fly::test::Signal server_signal;
 
             auto server_socket = socket_service->create_socket<UdpSocket>();
@@ -366,9 +360,8 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
 
             while (server_socket->is_open() && (received.size() != message.size()))
             {
-                CATCH_CHECK(server_socket->receive_async(
-                    [&server_signal, &received](std::string fragment)
-                    {
+                CATCH_CHECK(
+                    server_socket->receive_async([&server_signal, &received](std::string fragment) {
                         received.append(fragment);
                         server_signal.notify();
                     }));
@@ -380,8 +373,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_CHECK(received == message);
         };
 
-        auto client_thread = [&signal, &message]()
-        {
+        auto client_thread = [&signal, &message]() {
             auto client_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(client_socket);
             signal.wait();
@@ -411,12 +403,8 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
         auto socket = socket_service->create_socket<UdpSocket>();
         CATCH_REQUIRE(socket);
 
-        CATCH_CHECK(socket->send_async(
-            s_localhost,
-            s_port,
-            message,
-            [&signal](std::size_t bytes_sent)
-            {
+        CATCH_CHECK(
+            socket->send_async(s_localhost, s_port, message, [&signal](std::size_t bytes_sent) {
                 CATCH_CHECK(bytes_sent == 0);
                 signal.notify();
             }));
@@ -427,8 +415,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
 
     CATCH_SECTION("Socket sending blocks due to ::sendto() system call")
     {
-        auto server_thread = [&signal, &message]()
-        {
+        auto server_thread = [&signal, &message]() {
             auto server_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(server_socket);
 
@@ -445,8 +432,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_CHECK(received == message);
         };
 
-        auto client_thread = [&socket_service, &signal, &message]()
-        {
+        auto client_thread = [&socket_service, &signal, &message]() {
             fly::test::MockSystem mock(fly::test::MockCall::SendtoBlocking);
             fly::test::Signal client_signal;
 
@@ -458,8 +444,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
                 s_localhost,
                 s_port,
                 message,
-                [&client_signal, &message](std::size_t bytes_sent)
-                {
+                [&client_signal, &message](std::size_t bytes_sent) {
                     CATCH_CHECK(bytes_sent == message.size());
                     client_signal.notify();
                 }));
@@ -472,8 +457,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
 
     CATCH_SECTION("Socket receiving fails due to ::recvfrom() system call")
     {
-        auto server_thread = [&socket_service, &signal]()
-        {
+        auto server_thread = [&socket_service, &signal]() {
             fly::test::MockSystem mock(fly::test::MockCall::Recvfrom);
             fly::test::Signal server_signal;
 
@@ -483,19 +467,16 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_CHECK(server_socket->bind(s_localhost, s_port, fly::net::BindMode::AllowReuse));
             signal.notify();
 
-            CATCH_CHECK(server_socket->receive_async(
-                [&server_signal](std::string received)
-                {
-                    CATCH_CHECK(received.empty());
-                    server_signal.notify();
-                }));
+            CATCH_CHECK(server_socket->receive_async([&server_signal](std::string received) {
+                CATCH_CHECK(received.empty());
+                server_signal.notify();
+            }));
 
             server_signal.wait();
             CATCH_CHECK_FALSE(server_socket->is_open());
         };
 
-        auto client_thread = [&signal, &message]()
-        {
+        auto client_thread = [&signal, &message]() {
             auto client_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(client_socket);
             signal.wait();
@@ -508,8 +489,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
 
     CATCH_SECTION("Socket receiving blocks due to ::recvfrom() system call")
     {
-        auto server_thread = [&socket_service, &signal, &message]()
-        {
+        auto server_thread = [&socket_service, &signal, &message]() {
             fly::test::MockSystem mock(fly::test::MockCall::RecvfromBlocking);
             fly::test::Signal server_signal;
 
@@ -523,9 +503,8 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
 
             while (server_socket->is_open() && (received.size() != message.size()))
             {
-                CATCH_CHECK(server_socket->receive_async(
-                    [&server_signal, &received](std::string fragment)
-                    {
+                CATCH_CHECK(
+                    server_socket->receive_async([&server_signal, &received](std::string fragment) {
                         received.append(fragment);
                         server_signal.notify();
                     }));
@@ -537,8 +516,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncUdpSocket", "[net]", fly::net::IPv4Address, fly::
             CATCH_CHECK(received == message);
         };
 
-        auto client_thread = [&signal, &message]()
-        {
+        auto client_thread = [&signal, &message]() {
             auto client_socket = fly::test::create_socket<UdpSocket>(fly::net::IOMode::Synchronous);
             CATCH_REQUIRE(client_socket);
             signal.wait();
