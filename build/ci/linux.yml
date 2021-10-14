@@ -16,7 +16,7 @@ jobs:
       vmImage: ubuntu-20.04
 
     container:
-      image: trflynn89/libfly:ubuntu2104_clang12_gcc11
+      image: trflynn89/libfly:ubuntu2110_clang13_gcc11
       options: --cap-add SYS_PTRACE --sysctl net.ipv6.conf.all.disable_ipv6=0
 
     steps:
