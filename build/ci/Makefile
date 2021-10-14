@@ -18,7 +18,7 @@ REPO := libfly
 BASE := $(shell grep -oP "(?<=FROM )(\S+)" Dockerfile)
 
 # Toolchain versions.
-CLANG_VERSION := 12
+CLANG_VERSION := 13
 GCC_VERSION := 11
 JDK_VERSION := 15
 
