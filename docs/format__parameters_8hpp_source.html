@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">6.2.1</span>
+   &#160;<span id="projectnumber">6.2.2</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -404,7 +404,7 @@ $(document).ready(function(){initNavTree('format__parameters_8hpp_source.html','
 <div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;<span class="keyword">template</span> &lt;fly::FormattablePo<span class="keywordtype">int</span>er T&gt;</div>
 <div class="line"><a name="l00448"></a><span class="lineno"><a class="line" href="classfly_1_1detail_1_1_basic_format_parameter.html#a12213dc97ee3847866e6f940971a35a9">  448</a></span>&#160;constexpr <a class="code" href="classfly_1_1detail_1_1_basic_format_parameter.html#a4c3bcdde24628b2060868749800dfcbb">BasicFormatParameter&lt;FormatContext&gt;::BasicFormatParameter</a>(T value) noexcept :</div>
 <div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    m_type(Type::Pointer),</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    m_value {.m_standard {.m_pointer {value}, .m_format {format_standard_value&lt;FormatContext, T&gt;}}}</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    m_value {.m_standard {.m_pointer = value, .m_format {format_standard_value&lt;FormatContext, T&gt;}}}</div>
 <div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;{</div>
 <div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;}</div>
 <div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160; </div>
@@ -456,7 +456,7 @@ $(document).ready(function(){initNavTree('format__parameters_8hpp_source.html','
 <div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;<span class="keyword">template</span> &lt;fly::FormattableBoolean T&gt;</div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;constexpr <a class="code" href="classfly_1_1detail_1_1_basic_format_parameter.html#a4c3bcdde24628b2060868749800dfcbb">BasicFormatParameter&lt;FormatContext&gt;::BasicFormatParameter</a>(T value) noexcept :</div>
 <div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;    m_type(Type::Bool),</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;    m_value {.m_standard {.m_bool {value}, .m_format {format_standard_value&lt;FormatContext, T&gt;}}}</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;    m_value {.m_standard {.m_bool = value, .m_format {format_standard_value&lt;FormatContext, T&gt;}}}</div>
 <div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;{</div>
 <div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;}</div>
 <div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160; </div>

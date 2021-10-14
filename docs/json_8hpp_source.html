@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">6.2.1</span>
+   &#160;<span id="projectnumber">6.2.2</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -506,617 +506,613 @@ $(document).ready(function(){initNavTree('json_8hpp_source.html',''); initResiza
 <div class="line"><a name="l01638"></a><span class="lineno"> 1638</span>&#160;<span class="keyword">template</span> &lt;JsonString T&gt;</div>
 <div class="line"><a name="l01639"></a><span class="lineno"> 1639</span>&#160;Json::operator T() const &amp;noexcept(false)</div>
 <div class="line"><a name="l01640"></a><span class="lineno"> 1640</span>&#160;{</div>
-<div class="line"><a name="l01641"></a><span class="lineno"> 1641</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage) -&gt; T</div>
-<div class="line"><a name="l01642"></a><span class="lineno"> 1642</span>&#160;    {</div>
-<div class="line"><a name="l01643"></a><span class="lineno"> 1643</span>&#160;        <span class="keyword">using</span> S = decltype(storage);</div>
-<div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160; </div>
-<div class="line"><a name="l01645"></a><span class="lineno"> 1645</span>&#160;        <span class="keywordflow">if</span> constexpr (JsonString&lt;S&gt;)</div>
-<div class="line"><a name="l01646"></a><span class="lineno"> 1646</span>&#160;        {</div>
-<div class="line"><a name="l01647"></a><span class="lineno"> 1647</span>&#160;            <span class="keywordflow">if</span> constexpr (fly::SameAs&lt;T, json_string_type&gt;)</div>
-<div class="line"><a name="l01648"></a><span class="lineno"> 1648</span>&#160;            {</div>
-<div class="line"><a name="l01649"></a><span class="lineno"> 1649</span>&#160;                <span class="keywordflow">return</span> storage;</div>
-<div class="line"><a name="l01650"></a><span class="lineno"> 1650</span>&#160;            }</div>
-<div class="line"><a name="l01651"></a><span class="lineno"> 1651</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01652"></a><span class="lineno"> 1652</span>&#160;            {</div>
-<div class="line"><a name="l01653"></a><span class="lineno"> 1653</span>&#160;                <span class="comment">// The JSON string will have been validated for Unicode compliance during</span></div>
-<div class="line"><a name="l01654"></a><span class="lineno"> 1654</span>&#160;                <span class="comment">// construction.</span></div>
-<div class="line"><a name="l01655"></a><span class="lineno"> 1655</span>&#160;                <span class="keywordflow">return</span> *(JsonStringType::convert&lt;T&gt;(storage));</div>
-<div class="line"><a name="l01656"></a><span class="lineno"> 1656</span>&#160;            }</div>
-<div class="line"><a name="l01657"></a><span class="lineno"> 1657</span>&#160;        }</div>
-<div class="line"><a name="l01658"></a><span class="lineno"> 1658</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (JsonNumber&lt;S&gt;)</div>
-<div class="line"><a name="l01659"></a><span class="lineno"> 1659</span>&#160;        {</div>
-<div class="line"><a name="l01660"></a><span class="lineno"> 1660</span>&#160;            <span class="keyword">using</span> char_type = <span class="keyword">typename</span> T::value_type;</div>
-<div class="line"><a name="l01661"></a><span class="lineno"> 1661</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classfly_1_1_basic_string.html#a30b604da44c9309c4737739e8063ba81">BasicString&lt;char_type&gt;::format</a>(FLY_ARR(char_type, <span class="stringliteral">&quot;{}&quot;</span>), storage);</div>
-<div class="line"><a name="l01662"></a><span class="lineno"> 1662</span>&#160;        }</div>
-<div class="line"><a name="l01663"></a><span class="lineno"> 1663</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01664"></a><span class="lineno"> 1664</span>&#160;        {</div>
-<div class="line"><a name="l01665"></a><span class="lineno"> 1665</span>&#160;            <span class="keywordflow">throw</span> JsonException(*<span class="keyword">this</span>, <span class="stringliteral">&quot;JSON type is not a string&quot;</span>);</div>
-<div class="line"><a name="l01666"></a><span class="lineno"> 1666</span>&#160;        }</div>
-<div class="line"><a name="l01667"></a><span class="lineno"> 1667</span>&#160;    };</div>
-<div class="line"><a name="l01668"></a><span class="lineno"> 1668</span>&#160; </div>
-<div class="line"><a name="l01669"></a><span class="lineno"> 1669</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_value);</div>
-<div class="line"><a name="l01670"></a><span class="lineno"> 1670</span>&#160;}</div>
-<div class="line"><a name="l01671"></a><span class="lineno"> 1671</span>&#160; </div>
-<div class="line"><a name="l01672"></a><span class="lineno"> 1672</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01673"></a><span class="lineno"> 1673</span>&#160;<span class="keyword">template</span> &lt;JsonObject T&gt;</div>
-<div class="line"><a name="l01674"></a><span class="lineno"> 1674</span>&#160;Json::operator T() const &amp;noexcept(false)</div>
-<div class="line"><a name="l01675"></a><span class="lineno"> 1675</span>&#160;{</div>
-<div class="line"><a name="l01676"></a><span class="lineno"> 1676</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type is not an object&quot;</span>);</div>
-<div class="line"><a name="l01677"></a><span class="lineno"> 1677</span>&#160;    T result;</div>
-<div class="line"><a name="l01678"></a><span class="lineno"> 1678</span>&#160; </div>
-<div class="line"><a name="l01679"></a><span class="lineno"> 1679</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it : storage)</div>
-<div class="line"><a name="l01680"></a><span class="lineno"> 1680</span>&#160;    {</div>
-<div class="line"><a name="l01681"></a><span class="lineno"> 1681</span>&#160;        <span class="comment">// The JSON string will have been validated for Unicode compliance during construction.</span></div>
-<div class="line"><a name="l01682"></a><span class="lineno"> 1682</span>&#160;        <span class="keyword">auto</span> key = *std::move(JsonStringType::convert&lt;typename T::key_type&gt;(it.first));</div>
-<div class="line"><a name="l01683"></a><span class="lineno"> 1683</span>&#160;        result.emplace(std::move(key), it.second);</div>
-<div class="line"><a name="l01684"></a><span class="lineno"> 1684</span>&#160;    }</div>
-<div class="line"><a name="l01685"></a><span class="lineno"> 1685</span>&#160; </div>
-<div class="line"><a name="l01686"></a><span class="lineno"> 1686</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l01687"></a><span class="lineno"> 1687</span>&#160;}</div>
-<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160; </div>
-<div class="line"><a name="l01689"></a><span class="lineno"> 1689</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01690"></a><span class="lineno"> 1690</span>&#160;<span class="keyword">template</span> &lt;JsonArray T&gt;</div>
-<div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160;Json::operator T() const &amp;noexcept(false)</div>
-<div class="line"><a name="l01692"></a><span class="lineno"> 1692</span>&#160;{</div>
-<div class="line"><a name="l01693"></a><span class="lineno"> 1693</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_array_type&gt;(<span class="stringliteral">&quot;JSON type is not an array&quot;</span>);</div>
-<div class="line"><a name="l01694"></a><span class="lineno"> 1694</span>&#160;    T result {};</div>
-<div class="line"><a name="l01695"></a><span class="lineno"> 1695</span>&#160; </div>
-<div class="line"><a name="l01696"></a><span class="lineno"> 1696</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it : storage)</div>
-<div class="line"><a name="l01697"></a><span class="lineno"> 1697</span>&#160;    {</div>
-<div class="line"><a name="l01698"></a><span class="lineno"> 1698</span>&#160;        <span class="keyword">auto</span> copy = <span class="keyword">static_cast&lt;</span>typename T::value_type<span class="keyword">&gt;</span>(it);</div>
-<div class="line"><a name="l01699"></a><span class="lineno"> 1699</span>&#160;        detail::json_array_append(result, std::move(copy));</div>
-<div class="line"><a name="l01700"></a><span class="lineno"> 1700</span>&#160;    }</div>
-<div class="line"><a name="l01701"></a><span class="lineno"> 1701</span>&#160; </div>
-<div class="line"><a name="l01702"></a><span class="lineno"> 1702</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l01703"></a><span class="lineno"> 1703</span>&#160;}</div>
-<div class="line"><a name="l01704"></a><span class="lineno"> 1704</span>&#160; </div>
-<div class="line"><a name="l01705"></a><span class="lineno"> 1705</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01706"></a><span class="lineno"> 1706</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, std::<span class="keywordtype">size_t</span> N&gt;</div>
-<div class="line"><a name="l01707"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ac7e00468572b30980a4a8909b783ccf9"> 1707</a></span>&#160;Json::operator std::array&lt;T, N&gt;() const noexcept(false)</div>
-<div class="line"><a name="l01708"></a><span class="lineno"> 1708</span>&#160;{</div>
-<div class="line"><a name="l01709"></a><span class="lineno"> 1709</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_array_type&gt;(<span class="stringliteral">&quot;JSON type is not an array&quot;</span>);</div>
-<div class="line"><a name="l01710"></a><span class="lineno"> 1710</span>&#160;    std::array&lt;T, N&gt; result {};</div>
-<div class="line"><a name="l01711"></a><span class="lineno"> 1711</span>&#160; </div>
-<div class="line"><a name="l01712"></a><span class="lineno"> 1712</span>&#160;    <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; std::min(N, storage.size()); ++i)</div>
-<div class="line"><a name="l01713"></a><span class="lineno"> 1713</span>&#160;    {</div>
-<div class="line"><a name="l01714"></a><span class="lineno"> 1714</span>&#160;        result[i] = T(storage.at(i));</div>
-<div class="line"><a name="l01715"></a><span class="lineno"> 1715</span>&#160;    }</div>
-<div class="line"><a name="l01716"></a><span class="lineno"> 1716</span>&#160; </div>
-<div class="line"><a name="l01717"></a><span class="lineno"> 1717</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l01718"></a><span class="lineno"> 1718</span>&#160;}</div>
-<div class="line"><a name="l01719"></a><span class="lineno"> 1719</span>&#160; </div>
-<div class="line"><a name="l01720"></a><span class="lineno"> 1720</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01721"></a><span class="lineno"> 1721</span>&#160;<span class="keyword">template</span> &lt;JsonBoolean T&gt;</div>
-<div class="line"><a name="l01722"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a042972d586c6c4bca75435c20bdb88a5"> 1722</a></span>&#160;Json::operator T() const noexcept</div>
-<div class="line"><a name="l01723"></a><span class="lineno"> 1723</span>&#160;{</div>
-<div class="line"><a name="l01724"></a><span class="lineno"> 1724</span>&#160;    <span class="keyword">auto</span> visitor = [](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage) noexcept -&gt; T</div>
-<div class="line"><a name="l01725"></a><span class="lineno"> 1725</span>&#160;    {</div>
-<div class="line"><a name="l01726"></a><span class="lineno"> 1726</span>&#160;        <span class="keyword">using</span> S = decltype(storage);</div>
-<div class="line"><a name="l01727"></a><span class="lineno"> 1727</span>&#160; </div>
-<div class="line"><a name="l01728"></a><span class="lineno"> 1728</span>&#160;        <span class="keywordflow">if</span> constexpr (JsonContainer&lt;S&gt;)</div>
-<div class="line"><a name="l01729"></a><span class="lineno"> 1729</span>&#160;        {</div>
-<div class="line"><a name="l01730"></a><span class="lineno"> 1730</span>&#160;            <span class="keywordflow">return</span> !storage.empty();</div>
-<div class="line"><a name="l01731"></a><span class="lineno"> 1731</span>&#160;        }</div>
-<div class="line"><a name="l01732"></a><span class="lineno"> 1732</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (JsonFloatingPoint&lt;S&gt;)</div>
-<div class="line"><a name="l01733"></a><span class="lineno"> 1733</span>&#160;        {</div>
-<div class="line"><a name="l01734"></a><span class="lineno"> 1734</span>&#160;            <span class="keywordflow">return</span> std::abs(storage) &gt; <span class="keyword">static_cast&lt;</span>S<span class="keyword">&gt;</span>(0);</div>
-<div class="line"><a name="l01735"></a><span class="lineno"> 1735</span>&#160;        }</div>
-<div class="line"><a name="l01736"></a><span class="lineno"> 1736</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (JsonNull&lt;S&gt;)</div>
-<div class="line"><a name="l01737"></a><span class="lineno"> 1737</span>&#160;        {</div>
-<div class="line"><a name="l01738"></a><span class="lineno"> 1738</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l01739"></a><span class="lineno"> 1739</span>&#160;        }</div>
-<div class="line"><a name="l01740"></a><span class="lineno"> 1740</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01741"></a><span class="lineno"> 1741</span>&#160;        {</div>
-<div class="line"><a name="l01742"></a><span class="lineno"> 1742</span>&#160;            <span class="keywordflow">return</span> storage != <span class="keyword">static_cast&lt;</span>S<span class="keyword">&gt;</span>(0);</div>
-<div class="line"><a name="l01743"></a><span class="lineno"> 1743</span>&#160;        }</div>
-<div class="line"><a name="l01744"></a><span class="lineno"> 1744</span>&#160;    };</div>
-<div class="line"><a name="l01745"></a><span class="lineno"> 1745</span>&#160; </div>
-<div class="line"><a name="l01746"></a><span class="lineno"> 1746</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_value);</div>
-<div class="line"><a name="l01747"></a><span class="lineno"> 1747</span>&#160;}</div>
-<div class="line"><a name="l01748"></a><span class="lineno"> 1748</span>&#160; </div>
-<div class="line"><a name="l01749"></a><span class="lineno"> 1749</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01750"></a><span class="lineno"> 1750</span>&#160;<span class="keyword">template</span> &lt;JsonNumber T&gt;</div>
-<div class="line"><a name="l01751"></a><span class="lineno"> 1751</span>&#160;Json::operator T() const noexcept(false)</div>
-<div class="line"><a name="l01752"></a><span class="lineno"> 1752</span>&#160;{</div>
-<div class="line"><a name="l01753"></a><span class="lineno"> 1753</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage) -&gt; T</div>
-<div class="line"><a name="l01754"></a><span class="lineno"> 1754</span>&#160;    {</div>
-<div class="line"><a name="l01755"></a><span class="lineno"> 1755</span>&#160;        <span class="keyword">using</span> S = decltype(storage);</div>
-<div class="line"><a name="l01756"></a><span class="lineno"> 1756</span>&#160; </div>
-<div class="line"><a name="l01757"></a><span class="lineno"> 1757</span>&#160;        <span class="keywordflow">if</span> constexpr (JsonString&lt;S&gt;)</div>
-<div class="line"><a name="l01758"></a><span class="lineno"> 1758</span>&#160;        {</div>
-<div class="line"><a name="l01759"></a><span class="lineno"> 1759</span>&#160;            <span class="keywordflow">if</span> (<span class="keyword">auto</span> converted = JsonStringType::convert&lt;T&gt;(storage); converted)</div>
-<div class="line"><a name="l01760"></a><span class="lineno"> 1760</span>&#160;            {</div>
-<div class="line"><a name="l01761"></a><span class="lineno"> 1761</span>&#160;                <span class="keywordflow">return</span> *std::move(converted);</div>
-<div class="line"><a name="l01762"></a><span class="lineno"> 1762</span>&#160;            }</div>
-<div class="line"><a name="l01763"></a><span class="lineno"> 1763</span>&#160;        }</div>
-<div class="line"><a name="l01764"></a><span class="lineno"> 1764</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (JsonNumber&lt;S&gt;)</div>
-<div class="line"><a name="l01765"></a><span class="lineno"> 1765</span>&#160;        {</div>
-<div class="line"><a name="l01766"></a><span class="lineno"> 1766</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(storage);</div>
-<div class="line"><a name="l01767"></a><span class="lineno"> 1767</span>&#160;        }</div>
+<div class="line"><a name="l01641"></a><span class="lineno"> 1641</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage) -&gt; T {</div>
+<div class="line"><a name="l01642"></a><span class="lineno"> 1642</span>&#160;        <span class="keyword">using</span> S = decltype(storage);</div>
+<div class="line"><a name="l01643"></a><span class="lineno"> 1643</span>&#160; </div>
+<div class="line"><a name="l01644"></a><span class="lineno"> 1644</span>&#160;        <span class="keywordflow">if</span> constexpr (JsonString&lt;S&gt;)</div>
+<div class="line"><a name="l01645"></a><span class="lineno"> 1645</span>&#160;        {</div>
+<div class="line"><a name="l01646"></a><span class="lineno"> 1646</span>&#160;            <span class="keywordflow">if</span> constexpr (fly::SameAs&lt;T, json_string_type&gt;)</div>
+<div class="line"><a name="l01647"></a><span class="lineno"> 1647</span>&#160;            {</div>
+<div class="line"><a name="l01648"></a><span class="lineno"> 1648</span>&#160;                <span class="keywordflow">return</span> storage;</div>
+<div class="line"><a name="l01649"></a><span class="lineno"> 1649</span>&#160;            }</div>
+<div class="line"><a name="l01650"></a><span class="lineno"> 1650</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01651"></a><span class="lineno"> 1651</span>&#160;            {</div>
+<div class="line"><a name="l01652"></a><span class="lineno"> 1652</span>&#160;                <span class="comment">// The JSON string will have been validated for Unicode compliance during</span></div>
+<div class="line"><a name="l01653"></a><span class="lineno"> 1653</span>&#160;                <span class="comment">// construction.</span></div>
+<div class="line"><a name="l01654"></a><span class="lineno"> 1654</span>&#160;                <span class="keywordflow">return</span> *(JsonStringType::convert&lt;T&gt;(storage));</div>
+<div class="line"><a name="l01655"></a><span class="lineno"> 1655</span>&#160;            }</div>
+<div class="line"><a name="l01656"></a><span class="lineno"> 1656</span>&#160;        }</div>
+<div class="line"><a name="l01657"></a><span class="lineno"> 1657</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (JsonNumber&lt;S&gt;)</div>
+<div class="line"><a name="l01658"></a><span class="lineno"> 1658</span>&#160;        {</div>
+<div class="line"><a name="l01659"></a><span class="lineno"> 1659</span>&#160;            <span class="keyword">using</span> char_type = <span class="keyword">typename</span> T::value_type;</div>
+<div class="line"><a name="l01660"></a><span class="lineno"> 1660</span>&#160;            <span class="keywordflow">return</span> <a class="code" href="classfly_1_1_basic_string.html#a30b604da44c9309c4737739e8063ba81">BasicString&lt;char_type&gt;::format</a>(FLY_ARR(char_type, <span class="stringliteral">&quot;{}&quot;</span>), storage);</div>
+<div class="line"><a name="l01661"></a><span class="lineno"> 1661</span>&#160;        }</div>
+<div class="line"><a name="l01662"></a><span class="lineno"> 1662</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01663"></a><span class="lineno"> 1663</span>&#160;        {</div>
+<div class="line"><a name="l01664"></a><span class="lineno"> 1664</span>&#160;            <span class="keywordflow">throw</span> JsonException(*<span class="keyword">this</span>, <span class="stringliteral">&quot;JSON type is not a string&quot;</span>);</div>
+<div class="line"><a name="l01665"></a><span class="lineno"> 1665</span>&#160;        }</div>
+<div class="line"><a name="l01666"></a><span class="lineno"> 1666</span>&#160;    };</div>
+<div class="line"><a name="l01667"></a><span class="lineno"> 1667</span>&#160; </div>
+<div class="line"><a name="l01668"></a><span class="lineno"> 1668</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_value);</div>
+<div class="line"><a name="l01669"></a><span class="lineno"> 1669</span>&#160;}</div>
+<div class="line"><a name="l01670"></a><span class="lineno"> 1670</span>&#160; </div>
+<div class="line"><a name="l01671"></a><span class="lineno"> 1671</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01672"></a><span class="lineno"> 1672</span>&#160;<span class="keyword">template</span> &lt;JsonObject T&gt;</div>
+<div class="line"><a name="l01673"></a><span class="lineno"> 1673</span>&#160;Json::operator T() const &amp;noexcept(false)</div>
+<div class="line"><a name="l01674"></a><span class="lineno"> 1674</span>&#160;{</div>
+<div class="line"><a name="l01675"></a><span class="lineno"> 1675</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type is not an object&quot;</span>);</div>
+<div class="line"><a name="l01676"></a><span class="lineno"> 1676</span>&#160;    T result;</div>
+<div class="line"><a name="l01677"></a><span class="lineno"> 1677</span>&#160; </div>
+<div class="line"><a name="l01678"></a><span class="lineno"> 1678</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it : storage)</div>
+<div class="line"><a name="l01679"></a><span class="lineno"> 1679</span>&#160;    {</div>
+<div class="line"><a name="l01680"></a><span class="lineno"> 1680</span>&#160;        <span class="comment">// The JSON string will have been validated for Unicode compliance during construction.</span></div>
+<div class="line"><a name="l01681"></a><span class="lineno"> 1681</span>&#160;        <span class="keyword">auto</span> key = *std::move(JsonStringType::convert&lt;typename T::key_type&gt;(it.first));</div>
+<div class="line"><a name="l01682"></a><span class="lineno"> 1682</span>&#160;        result.emplace(std::move(key), it.second);</div>
+<div class="line"><a name="l01683"></a><span class="lineno"> 1683</span>&#160;    }</div>
+<div class="line"><a name="l01684"></a><span class="lineno"> 1684</span>&#160; </div>
+<div class="line"><a name="l01685"></a><span class="lineno"> 1685</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l01686"></a><span class="lineno"> 1686</span>&#160;}</div>
+<div class="line"><a name="l01687"></a><span class="lineno"> 1687</span>&#160; </div>
+<div class="line"><a name="l01688"></a><span class="lineno"> 1688</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01689"></a><span class="lineno"> 1689</span>&#160;<span class="keyword">template</span> &lt;JsonArray T&gt;</div>
+<div class="line"><a name="l01690"></a><span class="lineno"> 1690</span>&#160;Json::operator T() const &amp;noexcept(false)</div>
+<div class="line"><a name="l01691"></a><span class="lineno"> 1691</span>&#160;{</div>
+<div class="line"><a name="l01692"></a><span class="lineno"> 1692</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_array_type&gt;(<span class="stringliteral">&quot;JSON type is not an array&quot;</span>);</div>
+<div class="line"><a name="l01693"></a><span class="lineno"> 1693</span>&#160;    T result {};</div>
+<div class="line"><a name="l01694"></a><span class="lineno"> 1694</span>&#160; </div>
+<div class="line"><a name="l01695"></a><span class="lineno"> 1695</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;it : storage)</div>
+<div class="line"><a name="l01696"></a><span class="lineno"> 1696</span>&#160;    {</div>
+<div class="line"><a name="l01697"></a><span class="lineno"> 1697</span>&#160;        <span class="keyword">auto</span> copy = <span class="keyword">static_cast&lt;</span>typename T::value_type<span class="keyword">&gt;</span>(it);</div>
+<div class="line"><a name="l01698"></a><span class="lineno"> 1698</span>&#160;        detail::json_array_append(result, std::move(copy));</div>
+<div class="line"><a name="l01699"></a><span class="lineno"> 1699</span>&#160;    }</div>
+<div class="line"><a name="l01700"></a><span class="lineno"> 1700</span>&#160; </div>
+<div class="line"><a name="l01701"></a><span class="lineno"> 1701</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l01702"></a><span class="lineno"> 1702</span>&#160;}</div>
+<div class="line"><a name="l01703"></a><span class="lineno"> 1703</span>&#160; </div>
+<div class="line"><a name="l01704"></a><span class="lineno"> 1704</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01705"></a><span class="lineno"> 1705</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, std::<span class="keywordtype">size_t</span> N&gt;</div>
+<div class="line"><a name="l01706"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ac7e00468572b30980a4a8909b783ccf9"> 1706</a></span>&#160;Json::operator std::array&lt;T, N&gt;() const noexcept(false)</div>
+<div class="line"><a name="l01707"></a><span class="lineno"> 1707</span>&#160;{</div>
+<div class="line"><a name="l01708"></a><span class="lineno"> 1708</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_array_type&gt;(<span class="stringliteral">&quot;JSON type is not an array&quot;</span>);</div>
+<div class="line"><a name="l01709"></a><span class="lineno"> 1709</span>&#160;    std::array&lt;T, N&gt; result {};</div>
+<div class="line"><a name="l01710"></a><span class="lineno"> 1710</span>&#160; </div>
+<div class="line"><a name="l01711"></a><span class="lineno"> 1711</span>&#160;    <span class="keywordflow">for</span> (std::size_t i = 0; i &lt; std::min(N, storage.size()); ++i)</div>
+<div class="line"><a name="l01712"></a><span class="lineno"> 1712</span>&#160;    {</div>
+<div class="line"><a name="l01713"></a><span class="lineno"> 1713</span>&#160;        result[i] = T(storage.at(i));</div>
+<div class="line"><a name="l01714"></a><span class="lineno"> 1714</span>&#160;    }</div>
+<div class="line"><a name="l01715"></a><span class="lineno"> 1715</span>&#160; </div>
+<div class="line"><a name="l01716"></a><span class="lineno"> 1716</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l01717"></a><span class="lineno"> 1717</span>&#160;}</div>
+<div class="line"><a name="l01718"></a><span class="lineno"> 1718</span>&#160; </div>
+<div class="line"><a name="l01719"></a><span class="lineno"> 1719</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01720"></a><span class="lineno"> 1720</span>&#160;<span class="keyword">template</span> &lt;JsonBoolean T&gt;</div>
+<div class="line"><a name="l01721"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a042972d586c6c4bca75435c20bdb88a5"> 1721</a></span>&#160;Json::operator T() const noexcept</div>
+<div class="line"><a name="l01722"></a><span class="lineno"> 1722</span>&#160;{</div>
+<div class="line"><a name="l01723"></a><span class="lineno"> 1723</span>&#160;    <span class="keyword">auto</span> visitor = [](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage) noexcept -&gt; T {</div>
+<div class="line"><a name="l01724"></a><span class="lineno"> 1724</span>&#160;        <span class="keyword">using</span> S = decltype(storage);</div>
+<div class="line"><a name="l01725"></a><span class="lineno"> 1725</span>&#160; </div>
+<div class="line"><a name="l01726"></a><span class="lineno"> 1726</span>&#160;        <span class="keywordflow">if</span> constexpr (JsonContainer&lt;S&gt;)</div>
+<div class="line"><a name="l01727"></a><span class="lineno"> 1727</span>&#160;        {</div>
+<div class="line"><a name="l01728"></a><span class="lineno"> 1728</span>&#160;            <span class="keywordflow">return</span> !storage.empty();</div>
+<div class="line"><a name="l01729"></a><span class="lineno"> 1729</span>&#160;        }</div>
+<div class="line"><a name="l01730"></a><span class="lineno"> 1730</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (JsonFloatingPoint&lt;S&gt;)</div>
+<div class="line"><a name="l01731"></a><span class="lineno"> 1731</span>&#160;        {</div>
+<div class="line"><a name="l01732"></a><span class="lineno"> 1732</span>&#160;            <span class="keywordflow">return</span> std::abs(storage) &gt; <span class="keyword">static_cast&lt;</span>S<span class="keyword">&gt;</span>(0);</div>
+<div class="line"><a name="l01733"></a><span class="lineno"> 1733</span>&#160;        }</div>
+<div class="line"><a name="l01734"></a><span class="lineno"> 1734</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (JsonNull&lt;S&gt;)</div>
+<div class="line"><a name="l01735"></a><span class="lineno"> 1735</span>&#160;        {</div>
+<div class="line"><a name="l01736"></a><span class="lineno"> 1736</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l01737"></a><span class="lineno"> 1737</span>&#160;        }</div>
+<div class="line"><a name="l01738"></a><span class="lineno"> 1738</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01739"></a><span class="lineno"> 1739</span>&#160;        {</div>
+<div class="line"><a name="l01740"></a><span class="lineno"> 1740</span>&#160;            <span class="keywordflow">return</span> storage != <span class="keyword">static_cast&lt;</span>S<span class="keyword">&gt;</span>(0);</div>
+<div class="line"><a name="l01741"></a><span class="lineno"> 1741</span>&#160;        }</div>
+<div class="line"><a name="l01742"></a><span class="lineno"> 1742</span>&#160;    };</div>
+<div class="line"><a name="l01743"></a><span class="lineno"> 1743</span>&#160; </div>
+<div class="line"><a name="l01744"></a><span class="lineno"> 1744</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_value);</div>
+<div class="line"><a name="l01745"></a><span class="lineno"> 1745</span>&#160;}</div>
+<div class="line"><a name="l01746"></a><span class="lineno"> 1746</span>&#160; </div>
+<div class="line"><a name="l01747"></a><span class="lineno"> 1747</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01748"></a><span class="lineno"> 1748</span>&#160;<span class="keyword">template</span> &lt;JsonNumber T&gt;</div>
+<div class="line"><a name="l01749"></a><span class="lineno"> 1749</span>&#160;Json::operator T() const noexcept(false)</div>
+<div class="line"><a name="l01750"></a><span class="lineno"> 1750</span>&#160;{</div>
+<div class="line"><a name="l01751"></a><span class="lineno"> 1751</span>&#160;    <span class="keyword">auto</span> visitor = [<span class="keyword">this</span>](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage) -&gt; T {</div>
+<div class="line"><a name="l01752"></a><span class="lineno"> 1752</span>&#160;        <span class="keyword">using</span> S = decltype(storage);</div>
+<div class="line"><a name="l01753"></a><span class="lineno"> 1753</span>&#160; </div>
+<div class="line"><a name="l01754"></a><span class="lineno"> 1754</span>&#160;        <span class="keywordflow">if</span> constexpr (JsonString&lt;S&gt;)</div>
+<div class="line"><a name="l01755"></a><span class="lineno"> 1755</span>&#160;        {</div>
+<div class="line"><a name="l01756"></a><span class="lineno"> 1756</span>&#160;            <span class="keywordflow">if</span> (<span class="keyword">auto</span> converted = JsonStringType::convert&lt;T&gt;(storage); converted)</div>
+<div class="line"><a name="l01757"></a><span class="lineno"> 1757</span>&#160;            {</div>
+<div class="line"><a name="l01758"></a><span class="lineno"> 1758</span>&#160;                <span class="keywordflow">return</span> *std::move(converted);</div>
+<div class="line"><a name="l01759"></a><span class="lineno"> 1759</span>&#160;            }</div>
+<div class="line"><a name="l01760"></a><span class="lineno"> 1760</span>&#160;        }</div>
+<div class="line"><a name="l01761"></a><span class="lineno"> 1761</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (JsonNumber&lt;S&gt;)</div>
+<div class="line"><a name="l01762"></a><span class="lineno"> 1762</span>&#160;        {</div>
+<div class="line"><a name="l01763"></a><span class="lineno"> 1763</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(storage);</div>
+<div class="line"><a name="l01764"></a><span class="lineno"> 1764</span>&#160;        }</div>
+<div class="line"><a name="l01765"></a><span class="lineno"> 1765</span>&#160; </div>
+<div class="line"><a name="l01766"></a><span class="lineno"> 1766</span>&#160;        <span class="keywordflow">throw</span> JsonException(*<span class="keyword">this</span>, <span class="stringliteral">&quot;JSON type is not numeric&quot;</span>);</div>
+<div class="line"><a name="l01767"></a><span class="lineno"> 1767</span>&#160;    };</div>
 <div class="line"><a name="l01768"></a><span class="lineno"> 1768</span>&#160; </div>
-<div class="line"><a name="l01769"></a><span class="lineno"> 1769</span>&#160;        <span class="keywordflow">throw</span> JsonException(*<span class="keyword">this</span>, <span class="stringliteral">&quot;JSON type is not numeric&quot;</span>);</div>
-<div class="line"><a name="l01770"></a><span class="lineno"> 1770</span>&#160;    };</div>
+<div class="line"><a name="l01769"></a><span class="lineno"> 1769</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_value);</div>
+<div class="line"><a name="l01770"></a><span class="lineno"> 1770</span>&#160;}</div>
 <div class="line"><a name="l01771"></a><span class="lineno"> 1771</span>&#160; </div>
-<div class="line"><a name="l01772"></a><span class="lineno"> 1772</span>&#160;    <span class="keywordflow">return</span> std::visit(std::move(visitor), m_value);</div>
-<div class="line"><a name="l01773"></a><span class="lineno"> 1773</span>&#160;}</div>
-<div class="line"><a name="l01774"></a><span class="lineno"> 1774</span>&#160; </div>
-<div class="line"><a name="l01775"></a><span class="lineno"> 1775</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01776"></a><span class="lineno"> 1776</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
-<div class="line"><a name="l01777"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ab64f842a518c3a88bc2b4c57ad29f4b4"> 1777</a></span>&#160;<a class="code" href="classfly_1_1_json.html">Json::reference</a> <a class="code" href="classfly_1_1_json.html#ab64f842a518c3a88bc2b4c57ad29f4b4">Json::at</a>(T key)</div>
-<div class="line"><a name="l01778"></a><span class="lineno"> 1778</span>&#160;{</div>
-<div class="line"><a name="l01779"></a><span class="lineno"> 1779</span>&#160;    <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for operator[key]&quot;</span>);</div>
-<div class="line"><a name="l01780"></a><span class="lineno"> 1780</span>&#160;    <span class="keyword">auto</span> it = storage.find(convert_to_string(std::move(key)));</div>
-<div class="line"><a name="l01781"></a><span class="lineno"> 1781</span>&#160; </div>
-<div class="line"><a name="l01782"></a><span class="lineno"> 1782</span>&#160;    <span class="keywordflow">if</span> (it == storage.end())</div>
-<div class="line"><a name="l01783"></a><span class="lineno"> 1783</span>&#160;    {</div>
-<div class="line"><a name="l01784"></a><span class="lineno"> 1784</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_exception.html">JsonException</a>(*<span class="keyword">this</span>, <a class="code" href="classfly_1_1_basic_string.html#a30b604da44c9309c4737739e8063ba81">String::format</a>(<span class="stringliteral">&quot;Given key ({}) not found&quot;</span>, key));</div>
-<div class="line"><a name="l01785"></a><span class="lineno"> 1785</span>&#160;    }</div>
+<div class="line"><a name="l01772"></a><span class="lineno"> 1772</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01773"></a><span class="lineno"> 1773</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
+<div class="line"><a name="l01774"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ab64f842a518c3a88bc2b4c57ad29f4b4"> 1774</a></span>&#160;<a class="code" href="classfly_1_1_json.html">Json::reference</a> <a class="code" href="classfly_1_1_json.html#ab64f842a518c3a88bc2b4c57ad29f4b4">Json::at</a>(T key)</div>
+<div class="line"><a name="l01775"></a><span class="lineno"> 1775</span>&#160;{</div>
+<div class="line"><a name="l01776"></a><span class="lineno"> 1776</span>&#160;    <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for operator[key]&quot;</span>);</div>
+<div class="line"><a name="l01777"></a><span class="lineno"> 1777</span>&#160;    <span class="keyword">auto</span> it = storage.find(convert_to_string(std::move(key)));</div>
+<div class="line"><a name="l01778"></a><span class="lineno"> 1778</span>&#160; </div>
+<div class="line"><a name="l01779"></a><span class="lineno"> 1779</span>&#160;    <span class="keywordflow">if</span> (it == storage.end())</div>
+<div class="line"><a name="l01780"></a><span class="lineno"> 1780</span>&#160;    {</div>
+<div class="line"><a name="l01781"></a><span class="lineno"> 1781</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_exception.html">JsonException</a>(*<span class="keyword">this</span>, <a class="code" href="classfly_1_1_basic_string.html#a30b604da44c9309c4737739e8063ba81">String::format</a>(<span class="stringliteral">&quot;Given key ({}) not found&quot;</span>, key));</div>
+<div class="line"><a name="l01782"></a><span class="lineno"> 1782</span>&#160;    }</div>
+<div class="line"><a name="l01783"></a><span class="lineno"> 1783</span>&#160; </div>
+<div class="line"><a name="l01784"></a><span class="lineno"> 1784</span>&#160;    <span class="keywordflow">return</span> it-&gt;second;</div>
+<div class="line"><a name="l01785"></a><span class="lineno"> 1785</span>&#160;}</div>
 <div class="line"><a name="l01786"></a><span class="lineno"> 1786</span>&#160; </div>
-<div class="line"><a name="l01787"></a><span class="lineno"> 1787</span>&#160;    <span class="keywordflow">return</span> it-&gt;second;</div>
-<div class="line"><a name="l01788"></a><span class="lineno"> 1788</span>&#160;}</div>
-<div class="line"><a name="l01789"></a><span class="lineno"> 1789</span>&#160; </div>
-<div class="line"><a name="l01790"></a><span class="lineno"> 1790</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01791"></a><span class="lineno"> 1791</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
-<div class="line"><a name="l01792"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a45b7f1c1d794c74c81513406267a6749"> 1792</a></span>&#160;<a class="code" href="classfly_1_1_json.html">Json::const_reference</a> <a class="code" href="classfly_1_1_json.html#ab64f842a518c3a88bc2b4c57ad29f4b4">Json::at</a>(T key)<span class="keyword"> const</span></div>
-<div class="line"><a name="l01793"></a><span class="lineno"> 1793</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l01794"></a><span class="lineno"> 1794</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for operator[key]&quot;</span>);</div>
-<div class="line"><a name="l01795"></a><span class="lineno"> 1795</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> it = storage.find(convert_to_string(std::move(key)));</div>
-<div class="line"><a name="l01796"></a><span class="lineno"> 1796</span>&#160; </div>
-<div class="line"><a name="l01797"></a><span class="lineno"> 1797</span>&#160;    <span class="keywordflow">if</span> (it == storage.end())</div>
-<div class="line"><a name="l01798"></a><span class="lineno"> 1798</span>&#160;    {</div>
-<div class="line"><a name="l01799"></a><span class="lineno"> 1799</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_exception.html">JsonException</a>(*<span class="keyword">this</span>, <a class="code" href="classfly_1_1_basic_string.html#a30b604da44c9309c4737739e8063ba81">String::format</a>(<span class="stringliteral">&quot;Given key ({}) not found&quot;</span>, key));</div>
-<div class="line"><a name="l01800"></a><span class="lineno"> 1800</span>&#160;    }</div>
+<div class="line"><a name="l01787"></a><span class="lineno"> 1787</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01788"></a><span class="lineno"> 1788</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
+<div class="line"><a name="l01789"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a45b7f1c1d794c74c81513406267a6749"> 1789</a></span>&#160;<a class="code" href="classfly_1_1_json.html">Json::const_reference</a> <a class="code" href="classfly_1_1_json.html#ab64f842a518c3a88bc2b4c57ad29f4b4">Json::at</a>(T key)<span class="keyword"> const</span></div>
+<div class="line"><a name="l01790"></a><span class="lineno"> 1790</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l01791"></a><span class="lineno"> 1791</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for operator[key]&quot;</span>);</div>
+<div class="line"><a name="l01792"></a><span class="lineno"> 1792</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> it = storage.find(convert_to_string(std::move(key)));</div>
+<div class="line"><a name="l01793"></a><span class="lineno"> 1793</span>&#160; </div>
+<div class="line"><a name="l01794"></a><span class="lineno"> 1794</span>&#160;    <span class="keywordflow">if</span> (it == storage.end())</div>
+<div class="line"><a name="l01795"></a><span class="lineno"> 1795</span>&#160;    {</div>
+<div class="line"><a name="l01796"></a><span class="lineno"> 1796</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_exception.html">JsonException</a>(*<span class="keyword">this</span>, <a class="code" href="classfly_1_1_basic_string.html#a30b604da44c9309c4737739e8063ba81">String::format</a>(<span class="stringliteral">&quot;Given key ({}) not found&quot;</span>, key));</div>
+<div class="line"><a name="l01797"></a><span class="lineno"> 1797</span>&#160;    }</div>
+<div class="line"><a name="l01798"></a><span class="lineno"> 1798</span>&#160; </div>
+<div class="line"><a name="l01799"></a><span class="lineno"> 1799</span>&#160;    <span class="keywordflow">return</span> it-&gt;second;</div>
+<div class="line"><a name="l01800"></a><span class="lineno"> 1800</span>&#160;}</div>
 <div class="line"><a name="l01801"></a><span class="lineno"> 1801</span>&#160; </div>
-<div class="line"><a name="l01802"></a><span class="lineno"> 1802</span>&#160;    <span class="keywordflow">return</span> it-&gt;second;</div>
-<div class="line"><a name="l01803"></a><span class="lineno"> 1803</span>&#160;}</div>
-<div class="line"><a name="l01804"></a><span class="lineno"> 1804</span>&#160; </div>
-<div class="line"><a name="l01805"></a><span class="lineno"> 1805</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01806"></a><span class="lineno"> 1806</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
-<div class="line"><a name="l01807"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ad53e6822ebb30f8faef543b074aeca2a"> 1807</a></span>&#160;<a class="code" href="classfly_1_1_json.html">Json::reference</a> <a class="code" href="classfly_1_1_json.html#ad53e6822ebb30f8faef543b074aeca2a">Json::operator[]</a>(T key)</div>
-<div class="line"><a name="l01808"></a><span class="lineno"> 1808</span>&#160;{</div>
-<div class="line"><a name="l01809"></a><span class="lineno"> 1809</span>&#160;    <span class="keyword">auto</span> &amp;storage = get_or_promote&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for operator[key]&quot;</span>);</div>
-<div class="line"><a name="l01810"></a><span class="lineno"> 1810</span>&#160;    <span class="keywordflow">return</span> storage[convert_to_string(std::move(key))];</div>
-<div class="line"><a name="l01811"></a><span class="lineno"> 1811</span>&#160;}</div>
-<div class="line"><a name="l01812"></a><span class="lineno"> 1812</span>&#160; </div>
-<div class="line"><a name="l01813"></a><span class="lineno"> 1813</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01814"></a><span class="lineno"> 1814</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
-<div class="line"><a name="l01815"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#adda2040536c9a973a6475ad3eda00f0b"> 1815</a></span>&#160;<a class="code" href="classfly_1_1_json.html">Json::const_reference</a> <a class="code" href="classfly_1_1_json.html#ad53e6822ebb30f8faef543b074aeca2a">Json::operator[]</a>(T key)<span class="keyword"> const</span></div>
-<div class="line"><a name="l01816"></a><span class="lineno"> 1816</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l01817"></a><span class="lineno"> 1817</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classfly_1_1_json.html#ab64f842a518c3a88bc2b4c57ad29f4b4">at</a>(key);</div>
-<div class="line"><a name="l01818"></a><span class="lineno"> 1818</span>&#160;}</div>
-<div class="line"><a name="l01819"></a><span class="lineno"> 1819</span>&#160; </div>
-<div class="line"><a name="l01820"></a><span class="lineno"> 1820</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01821"></a><span class="lineno"> 1821</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike Key&gt;</div>
-<div class="line"><a name="l01822"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522"> 1822</a></span>&#160;std::pair&lt;Json::iterator, bool&gt; <a class="code" href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522">Json::insert</a>(Key key, <span class="keyword">const</span> <a class="code" href="classfly_1_1_json.html">Json</a> &amp;value)</div>
-<div class="line"><a name="l01823"></a><span class="lineno"> 1823</span>&#160;{</div>
-<div class="line"><a name="l01824"></a><span class="lineno"> 1824</span>&#160;    <span class="keywordflow">return</span> object_inserter(std::make_pair(convert_to_string(std::move(key)), value));</div>
-<div class="line"><a name="l01825"></a><span class="lineno"> 1825</span>&#160;}</div>
-<div class="line"><a name="l01826"></a><span class="lineno"> 1826</span>&#160; </div>
-<div class="line"><a name="l01827"></a><span class="lineno"> 1827</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01828"></a><span class="lineno"> 1828</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike Key&gt;</div>
-<div class="line"><a name="l01829"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a8903bfdd7a7343fbb85116016b1ae522"> 1829</a></span>&#160;std::pair&lt;Json::iterator, bool&gt; <a class="code" href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522">Json::insert</a>(Key key, <a class="code" href="classfly_1_1_json.html">Json</a> &amp;&amp;value)</div>
-<div class="line"><a name="l01830"></a><span class="lineno"> 1830</span>&#160;{</div>
-<div class="line"><a name="l01831"></a><span class="lineno"> 1831</span>&#160;    <span class="keywordflow">return</span> object_inserter(std::make_pair(convert_to_string(std::move(key)), std::move(value)));</div>
-<div class="line"><a name="l01832"></a><span class="lineno"> 1832</span>&#160;}</div>
-<div class="line"><a name="l01833"></a><span class="lineno"> 1833</span>&#160; </div>
-<div class="line"><a name="l01834"></a><span class="lineno"> 1834</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01835"></a><span class="lineno"> 1835</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike Key&gt;</div>
-<div class="line"><a name="l01836"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a6dc0941c4242c065021a0dd3dfd05482"> 1836</a></span>&#160;std::pair&lt;Json::iterator, bool&gt; <a class="code" href="classfly_1_1_json.html#a6dc0941c4242c065021a0dd3dfd05482">Json::insert_or_assign</a>(Key key, <a class="code" href="classfly_1_1_json.html">Json</a> &amp;&amp;value)</div>
-<div class="line"><a name="l01837"></a><span class="lineno"> 1837</span>&#160;{</div>
-<div class="line"><a name="l01838"></a><span class="lineno"> 1838</span>&#160;    <span class="keyword">auto</span> result = <a class="code" href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522">insert</a>(key, value);</div>
-<div class="line"><a name="l01839"></a><span class="lineno"> 1839</span>&#160; </div>
-<div class="line"><a name="l01840"></a><span class="lineno"> 1840</span>&#160;    <span class="keywordflow">if</span> (!result.second)</div>
-<div class="line"><a name="l01841"></a><span class="lineno"> 1841</span>&#160;    {</div>
-<div class="line"><a name="l01842"></a><span class="lineno"> 1842</span>&#160;        <span class="keyword">auto</span> &amp;it = std::get&lt;typename iterator::object_iterator_type&gt;(result.first.m_iterator);</div>
-<div class="line"><a name="l01843"></a><span class="lineno"> 1843</span>&#160;        it-&gt;second.swap(value);</div>
-<div class="line"><a name="l01844"></a><span class="lineno"> 1844</span>&#160;    }</div>
+<div class="line"><a name="l01802"></a><span class="lineno"> 1802</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01803"></a><span class="lineno"> 1803</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
+<div class="line"><a name="l01804"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ad53e6822ebb30f8faef543b074aeca2a"> 1804</a></span>&#160;<a class="code" href="classfly_1_1_json.html">Json::reference</a> <a class="code" href="classfly_1_1_json.html#ad53e6822ebb30f8faef543b074aeca2a">Json::operator[]</a>(T key)</div>
+<div class="line"><a name="l01805"></a><span class="lineno"> 1805</span>&#160;{</div>
+<div class="line"><a name="l01806"></a><span class="lineno"> 1806</span>&#160;    <span class="keyword">auto</span> &amp;storage = get_or_promote&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for operator[key]&quot;</span>);</div>
+<div class="line"><a name="l01807"></a><span class="lineno"> 1807</span>&#160;    <span class="keywordflow">return</span> storage[convert_to_string(std::move(key))];</div>
+<div class="line"><a name="l01808"></a><span class="lineno"> 1808</span>&#160;}</div>
+<div class="line"><a name="l01809"></a><span class="lineno"> 1809</span>&#160; </div>
+<div class="line"><a name="l01810"></a><span class="lineno"> 1810</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01811"></a><span class="lineno"> 1811</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
+<div class="line"><a name="l01812"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#adda2040536c9a973a6475ad3eda00f0b"> 1812</a></span>&#160;<a class="code" href="classfly_1_1_json.html">Json::const_reference</a> <a class="code" href="classfly_1_1_json.html#ad53e6822ebb30f8faef543b074aeca2a">Json::operator[]</a>(T key)<span class="keyword"> const</span></div>
+<div class="line"><a name="l01813"></a><span class="lineno"> 1813</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l01814"></a><span class="lineno"> 1814</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classfly_1_1_json.html#ab64f842a518c3a88bc2b4c57ad29f4b4">at</a>(key);</div>
+<div class="line"><a name="l01815"></a><span class="lineno"> 1815</span>&#160;}</div>
+<div class="line"><a name="l01816"></a><span class="lineno"> 1816</span>&#160; </div>
+<div class="line"><a name="l01817"></a><span class="lineno"> 1817</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01818"></a><span class="lineno"> 1818</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike Key&gt;</div>
+<div class="line"><a name="l01819"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522"> 1819</a></span>&#160;std::pair&lt;Json::iterator, bool&gt; <a class="code" href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522">Json::insert</a>(Key key, <span class="keyword">const</span> <a class="code" href="classfly_1_1_json.html">Json</a> &amp;value)</div>
+<div class="line"><a name="l01820"></a><span class="lineno"> 1820</span>&#160;{</div>
+<div class="line"><a name="l01821"></a><span class="lineno"> 1821</span>&#160;    <span class="keywordflow">return</span> object_inserter(std::make_pair(convert_to_string(std::move(key)), value));</div>
+<div class="line"><a name="l01822"></a><span class="lineno"> 1822</span>&#160;}</div>
+<div class="line"><a name="l01823"></a><span class="lineno"> 1823</span>&#160; </div>
+<div class="line"><a name="l01824"></a><span class="lineno"> 1824</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01825"></a><span class="lineno"> 1825</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike Key&gt;</div>
+<div class="line"><a name="l01826"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a8903bfdd7a7343fbb85116016b1ae522"> 1826</a></span>&#160;std::pair&lt;Json::iterator, bool&gt; <a class="code" href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522">Json::insert</a>(Key key, <a class="code" href="classfly_1_1_json.html">Json</a> &amp;&amp;value)</div>
+<div class="line"><a name="l01827"></a><span class="lineno"> 1827</span>&#160;{</div>
+<div class="line"><a name="l01828"></a><span class="lineno"> 1828</span>&#160;    <span class="keywordflow">return</span> object_inserter(std::make_pair(convert_to_string(std::move(key)), std::move(value)));</div>
+<div class="line"><a name="l01829"></a><span class="lineno"> 1829</span>&#160;}</div>
+<div class="line"><a name="l01830"></a><span class="lineno"> 1830</span>&#160; </div>
+<div class="line"><a name="l01831"></a><span class="lineno"> 1831</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01832"></a><span class="lineno"> 1832</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike Key&gt;</div>
+<div class="line"><a name="l01833"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a6dc0941c4242c065021a0dd3dfd05482"> 1833</a></span>&#160;std::pair&lt;Json::iterator, bool&gt; <a class="code" href="classfly_1_1_json.html#a6dc0941c4242c065021a0dd3dfd05482">Json::insert_or_assign</a>(Key key, <a class="code" href="classfly_1_1_json.html">Json</a> &amp;&amp;value)</div>
+<div class="line"><a name="l01834"></a><span class="lineno"> 1834</span>&#160;{</div>
+<div class="line"><a name="l01835"></a><span class="lineno"> 1835</span>&#160;    <span class="keyword">auto</span> result = <a class="code" href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522">insert</a>(key, value);</div>
+<div class="line"><a name="l01836"></a><span class="lineno"> 1836</span>&#160; </div>
+<div class="line"><a name="l01837"></a><span class="lineno"> 1837</span>&#160;    <span class="keywordflow">if</span> (!result.second)</div>
+<div class="line"><a name="l01838"></a><span class="lineno"> 1838</span>&#160;    {</div>
+<div class="line"><a name="l01839"></a><span class="lineno"> 1839</span>&#160;        <span class="keyword">auto</span> &amp;it = std::get&lt;typename iterator::object_iterator_type&gt;(result.first.m_iterator);</div>
+<div class="line"><a name="l01840"></a><span class="lineno"> 1840</span>&#160;        it-&gt;second.swap(value);</div>
+<div class="line"><a name="l01841"></a><span class="lineno"> 1841</span>&#160;    }</div>
+<div class="line"><a name="l01842"></a><span class="lineno"> 1842</span>&#160; </div>
+<div class="line"><a name="l01843"></a><span class="lineno"> 1843</span>&#160;    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l01844"></a><span class="lineno"> 1844</span>&#160;}</div>
 <div class="line"><a name="l01845"></a><span class="lineno"> 1845</span>&#160; </div>
-<div class="line"><a name="l01846"></a><span class="lineno"> 1846</span>&#160;    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l01847"></a><span class="lineno"> 1847</span>&#160;}</div>
-<div class="line"><a name="l01848"></a><span class="lineno"> 1848</span>&#160; </div>
-<div class="line"><a name="l01849"></a><span class="lineno"> 1849</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01850"></a><span class="lineno"> 1850</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike Key, <span class="keyword">typename</span> Value&gt;</div>
-<div class="line"><a name="l01851"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#af6e6da52177dbc09ddb6a0c2c1dedda6"> 1851</a></span>&#160;std::pair&lt;Json::iterator, bool&gt; <a class="code" href="classfly_1_1_json.html#af6e6da52177dbc09ddb6a0c2c1dedda6">Json::emplace</a>(Key key, Value &amp;&amp;value)</div>
-<div class="line"><a name="l01852"></a><span class="lineno"> 1852</span>&#160;{</div>
-<div class="line"><a name="l01853"></a><span class="lineno"> 1853</span>&#160;    <span class="keyword">auto</span> &amp;storage = get_or_promote&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for object emplacement&quot;</span>);</div>
-<div class="line"><a name="l01854"></a><span class="lineno"> 1854</span>&#160;    <span class="keyword">auto</span> result = storage.emplace(convert_to_string(std::move(key)), std::forward&lt;Value&gt;(value));</div>
+<div class="line"><a name="l01846"></a><span class="lineno"> 1846</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01847"></a><span class="lineno"> 1847</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike Key, <span class="keyword">typename</span> Value&gt;</div>
+<div class="line"><a name="l01848"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#af6e6da52177dbc09ddb6a0c2c1dedda6"> 1848</a></span>&#160;std::pair&lt;Json::iterator, bool&gt; <a class="code" href="classfly_1_1_json.html#af6e6da52177dbc09ddb6a0c2c1dedda6">Json::emplace</a>(Key key, Value &amp;&amp;value)</div>
+<div class="line"><a name="l01849"></a><span class="lineno"> 1849</span>&#160;{</div>
+<div class="line"><a name="l01850"></a><span class="lineno"> 1850</span>&#160;    <span class="keyword">auto</span> &amp;storage = get_or_promote&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for object emplacement&quot;</span>);</div>
+<div class="line"><a name="l01851"></a><span class="lineno"> 1851</span>&#160;    <span class="keyword">auto</span> result = storage.emplace(convert_to_string(std::move(key)), std::forward&lt;Value&gt;(value));</div>
+<div class="line"><a name="l01852"></a><span class="lineno"> 1852</span>&#160; </div>
+<div class="line"><a name="l01853"></a><span class="lineno"> 1853</span>&#160;    <span class="keyword">auto</span> it = <a class="code" href="classfly_1_1_json.html#a602e19619c93e9a9eeef1b39ed463b21">end</a>();</div>
+<div class="line"><a name="l01854"></a><span class="lineno"> 1854</span>&#160;    it.m_iterator = result.first;</div>
 <div class="line"><a name="l01855"></a><span class="lineno"> 1855</span>&#160; </div>
-<div class="line"><a name="l01856"></a><span class="lineno"> 1856</span>&#160;    <span class="keyword">auto</span> it = <a class="code" href="classfly_1_1_json.html#a602e19619c93e9a9eeef1b39ed463b21">end</a>();</div>
-<div class="line"><a name="l01857"></a><span class="lineno"> 1857</span>&#160;    it.m_iterator = result.first;</div>
+<div class="line"><a name="l01856"></a><span class="lineno"> 1856</span>&#160;    <span class="keywordflow">return</span> {it, result.second};</div>
+<div class="line"><a name="l01857"></a><span class="lineno"> 1857</span>&#160;}</div>
 <div class="line"><a name="l01858"></a><span class="lineno"> 1858</span>&#160; </div>
-<div class="line"><a name="l01859"></a><span class="lineno"> 1859</span>&#160;    <span class="keywordflow">return</span> {it, result.second};</div>
-<div class="line"><a name="l01860"></a><span class="lineno"> 1860</span>&#160;}</div>
-<div class="line"><a name="l01861"></a><span class="lineno"> 1861</span>&#160; </div>
-<div class="line"><a name="l01862"></a><span class="lineno"> 1862</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01863"></a><span class="lineno"> 1863</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l01864"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#af6f141b493b5befa927a48f613fe47ca"> 1864</a></span>&#160;<a class="code" href="classfly_1_1_json.html">Json::reference</a> <a class="code" href="classfly_1_1_json.html#af6f141b493b5befa927a48f613fe47ca">Json::emplace_back</a>(Args &amp;&amp;...args)</div>
-<div class="line"><a name="l01865"></a><span class="lineno"> 1865</span>&#160;{</div>
-<div class="line"><a name="l01866"></a><span class="lineno"> 1866</span>&#160;    <span class="keyword">auto</span> &amp;storage = get_or_promote&lt;json_array_type&gt;(<span class="stringliteral">&quot;JSON type invalid for array emplacement&quot;</span>);</div>
-<div class="line"><a name="l01867"></a><span class="lineno"> 1867</span>&#160;    <span class="keywordflow">return</span> storage.emplace_back(std::forward&lt;Args&gt;(args)...);</div>
-<div class="line"><a name="l01868"></a><span class="lineno"> 1868</span>&#160;}</div>
-<div class="line"><a name="l01869"></a><span class="lineno"> 1869</span>&#160; </div>
-<div class="line"><a name="l01870"></a><span class="lineno"> 1870</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01871"></a><span class="lineno"> 1871</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
-<div class="line"><a name="l01872"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a0fff24e5e6209b45a5a22bc84fc59af8"> 1872</a></span>&#160;Json::size_type <a class="code" href="classfly_1_1_json.html#a0fff24e5e6209b45a5a22bc84fc59af8">Json::erase</a>(T key)</div>
-<div class="line"><a name="l01873"></a><span class="lineno"> 1873</span>&#160;{</div>
-<div class="line"><a name="l01874"></a><span class="lineno"> 1874</span>&#160;    <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for erase(key)&quot;</span>);</div>
-<div class="line"><a name="l01875"></a><span class="lineno"> 1875</span>&#160;    <span class="keywordflow">return</span> storage.erase(convert_to_string(std::move(key)));</div>
-<div class="line"><a name="l01876"></a><span class="lineno"> 1876</span>&#160;}</div>
-<div class="line"><a name="l01877"></a><span class="lineno"> 1877</span>&#160; </div>
-<div class="line"><a name="l01878"></a><span class="lineno"> 1878</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01879"></a><span class="lineno"> 1879</span>&#160;<span class="keyword">template</span> &lt;JsonString T&gt;</div>
-<div class="line"><a name="l01880"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ac8f2224a710f5644dfe0244f274d8a02"> 1880</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classfly_1_1_json.html#af9103a462af195b9c3ceb64525cdfbce">Json::swap</a>(T &amp;other)</div>
-<div class="line"><a name="l01881"></a><span class="lineno"> 1881</span>&#160;{</div>
-<div class="line"><a name="l01882"></a><span class="lineno"> 1882</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="classfly_1_1_json.html#a6b364c146d4bbeda34cb967e512634e1">is_string</a>())</div>
-<div class="line"><a name="l01883"></a><span class="lineno"> 1883</span>&#160;    {</div>
-<div class="line"><a name="l01884"></a><span class="lineno"> 1884</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_exception.html">JsonException</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;JSON type invalid for swap(string)&quot;</span>);</div>
-<div class="line"><a name="l01885"></a><span class="lineno"> 1885</span>&#160;    }</div>
-<div class="line"><a name="l01886"></a><span class="lineno"> 1886</span>&#160; </div>
-<div class="line"><a name="l01887"></a><span class="lineno"> 1887</span>&#160;    T <span class="keywordtype">string</span> = <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(*this);</div>
-<div class="line"><a name="l01888"></a><span class="lineno"> 1888</span>&#160; </div>
-<div class="line"><a name="l01889"></a><span class="lineno"> 1889</span>&#160;    *<span class="keyword">this</span> = std::move(other);</div>
-<div class="line"><a name="l01890"></a><span class="lineno"> 1890</span>&#160;    other = std::move(<span class="keywordtype">string</span>);</div>
-<div class="line"><a name="l01891"></a><span class="lineno"> 1891</span>&#160;}</div>
-<div class="line"><a name="l01892"></a><span class="lineno"> 1892</span>&#160; </div>
-<div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01894"></a><span class="lineno"> 1894</span>&#160;<span class="keyword">template</span> &lt;JsonObject T&gt;</div>
-<div class="line"><a name="l01895"></a><span class="lineno"> 1895</span>&#160;<span class="keywordtype">void</span> <a class="code" href="classfly_1_1_json.html#af9103a462af195b9c3ceb64525cdfbce">Json::swap</a>(T &amp;other)</div>
-<div class="line"><a name="l01896"></a><span class="lineno"> 1896</span>&#160;{</div>
-<div class="line"><a name="l01897"></a><span class="lineno"> 1897</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="classfly_1_1_json.html#aa7d800c890520ef5dec515a133c7ae04">is_object</a>())</div>
-<div class="line"><a name="l01898"></a><span class="lineno"> 1898</span>&#160;    {</div>
-<div class="line"><a name="l01899"></a><span class="lineno"> 1899</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_exception.html">JsonException</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;JSON type invalid for swap(object)&quot;</span>);</div>
-<div class="line"><a name="l01900"></a><span class="lineno"> 1900</span>&#160;    }</div>
-<div class="line"><a name="l01901"></a><span class="lineno"> 1901</span>&#160; </div>
-<div class="line"><a name="l01902"></a><span class="lineno"> 1902</span>&#160;    T <span class="keywordtype">object</span> = <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(*this);</div>
-<div class="line"><a name="l01903"></a><span class="lineno"> 1903</span>&#160; </div>
-<div class="line"><a name="l01904"></a><span class="lineno"> 1904</span>&#160;    *<span class="keyword">this</span> = std::move(other);</div>
-<div class="line"><a name="l01905"></a><span class="lineno"> 1905</span>&#160;    other = std::move(<span class="keywordtype">object</span>);</div>
-<div class="line"><a name="l01906"></a><span class="lineno"> 1906</span>&#160;}</div>
-<div class="line"><a name="l01907"></a><span class="lineno"> 1907</span>&#160; </div>
-<div class="line"><a name="l01908"></a><span class="lineno"> 1908</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01909"></a><span class="lineno"> 1909</span>&#160;<span class="keyword">template</span> &lt;JsonArray T&gt;</div>
-<div class="line"><a name="l01910"></a><span class="lineno"> 1910</span>&#160;<span class="keywordtype">void</span> <a class="code" href="classfly_1_1_json.html#af9103a462af195b9c3ceb64525cdfbce">Json::swap</a>(T &amp;other)</div>
-<div class="line"><a name="l01911"></a><span class="lineno"> 1911</span>&#160;{</div>
-<div class="line"><a name="l01912"></a><span class="lineno"> 1912</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="classfly_1_1_json.html#af8f407a020b9b25dfaeea60a1e387308">is_array</a>())</div>
-<div class="line"><a name="l01913"></a><span class="lineno"> 1913</span>&#160;    {</div>
-<div class="line"><a name="l01914"></a><span class="lineno"> 1914</span>&#160;        <span class="keywordflow">throw</span> JsonException(*<span class="keyword">this</span>, <span class="stringliteral">&quot;JSON type invalid for swap(array)&quot;</span>);</div>
-<div class="line"><a name="l01915"></a><span class="lineno"> 1915</span>&#160;    }</div>
-<div class="line"><a name="l01916"></a><span class="lineno"> 1916</span>&#160; </div>
-<div class="line"><a name="l01917"></a><span class="lineno"> 1917</span>&#160;    T array = <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(*this);</div>
-<div class="line"><a name="l01918"></a><span class="lineno"> 1918</span>&#160; </div>
-<div class="line"><a name="l01919"></a><span class="lineno"> 1919</span>&#160;    *<span class="keyword">this</span> = std::move(other);</div>
-<div class="line"><a name="l01920"></a><span class="lineno"> 1920</span>&#160;    other = std::move(array);</div>
-<div class="line"><a name="l01921"></a><span class="lineno"> 1921</span>&#160;}</div>
-<div class="line"><a name="l01922"></a><span class="lineno"> 1922</span>&#160; </div>
-<div class="line"><a name="l01923"></a><span class="lineno"> 1923</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01924"></a><span class="lineno"> 1924</span>&#160;<span class="keyword">template</span> &lt;JsonObject T&gt;</div>
-<div class="line"><a name="l01925"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ac852e38f0f1406af5d235447da56406c"> 1925</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classfly_1_1_json.html#ac59b7e16af76609186422b3d14059230">Json::merge</a>(T &amp;other)</div>
-<div class="line"><a name="l01926"></a><span class="lineno"> 1926</span>&#160;{</div>
-<div class="line"><a name="l01927"></a><span class="lineno"> 1927</span>&#160;    get_or_promote&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for merging&quot;</span>);</div>
-<div class="line"><a name="l01928"></a><span class="lineno"> 1928</span>&#160; </div>
-<div class="line"><a name="l01929"></a><span class="lineno"> 1929</span>&#160;    <span class="comment">// Manual implementation of fly::json_object_type::merge(&amp;) to allow unordered maps.</span></div>
-<div class="line"><a name="l01930"></a><span class="lineno"> 1930</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> it = other.begin(); it != other.end();)</div>
-<div class="line"><a name="l01931"></a><span class="lineno"> 1931</span>&#160;    {</div>
-<div class="line"><a name="l01932"></a><span class="lineno"> 1932</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="classfly_1_1_json.html#a93bfb658a0c5db198da62be3cbde3949">contains</a>(it-&gt;first))</div>
-<div class="line"><a name="l01933"></a><span class="lineno"> 1933</span>&#160;        {</div>
-<div class="line"><a name="l01934"></a><span class="lineno"> 1934</span>&#160;            ++it;</div>
-<div class="line"><a name="l01935"></a><span class="lineno"> 1935</span>&#160;        }</div>
-<div class="line"><a name="l01936"></a><span class="lineno"> 1936</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01937"></a><span class="lineno"> 1937</span>&#160;        {</div>
-<div class="line"><a name="l01938"></a><span class="lineno"> 1938</span>&#160;            <a class="code" href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522">insert</a>(std::move(it-&gt;first), std::move(it-&gt;second));</div>
-<div class="line"><a name="l01939"></a><span class="lineno"> 1939</span>&#160;            it = other.erase(it);</div>
-<div class="line"><a name="l01940"></a><span class="lineno"> 1940</span>&#160;        }</div>
-<div class="line"><a name="l01941"></a><span class="lineno"> 1941</span>&#160;    }</div>
-<div class="line"><a name="l01942"></a><span class="lineno"> 1942</span>&#160;}</div>
-<div class="line"><a name="l01943"></a><span class="lineno"> 1943</span>&#160; </div>
-<div class="line"><a name="l01944"></a><span class="lineno"> 1944</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01945"></a><span class="lineno"> 1945</span>&#160;<span class="keyword">template</span> &lt;JsonObject T&gt;</div>
-<div class="line"><a name="l01946"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ab35db1db41e66701b04eab7663a8d1e7"> 1946</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classfly_1_1_json.html#ac59b7e16af76609186422b3d14059230">Json::merge</a>(T &amp;&amp;other)</div>
-<div class="line"><a name="l01947"></a><span class="lineno"> 1947</span>&#160;{</div>
-<div class="line"><a name="l01948"></a><span class="lineno"> 1948</span>&#160;    get_or_promote&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for merging&quot;</span>);</div>
-<div class="line"><a name="l01949"></a><span class="lineno"> 1949</span>&#160; </div>
-<div class="line"><a name="l01950"></a><span class="lineno"> 1950</span>&#160;    <span class="comment">// Manual implementation of fly::json_object_type::merge(&amp;&amp;) to allow unordered maps.</span></div>
-<div class="line"><a name="l01951"></a><span class="lineno"> 1951</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;&amp;it : other)</div>
-<div class="line"><a name="l01952"></a><span class="lineno"> 1952</span>&#160;    {</div>
-<div class="line"><a name="l01953"></a><span class="lineno"> 1953</span>&#160;        <span class="keywordflow">if</span> (!<a class="code" href="classfly_1_1_json.html#a93bfb658a0c5db198da62be3cbde3949">contains</a>(it.first))</div>
-<div class="line"><a name="l01954"></a><span class="lineno"> 1954</span>&#160;        {</div>
-<div class="line"><a name="l01955"></a><span class="lineno"> 1955</span>&#160;            <a class="code" href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522">insert</a>(std::move(it.first), std::move(it.second));</div>
-<div class="line"><a name="l01956"></a><span class="lineno"> 1956</span>&#160;        }</div>
-<div class="line"><a name="l01957"></a><span class="lineno"> 1957</span>&#160;    }</div>
-<div class="line"><a name="l01958"></a><span class="lineno"> 1958</span>&#160;}</div>
-<div class="line"><a name="l01959"></a><span class="lineno"> 1959</span>&#160; </div>
-<div class="line"><a name="l01960"></a><span class="lineno"> 1960</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01961"></a><span class="lineno"> 1961</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
-<div class="line"><a name="l01962"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#af0c8f4cf6bb996aeee8e646536e40370"> 1962</a></span>&#160;Json::size_type <a class="code" href="classfly_1_1_json.html#af0c8f4cf6bb996aeee8e646536e40370">Json::count</a>(T key)<span class="keyword"> const</span></div>
-<div class="line"><a name="l01963"></a><span class="lineno"> 1963</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l01964"></a><span class="lineno"> 1964</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for count(key)&quot;</span>);</div>
-<div class="line"><a name="l01965"></a><span class="lineno"> 1965</span>&#160;    <span class="keywordflow">return</span> storage.count(convert_to_string(std::move(key)));</div>
-<div class="line"><a name="l01966"></a><span class="lineno"> 1966</span>&#160;}</div>
-<div class="line"><a name="l01967"></a><span class="lineno"> 1967</span>&#160; </div>
-<div class="line"><a name="l01968"></a><span class="lineno"> 1968</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01969"></a><span class="lineno"> 1969</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
-<div class="line"><a name="l01970"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a916d13329e55ad2909bbf7572999ea2d"> 1970</a></span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html">Json::iterator</a> <a class="code" href="classfly_1_1_json.html#a916d13329e55ad2909bbf7572999ea2d">Json::find</a>(T key)</div>
-<div class="line"><a name="l01971"></a><span class="lineno"> 1971</span>&#160;{</div>
-<div class="line"><a name="l01972"></a><span class="lineno"> 1972</span>&#160;    <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for find(key)&quot;</span>);</div>
+<div class="line"><a name="l01859"></a><span class="lineno"> 1859</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01860"></a><span class="lineno"> 1860</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><a name="l01861"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#af6f141b493b5befa927a48f613fe47ca"> 1861</a></span>&#160;<a class="code" href="classfly_1_1_json.html">Json::reference</a> <a class="code" href="classfly_1_1_json.html#af6f141b493b5befa927a48f613fe47ca">Json::emplace_back</a>(Args &amp;&amp;...args)</div>
+<div class="line"><a name="l01862"></a><span class="lineno"> 1862</span>&#160;{</div>
+<div class="line"><a name="l01863"></a><span class="lineno"> 1863</span>&#160;    <span class="keyword">auto</span> &amp;storage = get_or_promote&lt;json_array_type&gt;(<span class="stringliteral">&quot;JSON type invalid for array emplacement&quot;</span>);</div>
+<div class="line"><a name="l01864"></a><span class="lineno"> 1864</span>&#160;    <span class="keywordflow">return</span> storage.emplace_back(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><a name="l01865"></a><span class="lineno"> 1865</span>&#160;}</div>
+<div class="line"><a name="l01866"></a><span class="lineno"> 1866</span>&#160; </div>
+<div class="line"><a name="l01867"></a><span class="lineno"> 1867</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01868"></a><span class="lineno"> 1868</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
+<div class="line"><a name="l01869"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a0fff24e5e6209b45a5a22bc84fc59af8"> 1869</a></span>&#160;Json::size_type <a class="code" href="classfly_1_1_json.html#a0fff24e5e6209b45a5a22bc84fc59af8">Json::erase</a>(T key)</div>
+<div class="line"><a name="l01870"></a><span class="lineno"> 1870</span>&#160;{</div>
+<div class="line"><a name="l01871"></a><span class="lineno"> 1871</span>&#160;    <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for erase(key)&quot;</span>);</div>
+<div class="line"><a name="l01872"></a><span class="lineno"> 1872</span>&#160;    <span class="keywordflow">return</span> storage.erase(convert_to_string(std::move(key)));</div>
+<div class="line"><a name="l01873"></a><span class="lineno"> 1873</span>&#160;}</div>
+<div class="line"><a name="l01874"></a><span class="lineno"> 1874</span>&#160; </div>
+<div class="line"><a name="l01875"></a><span class="lineno"> 1875</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01876"></a><span class="lineno"> 1876</span>&#160;<span class="keyword">template</span> &lt;JsonString T&gt;</div>
+<div class="line"><a name="l01877"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ac8f2224a710f5644dfe0244f274d8a02"> 1877</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classfly_1_1_json.html#af9103a462af195b9c3ceb64525cdfbce">Json::swap</a>(T &amp;other)</div>
+<div class="line"><a name="l01878"></a><span class="lineno"> 1878</span>&#160;{</div>
+<div class="line"><a name="l01879"></a><span class="lineno"> 1879</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="classfly_1_1_json.html#a6b364c146d4bbeda34cb967e512634e1">is_string</a>())</div>
+<div class="line"><a name="l01880"></a><span class="lineno"> 1880</span>&#160;    {</div>
+<div class="line"><a name="l01881"></a><span class="lineno"> 1881</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_exception.html">JsonException</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;JSON type invalid for swap(string)&quot;</span>);</div>
+<div class="line"><a name="l01882"></a><span class="lineno"> 1882</span>&#160;    }</div>
+<div class="line"><a name="l01883"></a><span class="lineno"> 1883</span>&#160; </div>
+<div class="line"><a name="l01884"></a><span class="lineno"> 1884</span>&#160;    T <span class="keywordtype">string</span> = <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(*this);</div>
+<div class="line"><a name="l01885"></a><span class="lineno"> 1885</span>&#160; </div>
+<div class="line"><a name="l01886"></a><span class="lineno"> 1886</span>&#160;    *<span class="keyword">this</span> = std::move(other);</div>
+<div class="line"><a name="l01887"></a><span class="lineno"> 1887</span>&#160;    other = std::move(<span class="keywordtype">string</span>);</div>
+<div class="line"><a name="l01888"></a><span class="lineno"> 1888</span>&#160;}</div>
+<div class="line"><a name="l01889"></a><span class="lineno"> 1889</span>&#160; </div>
+<div class="line"><a name="l01890"></a><span class="lineno"> 1890</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01891"></a><span class="lineno"> 1891</span>&#160;<span class="keyword">template</span> &lt;JsonObject T&gt;</div>
+<div class="line"><a name="l01892"></a><span class="lineno"> 1892</span>&#160;<span class="keywordtype">void</span> <a class="code" href="classfly_1_1_json.html#af9103a462af195b9c3ceb64525cdfbce">Json::swap</a>(T &amp;other)</div>
+<div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160;{</div>
+<div class="line"><a name="l01894"></a><span class="lineno"> 1894</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="classfly_1_1_json.html#aa7d800c890520ef5dec515a133c7ae04">is_object</a>())</div>
+<div class="line"><a name="l01895"></a><span class="lineno"> 1895</span>&#160;    {</div>
+<div class="line"><a name="l01896"></a><span class="lineno"> 1896</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classfly_1_1_json_exception.html">JsonException</a>(*<span class="keyword">this</span>, <span class="stringliteral">&quot;JSON type invalid for swap(object)&quot;</span>);</div>
+<div class="line"><a name="l01897"></a><span class="lineno"> 1897</span>&#160;    }</div>
+<div class="line"><a name="l01898"></a><span class="lineno"> 1898</span>&#160; </div>
+<div class="line"><a name="l01899"></a><span class="lineno"> 1899</span>&#160;    T <span class="keywordtype">object</span> = <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(*this);</div>
+<div class="line"><a name="l01900"></a><span class="lineno"> 1900</span>&#160; </div>
+<div class="line"><a name="l01901"></a><span class="lineno"> 1901</span>&#160;    *<span class="keyword">this</span> = std::move(other);</div>
+<div class="line"><a name="l01902"></a><span class="lineno"> 1902</span>&#160;    other = std::move(<span class="keywordtype">object</span>);</div>
+<div class="line"><a name="l01903"></a><span class="lineno"> 1903</span>&#160;}</div>
+<div class="line"><a name="l01904"></a><span class="lineno"> 1904</span>&#160; </div>
+<div class="line"><a name="l01905"></a><span class="lineno"> 1905</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01906"></a><span class="lineno"> 1906</span>&#160;<span class="keyword">template</span> &lt;JsonArray T&gt;</div>
+<div class="line"><a name="l01907"></a><span class="lineno"> 1907</span>&#160;<span class="keywordtype">void</span> <a class="code" href="classfly_1_1_json.html#af9103a462af195b9c3ceb64525cdfbce">Json::swap</a>(T &amp;other)</div>
+<div class="line"><a name="l01908"></a><span class="lineno"> 1908</span>&#160;{</div>
+<div class="line"><a name="l01909"></a><span class="lineno"> 1909</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="classfly_1_1_json.html#af8f407a020b9b25dfaeea60a1e387308">is_array</a>())</div>
+<div class="line"><a name="l01910"></a><span class="lineno"> 1910</span>&#160;    {</div>
+<div class="line"><a name="l01911"></a><span class="lineno"> 1911</span>&#160;        <span class="keywordflow">throw</span> JsonException(*<span class="keyword">this</span>, <span class="stringliteral">&quot;JSON type invalid for swap(array)&quot;</span>);</div>
+<div class="line"><a name="l01912"></a><span class="lineno"> 1912</span>&#160;    }</div>
+<div class="line"><a name="l01913"></a><span class="lineno"> 1913</span>&#160; </div>
+<div class="line"><a name="l01914"></a><span class="lineno"> 1914</span>&#160;    T array = <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(*this);</div>
+<div class="line"><a name="l01915"></a><span class="lineno"> 1915</span>&#160; </div>
+<div class="line"><a name="l01916"></a><span class="lineno"> 1916</span>&#160;    *<span class="keyword">this</span> = std::move(other);</div>
+<div class="line"><a name="l01917"></a><span class="lineno"> 1917</span>&#160;    other = std::move(array);</div>
+<div class="line"><a name="l01918"></a><span class="lineno"> 1918</span>&#160;}</div>
+<div class="line"><a name="l01919"></a><span class="lineno"> 1919</span>&#160; </div>
+<div class="line"><a name="l01920"></a><span class="lineno"> 1920</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01921"></a><span class="lineno"> 1921</span>&#160;<span class="keyword">template</span> &lt;JsonObject T&gt;</div>
+<div class="line"><a name="l01922"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ac852e38f0f1406af5d235447da56406c"> 1922</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classfly_1_1_json.html#ac59b7e16af76609186422b3d14059230">Json::merge</a>(T &amp;other)</div>
+<div class="line"><a name="l01923"></a><span class="lineno"> 1923</span>&#160;{</div>
+<div class="line"><a name="l01924"></a><span class="lineno"> 1924</span>&#160;    get_or_promote&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for merging&quot;</span>);</div>
+<div class="line"><a name="l01925"></a><span class="lineno"> 1925</span>&#160; </div>
+<div class="line"><a name="l01926"></a><span class="lineno"> 1926</span>&#160;    <span class="comment">// Manual implementation of fly::json_object_type::merge(&amp;) to allow unordered maps.</span></div>
+<div class="line"><a name="l01927"></a><span class="lineno"> 1927</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> it = other.begin(); it != other.end();)</div>
+<div class="line"><a name="l01928"></a><span class="lineno"> 1928</span>&#160;    {</div>
+<div class="line"><a name="l01929"></a><span class="lineno"> 1929</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="classfly_1_1_json.html#a93bfb658a0c5db198da62be3cbde3949">contains</a>(it-&gt;first))</div>
+<div class="line"><a name="l01930"></a><span class="lineno"> 1930</span>&#160;        {</div>
+<div class="line"><a name="l01931"></a><span class="lineno"> 1931</span>&#160;            ++it;</div>
+<div class="line"><a name="l01932"></a><span class="lineno"> 1932</span>&#160;        }</div>
+<div class="line"><a name="l01933"></a><span class="lineno"> 1933</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01934"></a><span class="lineno"> 1934</span>&#160;        {</div>
+<div class="line"><a name="l01935"></a><span class="lineno"> 1935</span>&#160;            <a class="code" href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522">insert</a>(std::move(it-&gt;first), std::move(it-&gt;second));</div>
+<div class="line"><a name="l01936"></a><span class="lineno"> 1936</span>&#160;            it = other.erase(it);</div>
+<div class="line"><a name="l01937"></a><span class="lineno"> 1937</span>&#160;        }</div>
+<div class="line"><a name="l01938"></a><span class="lineno"> 1938</span>&#160;    }</div>
+<div class="line"><a name="l01939"></a><span class="lineno"> 1939</span>&#160;}</div>
+<div class="line"><a name="l01940"></a><span class="lineno"> 1940</span>&#160; </div>
+<div class="line"><a name="l01941"></a><span class="lineno"> 1941</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01942"></a><span class="lineno"> 1942</span>&#160;<span class="keyword">template</span> &lt;JsonObject T&gt;</div>
+<div class="line"><a name="l01943"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ab35db1db41e66701b04eab7663a8d1e7"> 1943</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classfly_1_1_json.html#ac59b7e16af76609186422b3d14059230">Json::merge</a>(T &amp;&amp;other)</div>
+<div class="line"><a name="l01944"></a><span class="lineno"> 1944</span>&#160;{</div>
+<div class="line"><a name="l01945"></a><span class="lineno"> 1945</span>&#160;    get_or_promote&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for merging&quot;</span>);</div>
+<div class="line"><a name="l01946"></a><span class="lineno"> 1946</span>&#160; </div>
+<div class="line"><a name="l01947"></a><span class="lineno"> 1947</span>&#160;    <span class="comment">// Manual implementation of fly::json_object_type::merge(&amp;&amp;) to allow unordered maps.</span></div>
+<div class="line"><a name="l01948"></a><span class="lineno"> 1948</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> &amp;&amp;it : other)</div>
+<div class="line"><a name="l01949"></a><span class="lineno"> 1949</span>&#160;    {</div>
+<div class="line"><a name="l01950"></a><span class="lineno"> 1950</span>&#160;        <span class="keywordflow">if</span> (!<a class="code" href="classfly_1_1_json.html#a93bfb658a0c5db198da62be3cbde3949">contains</a>(it.first))</div>
+<div class="line"><a name="l01951"></a><span class="lineno"> 1951</span>&#160;        {</div>
+<div class="line"><a name="l01952"></a><span class="lineno"> 1952</span>&#160;            <a class="code" href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522">insert</a>(std::move(it.first), std::move(it.second));</div>
+<div class="line"><a name="l01953"></a><span class="lineno"> 1953</span>&#160;        }</div>
+<div class="line"><a name="l01954"></a><span class="lineno"> 1954</span>&#160;    }</div>
+<div class="line"><a name="l01955"></a><span class="lineno"> 1955</span>&#160;}</div>
+<div class="line"><a name="l01956"></a><span class="lineno"> 1956</span>&#160; </div>
+<div class="line"><a name="l01957"></a><span class="lineno"> 1957</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01958"></a><span class="lineno"> 1958</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
+<div class="line"><a name="l01959"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#af0c8f4cf6bb996aeee8e646536e40370"> 1959</a></span>&#160;Json::size_type <a class="code" href="classfly_1_1_json.html#af0c8f4cf6bb996aeee8e646536e40370">Json::count</a>(T key)<span class="keyword"> const</span></div>
+<div class="line"><a name="l01960"></a><span class="lineno"> 1960</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l01961"></a><span class="lineno"> 1961</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for count(key)&quot;</span>);</div>
+<div class="line"><a name="l01962"></a><span class="lineno"> 1962</span>&#160;    <span class="keywordflow">return</span> storage.count(convert_to_string(std::move(key)));</div>
+<div class="line"><a name="l01963"></a><span class="lineno"> 1963</span>&#160;}</div>
+<div class="line"><a name="l01964"></a><span class="lineno"> 1964</span>&#160; </div>
+<div class="line"><a name="l01965"></a><span class="lineno"> 1965</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01966"></a><span class="lineno"> 1966</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
+<div class="line"><a name="l01967"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a916d13329e55ad2909bbf7572999ea2d"> 1967</a></span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html">Json::iterator</a> <a class="code" href="classfly_1_1_json.html#a916d13329e55ad2909bbf7572999ea2d">Json::find</a>(T key)</div>
+<div class="line"><a name="l01968"></a><span class="lineno"> 1968</span>&#160;{</div>
+<div class="line"><a name="l01969"></a><span class="lineno"> 1969</span>&#160;    <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for find(key)&quot;</span>);</div>
+<div class="line"><a name="l01970"></a><span class="lineno"> 1970</span>&#160; </div>
+<div class="line"><a name="l01971"></a><span class="lineno"> 1971</span>&#160;    <span class="keyword">auto</span> it = <a class="code" href="classfly_1_1_json.html#a602e19619c93e9a9eeef1b39ed463b21">end</a>();</div>
+<div class="line"><a name="l01972"></a><span class="lineno"> 1972</span>&#160;    it.m_iterator = storage.find(convert_to_string(std::move(key)));</div>
 <div class="line"><a name="l01973"></a><span class="lineno"> 1973</span>&#160; </div>
-<div class="line"><a name="l01974"></a><span class="lineno"> 1974</span>&#160;    <span class="keyword">auto</span> it = <a class="code" href="classfly_1_1_json.html#a602e19619c93e9a9eeef1b39ed463b21">end</a>();</div>
-<div class="line"><a name="l01975"></a><span class="lineno"> 1975</span>&#160;    it.m_iterator = storage.find(convert_to_string(std::move(key)));</div>
+<div class="line"><a name="l01974"></a><span class="lineno"> 1974</span>&#160;    <span class="keywordflow">return</span> it;</div>
+<div class="line"><a name="l01975"></a><span class="lineno"> 1975</span>&#160;}</div>
 <div class="line"><a name="l01976"></a><span class="lineno"> 1976</span>&#160; </div>
-<div class="line"><a name="l01977"></a><span class="lineno"> 1977</span>&#160;    <span class="keywordflow">return</span> it;</div>
-<div class="line"><a name="l01978"></a><span class="lineno"> 1978</span>&#160;}</div>
-<div class="line"><a name="l01979"></a><span class="lineno"> 1979</span>&#160; </div>
-<div class="line"><a name="l01980"></a><span class="lineno"> 1980</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01981"></a><span class="lineno"> 1981</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
-<div class="line"><a name="l01982"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ae9b54e4f8e72cffbce05595b9547ee43"> 1982</a></span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html">Json::const_iterator</a> <a class="code" href="classfly_1_1_json.html#a916d13329e55ad2909bbf7572999ea2d">Json::find</a>(T key)<span class="keyword"> const</span></div>
-<div class="line"><a name="l01983"></a><span class="lineno"> 1983</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l01984"></a><span class="lineno"> 1984</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for find(key)&quot;</span>);</div>
+<div class="line"><a name="l01977"></a><span class="lineno"> 1977</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01978"></a><span class="lineno"> 1978</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
+<div class="line"><a name="l01979"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#ae9b54e4f8e72cffbce05595b9547ee43"> 1979</a></span>&#160;<a class="code" href="classfly_1_1detail_1_1_json_iterator.html">Json::const_iterator</a> <a class="code" href="classfly_1_1_json.html#a916d13329e55ad2909bbf7572999ea2d">Json::find</a>(T key)<span class="keyword"> const</span></div>
+<div class="line"><a name="l01980"></a><span class="lineno"> 1980</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l01981"></a><span class="lineno"> 1981</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for find(key)&quot;</span>);</div>
+<div class="line"><a name="l01982"></a><span class="lineno"> 1982</span>&#160; </div>
+<div class="line"><a name="l01983"></a><span class="lineno"> 1983</span>&#160;    <span class="keyword">auto</span> it = <a class="code" href="classfly_1_1_json.html#aa307e1fed71581abbdbf85b306d0d579">cend</a>();</div>
+<div class="line"><a name="l01984"></a><span class="lineno"> 1984</span>&#160;    it.m_iterator = storage.find(convert_to_string(std::move(key)));</div>
 <div class="line"><a name="l01985"></a><span class="lineno"> 1985</span>&#160; </div>
-<div class="line"><a name="l01986"></a><span class="lineno"> 1986</span>&#160;    <span class="keyword">auto</span> it = <a class="code" href="classfly_1_1_json.html#aa307e1fed71581abbdbf85b306d0d579">cend</a>();</div>
-<div class="line"><a name="l01987"></a><span class="lineno"> 1987</span>&#160;    it.m_iterator = storage.find(convert_to_string(std::move(key)));</div>
+<div class="line"><a name="l01986"></a><span class="lineno"> 1986</span>&#160;    <span class="keywordflow">return</span> it;</div>
+<div class="line"><a name="l01987"></a><span class="lineno"> 1987</span>&#160;}</div>
 <div class="line"><a name="l01988"></a><span class="lineno"> 1988</span>&#160; </div>
-<div class="line"><a name="l01989"></a><span class="lineno"> 1989</span>&#160;    <span class="keywordflow">return</span> it;</div>
-<div class="line"><a name="l01990"></a><span class="lineno"> 1990</span>&#160;}</div>
-<div class="line"><a name="l01991"></a><span class="lineno"> 1991</span>&#160; </div>
-<div class="line"><a name="l01992"></a><span class="lineno"> 1992</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l01993"></a><span class="lineno"> 1993</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
-<div class="line"><a name="l01994"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a93bfb658a0c5db198da62be3cbde3949"> 1994</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1_json.html#a93bfb658a0c5db198da62be3cbde3949">Json::contains</a>(T key)<span class="keyword"> const</span></div>
-<div class="line"><a name="l01995"></a><span class="lineno"> 1995</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l01996"></a><span class="lineno"> 1996</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for contains(key)&quot;</span>);</div>
-<div class="line"><a name="l01997"></a><span class="lineno"> 1997</span>&#160;    <span class="keywordflow">return</span> storage.contains(convert_to_string(std::move(key)));</div>
-<div class="line"><a name="l01998"></a><span class="lineno"> 1998</span>&#160;}</div>
-<div class="line"><a name="l01999"></a><span class="lineno"> 1999</span>&#160; </div>
-<div class="line"><a name="l02000"></a><span class="lineno"> 2000</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l02001"></a><span class="lineno"> 2001</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
-<div class="line"><a name="l02002"></a><span class="lineno"> 2002</span>&#160;json_string_type Json::convert_to_string(T value)</div>
-<div class="line"><a name="l02003"></a><span class="lineno"> 2003</span>&#160;{</div>
-<div class="line"><a name="l02004"></a><span class="lineno"> 2004</span>&#160;    <span class="keyword">using</span> StringType = <a class="code" href="classfly_1_1_basic_string.html">BasicString&lt;fly::StandardCharacterType&lt;T&gt;</a>&gt;;</div>
-<div class="line"><a name="l02005"></a><span class="lineno"> 2005</span>&#160; </div>
-<div class="line"><a name="l02006"></a><span class="lineno"> 2006</span>&#160;    <span class="keywordflow">if</span> constexpr (fly::SameAs&lt;typename StringType::string_type, json_string_type&gt;)</div>
-<div class="line"><a name="l02007"></a><span class="lineno"> 2007</span>&#160;    {</div>
-<div class="line"><a name="l02008"></a><span class="lineno"> 2008</span>&#160;        <span class="keywordflow">if</span> (StringType::validate(value))</div>
-<div class="line"><a name="l02009"></a><span class="lineno"> 2009</span>&#160;        {</div>
-<div class="line"><a name="l02010"></a><span class="lineno"> 2010</span>&#160;            <span class="keywordflow">return</span> validate_string(std::move(value));</div>
-<div class="line"><a name="l02011"></a><span class="lineno"> 2011</span>&#160;        }</div>
-<div class="line"><a name="l02012"></a><span class="lineno"> 2012</span>&#160;    }</div>
-<div class="line"><a name="l02013"></a><span class="lineno"> 2013</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l02014"></a><span class="lineno"> 2014</span>&#160;    {</div>
-<div class="line"><a name="l02015"></a><span class="lineno"> 2015</span>&#160;        <span class="keywordflow">if</span> (<span class="keyword">auto</span> result = StringType::template convert&lt;json_string_type&gt;(value); result)</div>
-<div class="line"><a name="l02016"></a><span class="lineno"> 2016</span>&#160;        {</div>
-<div class="line"><a name="l02017"></a><span class="lineno"> 2017</span>&#160;            <span class="keywordflow">return</span> validate_string(*std::move(result));</div>
-<div class="line"><a name="l02018"></a><span class="lineno"> 2018</span>&#160;        }</div>
-<div class="line"><a name="l02019"></a><span class="lineno"> 2019</span>&#160;    }</div>
+<div class="line"><a name="l01989"></a><span class="lineno"> 1989</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01990"></a><span class="lineno"> 1990</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
+<div class="line"><a name="l01991"></a><span class="lineno"><a class="line" href="classfly_1_1_json.html#a93bfb658a0c5db198da62be3cbde3949"> 1991</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classfly_1_1_json.html#a93bfb658a0c5db198da62be3cbde3949">Json::contains</a>(T key)<span class="keyword"> const</span></div>
+<div class="line"><a name="l01992"></a><span class="lineno"> 1992</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l01993"></a><span class="lineno"> 1993</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for contains(key)&quot;</span>);</div>
+<div class="line"><a name="l01994"></a><span class="lineno"> 1994</span>&#160;    <span class="keywordflow">return</span> storage.contains(convert_to_string(std::move(key)));</div>
+<div class="line"><a name="l01995"></a><span class="lineno"> 1995</span>&#160;}</div>
+<div class="line"><a name="l01996"></a><span class="lineno"> 1996</span>&#160; </div>
+<div class="line"><a name="l01997"></a><span class="lineno"> 1997</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l01998"></a><span class="lineno"> 1998</span>&#160;<span class="keyword">template</span> &lt;JsonStringLike T&gt;</div>
+<div class="line"><a name="l01999"></a><span class="lineno"> 1999</span>&#160;json_string_type Json::convert_to_string(T value)</div>
+<div class="line"><a name="l02000"></a><span class="lineno"> 2000</span>&#160;{</div>
+<div class="line"><a name="l02001"></a><span class="lineno"> 2001</span>&#160;    <span class="keyword">using</span> StringType = <a class="code" href="classfly_1_1_basic_string.html">BasicString&lt;fly::StandardCharacterType&lt;T&gt;</a>&gt;;</div>
+<div class="line"><a name="l02002"></a><span class="lineno"> 2002</span>&#160; </div>
+<div class="line"><a name="l02003"></a><span class="lineno"> 2003</span>&#160;    <span class="keywordflow">if</span> constexpr (fly::SameAs&lt;typename StringType::string_type, json_string_type&gt;)</div>
+<div class="line"><a name="l02004"></a><span class="lineno"> 2004</span>&#160;    {</div>
+<div class="line"><a name="l02005"></a><span class="lineno"> 2005</span>&#160;        <span class="keywordflow">if</span> (StringType::validate(value))</div>
+<div class="line"><a name="l02006"></a><span class="lineno"> 2006</span>&#160;        {</div>
+<div class="line"><a name="l02007"></a><span class="lineno"> 2007</span>&#160;            <span class="keywordflow">return</span> validate_string(std::move(value));</div>
+<div class="line"><a name="l02008"></a><span class="lineno"> 2008</span>&#160;        }</div>
+<div class="line"><a name="l02009"></a><span class="lineno"> 2009</span>&#160;    }</div>
+<div class="line"><a name="l02010"></a><span class="lineno"> 2010</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02011"></a><span class="lineno"> 2011</span>&#160;    {</div>
+<div class="line"><a name="l02012"></a><span class="lineno"> 2012</span>&#160;        <span class="keywordflow">if</span> (<span class="keyword">auto</span> result = StringType::template convert&lt;json_string_type&gt;(value); result)</div>
+<div class="line"><a name="l02013"></a><span class="lineno"> 2013</span>&#160;        {</div>
+<div class="line"><a name="l02014"></a><span class="lineno"> 2014</span>&#160;            <span class="keywordflow">return</span> validate_string(*std::move(result));</div>
+<div class="line"><a name="l02015"></a><span class="lineno"> 2015</span>&#160;        }</div>
+<div class="line"><a name="l02016"></a><span class="lineno"> 2016</span>&#160;    }</div>
+<div class="line"><a name="l02017"></a><span class="lineno"> 2017</span>&#160; </div>
+<div class="line"><a name="l02018"></a><span class="lineno"> 2018</span>&#160;    <span class="keywordflow">throw</span> JsonException(<span class="stringliteral">&quot;Could not convert string-like type to a JSON string&quot;</span>);</div>
+<div class="line"><a name="l02019"></a><span class="lineno"> 2019</span>&#160;}</div>
 <div class="line"><a name="l02020"></a><span class="lineno"> 2020</span>&#160; </div>
-<div class="line"><a name="l02021"></a><span class="lineno"> 2021</span>&#160;    <span class="keywordflow">throw</span> JsonException(<span class="stringliteral">&quot;Could not convert string-like type to a JSON string&quot;</span>);</div>
-<div class="line"><a name="l02022"></a><span class="lineno"> 2022</span>&#160;}</div>
-<div class="line"><a name="l02023"></a><span class="lineno"> 2023</span>&#160; </div>
-<div class="line"><a name="l02024"></a><span class="lineno"> 2024</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l02025"></a><span class="lineno"> 2025</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l02026"></a><span class="lineno"> 2026</span>&#160;Json::object_insertion_result&lt;Args...&gt; Json::object_inserter(Args &amp;&amp;...args)</div>
-<div class="line"><a name="l02027"></a><span class="lineno"> 2027</span>&#160;{</div>
-<div class="line"><a name="l02028"></a><span class="lineno"> 2028</span>&#160;    <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for object insertion&quot;</span>);</div>
-<div class="line"><a name="l02029"></a><span class="lineno"> 2029</span>&#160; </div>
-<div class="line"><a name="l02030"></a><span class="lineno"> 2030</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;object_insertion_result&lt;Args...&gt;&gt;)</div>
-<div class="line"><a name="l02031"></a><span class="lineno"> 2031</span>&#160;    {</div>
-<div class="line"><a name="l02032"></a><span class="lineno"> 2032</span>&#160;        storage.insert(std::forward&lt;Args&gt;(args)...);</div>
-<div class="line"><a name="l02033"></a><span class="lineno"> 2033</span>&#160;    }</div>
-<div class="line"><a name="l02034"></a><span class="lineno"> 2034</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l02035"></a><span class="lineno"> 2035</span>&#160;    {</div>
-<div class="line"><a name="l02036"></a><span class="lineno"> 2036</span>&#160;        <span class="keyword">auto</span> result = storage.insert(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><a name="l02021"></a><span class="lineno"> 2021</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l02022"></a><span class="lineno"> 2022</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><a name="l02023"></a><span class="lineno"> 2023</span>&#160;Json::object_insertion_result&lt;Args...&gt; Json::object_inserter(Args &amp;&amp;...args)</div>
+<div class="line"><a name="l02024"></a><span class="lineno"> 2024</span>&#160;{</div>
+<div class="line"><a name="l02025"></a><span class="lineno"> 2025</span>&#160;    <span class="keyword">auto</span> &amp;storage = get&lt;json_object_type&gt;(<span class="stringliteral">&quot;JSON type invalid for object insertion&quot;</span>);</div>
+<div class="line"><a name="l02026"></a><span class="lineno"> 2026</span>&#160; </div>
+<div class="line"><a name="l02027"></a><span class="lineno"> 2027</span>&#160;    <span class="keywordflow">if</span> constexpr (std::is_void_v&lt;object_insertion_result&lt;Args...&gt;&gt;)</div>
+<div class="line"><a name="l02028"></a><span class="lineno"> 2028</span>&#160;    {</div>
+<div class="line"><a name="l02029"></a><span class="lineno"> 2029</span>&#160;        storage.insert(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><a name="l02030"></a><span class="lineno"> 2030</span>&#160;    }</div>
+<div class="line"><a name="l02031"></a><span class="lineno"> 2031</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02032"></a><span class="lineno"> 2032</span>&#160;    {</div>
+<div class="line"><a name="l02033"></a><span class="lineno"> 2033</span>&#160;        <span class="keyword">auto</span> result = storage.insert(std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><a name="l02034"></a><span class="lineno"> 2034</span>&#160; </div>
+<div class="line"><a name="l02035"></a><span class="lineno"> 2035</span>&#160;        <span class="keyword">auto</span> it = <a class="code" href="classfly_1_1_json.html#a602e19619c93e9a9eeef1b39ed463b21">end</a>();</div>
+<div class="line"><a name="l02036"></a><span class="lineno"> 2036</span>&#160;        it.m_iterator = result.first;</div>
 <div class="line"><a name="l02037"></a><span class="lineno"> 2037</span>&#160; </div>
-<div class="line"><a name="l02038"></a><span class="lineno"> 2038</span>&#160;        <span class="keyword">auto</span> it = <a class="code" href="classfly_1_1_json.html#a602e19619c93e9a9eeef1b39ed463b21">end</a>();</div>
-<div class="line"><a name="l02039"></a><span class="lineno"> 2039</span>&#160;        it.m_iterator = result.first;</div>
-<div class="line"><a name="l02040"></a><span class="lineno"> 2040</span>&#160; </div>
-<div class="line"><a name="l02041"></a><span class="lineno"> 2041</span>&#160;        <span class="keywordflow">return</span> {it, result.second};</div>
-<div class="line"><a name="l02042"></a><span class="lineno"> 2042</span>&#160;    }</div>
-<div class="line"><a name="l02043"></a><span class="lineno"> 2043</span>&#160;}</div>
-<div class="line"><a name="l02044"></a><span class="lineno"> 2044</span>&#160; </div>
-<div class="line"><a name="l02045"></a><span class="lineno"> 2045</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l02046"></a><span class="lineno"> 2046</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
-<div class="line"><a name="l02047"></a><span class="lineno"> 2047</span>&#160;Json::iterator Json::array_inserter(const_iterator position, Args &amp;&amp;...args)</div>
-<div class="line"><a name="l02048"></a><span class="lineno"> 2048</span>&#160;{</div>
-<div class="line"><a name="l02049"></a><span class="lineno"> 2049</span>&#160;    <span class="keyword">auto</span> &amp;storage = get&lt;json_array_type&gt;(<span class="stringliteral">&quot;JSON type invalid for array insertion&quot;</span>);</div>
-<div class="line"><a name="l02050"></a><span class="lineno"> 2050</span>&#160; </div>
-<div class="line"><a name="l02051"></a><span class="lineno"> 2051</span>&#160;    <span class="keywordflow">if</span> (position.m_json != <span class="keyword">this</span>)</div>
-<div class="line"><a name="l02052"></a><span class="lineno"> 2052</span>&#160;    {</div>
-<div class="line"><a name="l02053"></a><span class="lineno"> 2053</span>&#160;        <span class="keywordflow">throw</span> JsonException(<span class="stringliteral">&quot;Provided iterator is for a different Json instance&quot;</span>);</div>
-<div class="line"><a name="l02054"></a><span class="lineno"> 2054</span>&#160;    }</div>
+<div class="line"><a name="l02038"></a><span class="lineno"> 2038</span>&#160;        <span class="keywordflow">return</span> {it, result.second};</div>
+<div class="line"><a name="l02039"></a><span class="lineno"> 2039</span>&#160;    }</div>
+<div class="line"><a name="l02040"></a><span class="lineno"> 2040</span>&#160;}</div>
+<div class="line"><a name="l02041"></a><span class="lineno"> 2041</span>&#160; </div>
+<div class="line"><a name="l02042"></a><span class="lineno"> 2042</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l02043"></a><span class="lineno"> 2043</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</div>
+<div class="line"><a name="l02044"></a><span class="lineno"> 2044</span>&#160;Json::iterator Json::array_inserter(const_iterator position, Args &amp;&amp;...args)</div>
+<div class="line"><a name="l02045"></a><span class="lineno"> 2045</span>&#160;{</div>
+<div class="line"><a name="l02046"></a><span class="lineno"> 2046</span>&#160;    <span class="keyword">auto</span> &amp;storage = get&lt;json_array_type&gt;(<span class="stringliteral">&quot;JSON type invalid for array insertion&quot;</span>);</div>
+<div class="line"><a name="l02047"></a><span class="lineno"> 2047</span>&#160; </div>
+<div class="line"><a name="l02048"></a><span class="lineno"> 2048</span>&#160;    <span class="keywordflow">if</span> (position.m_json != <span class="keyword">this</span>)</div>
+<div class="line"><a name="l02049"></a><span class="lineno"> 2049</span>&#160;    {</div>
+<div class="line"><a name="l02050"></a><span class="lineno"> 2050</span>&#160;        <span class="keywordflow">throw</span> JsonException(<span class="stringliteral">&quot;Provided iterator is for a different Json instance&quot;</span>);</div>
+<div class="line"><a name="l02051"></a><span class="lineno"> 2051</span>&#160;    }</div>
+<div class="line"><a name="l02052"></a><span class="lineno"> 2052</span>&#160; </div>
+<div class="line"><a name="l02053"></a><span class="lineno"> 2053</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;position_iterator =</div>
+<div class="line"><a name="l02054"></a><span class="lineno"> 2054</span>&#160;        std::get&lt;typename const_iterator::array_iterator_type&gt;(position.m_iterator);</div>
 <div class="line"><a name="l02055"></a><span class="lineno"> 2055</span>&#160; </div>
-<div class="line"><a name="l02056"></a><span class="lineno"> 2056</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> &amp;position_iterator =</div>
-<div class="line"><a name="l02057"></a><span class="lineno"> 2057</span>&#160;        std::get&lt;typename const_iterator::array_iterator_type&gt;(position.m_iterator);</div>
+<div class="line"><a name="l02056"></a><span class="lineno"> 2056</span>&#160;    <span class="keyword">auto</span> it = <a class="code" href="classfly_1_1_json.html#a602e19619c93e9a9eeef1b39ed463b21">end</a>();</div>
+<div class="line"><a name="l02057"></a><span class="lineno"> 2057</span>&#160;    it.m_iterator = storage.insert(position_iterator, std::forward&lt;Args&gt;(args)...);</div>
 <div class="line"><a name="l02058"></a><span class="lineno"> 2058</span>&#160; </div>
-<div class="line"><a name="l02059"></a><span class="lineno"> 2059</span>&#160;    <span class="keyword">auto</span> it = <a class="code" href="classfly_1_1_json.html#a602e19619c93e9a9eeef1b39ed463b21">end</a>();</div>
-<div class="line"><a name="l02060"></a><span class="lineno"> 2060</span>&#160;    it.m_iterator = storage.insert(position_iterator, std::forward&lt;Args&gt;(args)...);</div>
+<div class="line"><a name="l02059"></a><span class="lineno"> 2059</span>&#160;    <span class="keywordflow">return</span> it;</div>
+<div class="line"><a name="l02060"></a><span class="lineno"> 2060</span>&#160;}</div>
 <div class="line"><a name="l02061"></a><span class="lineno"> 2061</span>&#160; </div>
-<div class="line"><a name="l02062"></a><span class="lineno"> 2062</span>&#160;    <span class="keywordflow">return</span> it;</div>
-<div class="line"><a name="l02063"></a><span class="lineno"> 2063</span>&#160;}</div>
-<div class="line"><a name="l02064"></a><span class="lineno"> 2064</span>&#160; </div>
-<div class="line"><a name="l02065"></a><span class="lineno"> 2065</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l02066"></a><span class="lineno"> 2066</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l02067"></a><span class="lineno"> 2067</span>&#160;<span class="keyword">inline</span> T &amp;Json::get(<span class="keyword">const</span> <span class="keywordtype">char</span> *error_message)</div>
-<div class="line"><a name="l02068"></a><span class="lineno"> 2068</span>&#160;{</div>
-<div class="line"><a name="l02069"></a><span class="lineno"> 2069</span>&#160;    <span class="keyword">auto</span> *storage = std::get_if&lt;T&gt;(&amp;m_value);</div>
-<div class="line"><a name="l02070"></a><span class="lineno"> 2070</span>&#160; </div>
-<div class="line"><a name="l02071"></a><span class="lineno"> 2071</span>&#160;    <span class="keywordflow">if</span> (storage == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l02072"></a><span class="lineno"> 2072</span>&#160;    {</div>
-<div class="line"><a name="l02073"></a><span class="lineno"> 2073</span>&#160;        <span class="keywordflow">throw</span> JsonException(*<span class="keyword">this</span>, error_message);</div>
-<div class="line"><a name="l02074"></a><span class="lineno"> 2074</span>&#160;    }</div>
+<div class="line"><a name="l02062"></a><span class="lineno"> 2062</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l02063"></a><span class="lineno"> 2063</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l02064"></a><span class="lineno"> 2064</span>&#160;<span class="keyword">inline</span> T &amp;Json::get(<span class="keyword">const</span> <span class="keywordtype">char</span> *error_message)</div>
+<div class="line"><a name="l02065"></a><span class="lineno"> 2065</span>&#160;{</div>
+<div class="line"><a name="l02066"></a><span class="lineno"> 2066</span>&#160;    <span class="keyword">auto</span> *storage = std::get_if&lt;T&gt;(&amp;m_value);</div>
+<div class="line"><a name="l02067"></a><span class="lineno"> 2067</span>&#160; </div>
+<div class="line"><a name="l02068"></a><span class="lineno"> 2068</span>&#160;    <span class="keywordflow">if</span> (storage == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l02069"></a><span class="lineno"> 2069</span>&#160;    {</div>
+<div class="line"><a name="l02070"></a><span class="lineno"> 2070</span>&#160;        <span class="keywordflow">throw</span> JsonException(*<span class="keyword">this</span>, error_message);</div>
+<div class="line"><a name="l02071"></a><span class="lineno"> 2071</span>&#160;    }</div>
+<div class="line"><a name="l02072"></a><span class="lineno"> 2072</span>&#160; </div>
+<div class="line"><a name="l02073"></a><span class="lineno"> 2073</span>&#160;    <span class="keywordflow">return</span> *storage;</div>
+<div class="line"><a name="l02074"></a><span class="lineno"> 2074</span>&#160;}</div>
 <div class="line"><a name="l02075"></a><span class="lineno"> 2075</span>&#160; </div>
-<div class="line"><a name="l02076"></a><span class="lineno"> 2076</span>&#160;    <span class="keywordflow">return</span> *storage;</div>
-<div class="line"><a name="l02077"></a><span class="lineno"> 2077</span>&#160;}</div>
-<div class="line"><a name="l02078"></a><span class="lineno"> 2078</span>&#160; </div>
-<div class="line"><a name="l02079"></a><span class="lineno"> 2079</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l02080"></a><span class="lineno"> 2080</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l02081"></a><span class="lineno"> 2081</span>&#160;<span class="keyword">inline</span> T &amp;Json::get_or_promote(<span class="keyword">const</span> <span class="keywordtype">char</span> *error_message)</div>
-<div class="line"><a name="l02082"></a><span class="lineno"> 2082</span>&#160;{</div>
-<div class="line"><a name="l02083"></a><span class="lineno"> 2083</span>&#160;    <span class="keyword">auto</span> *storage = std::get_if&lt;T&gt;(&amp;m_value);</div>
-<div class="line"><a name="l02084"></a><span class="lineno"> 2084</span>&#160; </div>
-<div class="line"><a name="l02085"></a><span class="lineno"> 2085</span>&#160;    <span class="keywordflow">if</span> (storage == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l02086"></a><span class="lineno"> 2086</span>&#160;    {</div>
-<div class="line"><a name="l02087"></a><span class="lineno"> 2087</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="classfly_1_1_json.html#a7a96dec16abae5a71b29f285350d45b4">is_null</a>())</div>
-<div class="line"><a name="l02088"></a><span class="lineno"> 2088</span>&#160;        {</div>
-<div class="line"><a name="l02089"></a><span class="lineno"> 2089</span>&#160;            <span class="keywordflow">return</span> m_value.emplace&lt;T&gt;();</div>
-<div class="line"><a name="l02090"></a><span class="lineno"> 2090</span>&#160;        }</div>
+<div class="line"><a name="l02076"></a><span class="lineno"> 2076</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l02077"></a><span class="lineno"> 2077</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l02078"></a><span class="lineno"> 2078</span>&#160;<span class="keyword">inline</span> T &amp;Json::get_or_promote(<span class="keyword">const</span> <span class="keywordtype">char</span> *error_message)</div>
+<div class="line"><a name="l02079"></a><span class="lineno"> 2079</span>&#160;{</div>
+<div class="line"><a name="l02080"></a><span class="lineno"> 2080</span>&#160;    <span class="keyword">auto</span> *storage = std::get_if&lt;T&gt;(&amp;m_value);</div>
+<div class="line"><a name="l02081"></a><span class="lineno"> 2081</span>&#160; </div>
+<div class="line"><a name="l02082"></a><span class="lineno"> 2082</span>&#160;    <span class="keywordflow">if</span> (storage == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l02083"></a><span class="lineno"> 2083</span>&#160;    {</div>
+<div class="line"><a name="l02084"></a><span class="lineno"> 2084</span>&#160;        <span class="keywordflow">if</span> (<a class="code" href="classfly_1_1_json.html#a7a96dec16abae5a71b29f285350d45b4">is_null</a>())</div>
+<div class="line"><a name="l02085"></a><span class="lineno"> 2085</span>&#160;        {</div>
+<div class="line"><a name="l02086"></a><span class="lineno"> 2086</span>&#160;            <span class="keywordflow">return</span> m_value.emplace&lt;T&gt;();</div>
+<div class="line"><a name="l02087"></a><span class="lineno"> 2087</span>&#160;        }</div>
+<div class="line"><a name="l02088"></a><span class="lineno"> 2088</span>&#160; </div>
+<div class="line"><a name="l02089"></a><span class="lineno"> 2089</span>&#160;        <span class="keywordflow">throw</span> JsonException(*<span class="keyword">this</span>, error_message);</div>
+<div class="line"><a name="l02090"></a><span class="lineno"> 2090</span>&#160;    }</div>
 <div class="line"><a name="l02091"></a><span class="lineno"> 2091</span>&#160; </div>
-<div class="line"><a name="l02092"></a><span class="lineno"> 2092</span>&#160;        <span class="keywordflow">throw</span> JsonException(*<span class="keyword">this</span>, error_message);</div>
-<div class="line"><a name="l02093"></a><span class="lineno"> 2093</span>&#160;    }</div>
+<div class="line"><a name="l02092"></a><span class="lineno"> 2092</span>&#160;    <span class="keywordflow">return</span> *storage;</div>
+<div class="line"><a name="l02093"></a><span class="lineno"> 2093</span>&#160;}</div>
 <div class="line"><a name="l02094"></a><span class="lineno"> 2094</span>&#160; </div>
-<div class="line"><a name="l02095"></a><span class="lineno"> 2095</span>&#160;    <span class="keywordflow">return</span> *storage;</div>
-<div class="line"><a name="l02096"></a><span class="lineno"> 2096</span>&#160;}</div>
-<div class="line"><a name="l02097"></a><span class="lineno"> 2097</span>&#160; </div>
-<div class="line"><a name="l02098"></a><span class="lineno"> 2098</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l02099"></a><span class="lineno"> 2099</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l02100"></a><span class="lineno"> 2100</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> T &amp;Json::get(<span class="keyword">const</span> <span class="keywordtype">char</span> *error_message)<span class="keyword"> const</span></div>
-<div class="line"><a name="l02101"></a><span class="lineno"> 2101</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l02102"></a><span class="lineno"> 2102</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> *storage = std::get_if&lt;T&gt;(&amp;m_value);</div>
-<div class="line"><a name="l02103"></a><span class="lineno"> 2103</span>&#160; </div>
-<div class="line"><a name="l02104"></a><span class="lineno"> 2104</span>&#160;    <span class="keywordflow">if</span> (storage == <span class="keyword">nullptr</span>)</div>
-<div class="line"><a name="l02105"></a><span class="lineno"> 2105</span>&#160;    {</div>
-<div class="line"><a name="l02106"></a><span class="lineno"> 2106</span>&#160;        <span class="keywordflow">throw</span> JsonException(*<span class="keyword">this</span>, error_message);</div>
-<div class="line"><a name="l02107"></a><span class="lineno"> 2107</span>&#160;    }</div>
+<div class="line"><a name="l02095"></a><span class="lineno"> 2095</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l02096"></a><span class="lineno"> 2096</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l02097"></a><span class="lineno"> 2097</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> T &amp;Json::get(<span class="keyword">const</span> <span class="keywordtype">char</span> *error_message)<span class="keyword"> const</span></div>
+<div class="line"><a name="l02098"></a><span class="lineno"> 2098</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l02099"></a><span class="lineno"> 2099</span>&#160;    <span class="keyword">const</span> <span class="keyword">auto</span> *storage = std::get_if&lt;T&gt;(&amp;m_value);</div>
+<div class="line"><a name="l02100"></a><span class="lineno"> 2100</span>&#160; </div>
+<div class="line"><a name="l02101"></a><span class="lineno"> 2101</span>&#160;    <span class="keywordflow">if</span> (storage == <span class="keyword">nullptr</span>)</div>
+<div class="line"><a name="l02102"></a><span class="lineno"> 2102</span>&#160;    {</div>
+<div class="line"><a name="l02103"></a><span class="lineno"> 2103</span>&#160;        <span class="keywordflow">throw</span> JsonException(*<span class="keyword">this</span>, error_message);</div>
+<div class="line"><a name="l02104"></a><span class="lineno"> 2104</span>&#160;    }</div>
+<div class="line"><a name="l02105"></a><span class="lineno"> 2105</span>&#160; </div>
+<div class="line"><a name="l02106"></a><span class="lineno"> 2106</span>&#160;    <span class="keywordflow">return</span> *storage;</div>
+<div class="line"><a name="l02107"></a><span class="lineno"> 2107</span>&#160;}</div>
 <div class="line"><a name="l02108"></a><span class="lineno"> 2108</span>&#160; </div>
-<div class="line"><a name="l02109"></a><span class="lineno"> 2109</span>&#160;    <span class="keywordflow">return</span> *storage;</div>
-<div class="line"><a name="l02110"></a><span class="lineno"> 2110</span>&#160;}</div>
-<div class="line"><a name="l02111"></a><span class="lineno"> 2111</span>&#160; </div>
-<div class="line"><a name="l02112"></a><span class="lineno"> 2112</span>&#160;} <span class="comment">// namespace fly</span></div>
-<div class="line"><a name="l02113"></a><span class="lineno"> 2113</span>&#160; </div>
-<div class="line"><a name="l02114"></a><span class="lineno"> 2114</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l02115"></a><span class="lineno"> 2115</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> CharType&gt;</div>
-<div class="line"><a name="l02116"></a><span class="lineno"><a class="line" href="structfly_1_1_formatter_3_01fly_1_1_json_00_01_char_type_01_4.html"> 2116</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structfly_1_1_formatter.html">fly::Formatter</a>&lt;fly::<a class="code" href="classfly_1_1_json.html">Json</a>, CharType&gt; :</div>
-<div class="line"><a name="l02117"></a><span class="lineno"> 2117</span>&#160;    <span class="keyword">public</span> <a class="code" href="structfly_1_1_formatter.html">fly::Formatter</a>&lt;std::basic_string&lt;CharType&gt;, CharType&gt;</div>
-<div class="line"><a name="l02118"></a><span class="lineno"> 2118</span>&#160;{</div>
-<div class="line"><a name="l02119"></a><span class="lineno"> 2119</span>&#160;    <span class="keyword">using</span> string_type = std::basic_string&lt;CharType&gt;;</div>
-<div class="line"><a name="l02120"></a><span class="lineno"> 2120</span>&#160; </div>
-<div class="line"><a name="l02129"></a><span class="lineno"> 2129</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> FormatContext&gt;</div>
-<div class="line"><a name="l02130"></a><span class="lineno"><a class="line" href="structfly_1_1_formatter_3_01fly_1_1_json_00_01_char_type_01_4.html#a34c0823211003267a47e8fd161ab4ee2"> 2130</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="structfly_1_1_formatter_3_01fly_1_1_json_00_01_char_type_01_4.html#a34c0823211003267a47e8fd161ab4ee2">format</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1_json.html">fly::Json</a> &amp;json, FormatContext &amp;context)</div>
-<div class="line"><a name="l02131"></a><span class="lineno"> 2131</span>&#160;    {</div>
-<div class="line"><a name="l02132"></a><span class="lineno"> 2132</span>&#160;        <span class="keywordflow">if</span> constexpr (fly::SameAs&lt;CharType, fly::json_char_type&gt;)</div>
-<div class="line"><a name="l02133"></a><span class="lineno"> 2133</span>&#160;        {</div>
-<div class="line"><a name="l02134"></a><span class="lineno"> 2134</span>&#160;            <a class="code" href="structfly_1_1_formatter.html">fly::Formatter&lt;string_type, CharType&gt;::format</a>(json.<a class="code" href="classfly_1_1_json.html#aa36f88f96f2a3ac36fa806de3a65d042">serialize</a>(), context);</div>
-<div class="line"><a name="l02135"></a><span class="lineno"> 2135</span>&#160;        }</div>
-<div class="line"><a name="l02136"></a><span class="lineno"> 2136</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l02137"></a><span class="lineno"> 2137</span>&#160;        {</div>
-<div class="line"><a name="l02138"></a><span class="lineno"> 2138</span>&#160;            <span class="keyword">auto</span> serialized = JsonStringType::convert&lt;string_type&gt;(json.<a class="code" href="classfly_1_1_json.html#aa36f88f96f2a3ac36fa806de3a65d042">serialize</a>());</div>
-<div class="line"><a name="l02139"></a><span class="lineno"> 2139</span>&#160; </div>
-<div class="line"><a name="l02140"></a><span class="lineno"> 2140</span>&#160;            <span class="comment">// The JSON string will have been validated for Unicode compliance during construction.</span></div>
-<div class="line"><a name="l02141"></a><span class="lineno"> 2141</span>&#160;            <a class="code" href="structfly_1_1_formatter.html">fly::Formatter&lt;string_type, CharType&gt;::format</a>(*serialized, context);</div>
-<div class="line"><a name="l02142"></a><span class="lineno"> 2142</span>&#160;        }</div>
-<div class="line"><a name="l02143"></a><span class="lineno"> 2143</span>&#160;    }</div>
-<div class="line"><a name="l02144"></a><span class="lineno"> 2144</span>&#160;};</div>
-<div class="line"><a name="l02145"></a><span class="lineno"> 2145</span>&#160; </div>
-<div class="line"><a name="l02146"></a><span class="lineno"> 2146</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l02147"></a><span class="lineno"> 2147</span>&#160;<span class="keyword">template</span> &lt;&gt;</div>
-<div class="line"><a name="l02148"></a><span class="lineno"><a class="line" href="structstd_1_1hash_3_01fly_1_1_json_01_4.html"> 2148</a></span>&#160;<span class="keyword">struct </span>std::hash&lt;fly::Json&gt;</div>
-<div class="line"><a name="l02149"></a><span class="lineno"> 2149</span>&#160;{</div>
-<div class="line"><a name="l02157"></a><span class="lineno"><a class="line" href="structstd_1_1hash_3_01fly_1_1_json_01_4.html#a82dcd736baaab894c9305ac52f18029f"> 2157</a></span>&#160;    std::size_t <a class="code" href="structstd_1_1hash_3_01fly_1_1_json_01_4.html#a82dcd736baaab894c9305ac52f18029f">operator()</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1_json.html">fly::Json</a> &amp;json)<span class="keyword"> const</span></div>
-<div class="line"><a name="l02158"></a><span class="lineno"> 2158</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l02159"></a><span class="lineno"> 2159</span>&#160;        std::size_t type = json.m_value.index();</div>
+<div class="line"><a name="l02109"></a><span class="lineno"> 2109</span>&#160;} <span class="comment">// namespace fly</span></div>
+<div class="line"><a name="l02110"></a><span class="lineno"> 2110</span>&#160; </div>
+<div class="line"><a name="l02111"></a><span class="lineno"> 2111</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l02112"></a><span class="lineno"> 2112</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> CharType&gt;</div>
+<div class="line"><a name="l02113"></a><span class="lineno"><a class="line" href="structfly_1_1_formatter_3_01fly_1_1_json_00_01_char_type_01_4.html"> 2113</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structfly_1_1_formatter.html">fly::Formatter</a>&lt;fly::<a class="code" href="classfly_1_1_json.html">Json</a>, CharType&gt; :</div>
+<div class="line"><a name="l02114"></a><span class="lineno"> 2114</span>&#160;    <span class="keyword">public</span> <a class="code" href="structfly_1_1_formatter.html">fly::Formatter</a>&lt;std::basic_string&lt;CharType&gt;, CharType&gt;</div>
+<div class="line"><a name="l02115"></a><span class="lineno"> 2115</span>&#160;{</div>
+<div class="line"><a name="l02116"></a><span class="lineno"> 2116</span>&#160;    <span class="keyword">using</span> string_type = std::basic_string&lt;CharType&gt;;</div>
+<div class="line"><a name="l02117"></a><span class="lineno"> 2117</span>&#160; </div>
+<div class="line"><a name="l02126"></a><span class="lineno"> 2126</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> FormatContext&gt;</div>
+<div class="line"><a name="l02127"></a><span class="lineno"><a class="line" href="structfly_1_1_formatter_3_01fly_1_1_json_00_01_char_type_01_4.html#a34c0823211003267a47e8fd161ab4ee2"> 2127</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="structfly_1_1_formatter_3_01fly_1_1_json_00_01_char_type_01_4.html#a34c0823211003267a47e8fd161ab4ee2">format</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1_json.html">fly::Json</a> &amp;json, FormatContext &amp;context)</div>
+<div class="line"><a name="l02128"></a><span class="lineno"> 2128</span>&#160;    {</div>
+<div class="line"><a name="l02129"></a><span class="lineno"> 2129</span>&#160;        <span class="keywordflow">if</span> constexpr (fly::SameAs&lt;CharType, fly::json_char_type&gt;)</div>
+<div class="line"><a name="l02130"></a><span class="lineno"> 2130</span>&#160;        {</div>
+<div class="line"><a name="l02131"></a><span class="lineno"> 2131</span>&#160;            <a class="code" href="structfly_1_1_formatter.html">fly::Formatter&lt;string_type, CharType&gt;::format</a>(json.<a class="code" href="classfly_1_1_json.html#aa36f88f96f2a3ac36fa806de3a65d042">serialize</a>(), context);</div>
+<div class="line"><a name="l02132"></a><span class="lineno"> 2132</span>&#160;        }</div>
+<div class="line"><a name="l02133"></a><span class="lineno"> 2133</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02134"></a><span class="lineno"> 2134</span>&#160;        {</div>
+<div class="line"><a name="l02135"></a><span class="lineno"> 2135</span>&#160;            <span class="keyword">auto</span> serialized = JsonStringType::convert&lt;string_type&gt;(json.<a class="code" href="classfly_1_1_json.html#aa36f88f96f2a3ac36fa806de3a65d042">serialize</a>());</div>
+<div class="line"><a name="l02136"></a><span class="lineno"> 2136</span>&#160; </div>
+<div class="line"><a name="l02137"></a><span class="lineno"> 2137</span>&#160;            <span class="comment">// The JSON string will have been validated for Unicode compliance during construction.</span></div>
+<div class="line"><a name="l02138"></a><span class="lineno"> 2138</span>&#160;            <a class="code" href="structfly_1_1_formatter.html">fly::Formatter&lt;string_type, CharType&gt;::format</a>(*serialized, context);</div>
+<div class="line"><a name="l02139"></a><span class="lineno"> 2139</span>&#160;        }</div>
+<div class="line"><a name="l02140"></a><span class="lineno"> 2140</span>&#160;    }</div>
+<div class="line"><a name="l02141"></a><span class="lineno"> 2141</span>&#160;};</div>
+<div class="line"><a name="l02142"></a><span class="lineno"> 2142</span>&#160; </div>
+<div class="line"><a name="l02143"></a><span class="lineno"> 2143</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l02144"></a><span class="lineno"> 2144</span>&#160;<span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a name="l02145"></a><span class="lineno"><a class="line" href="structstd_1_1hash_3_01fly_1_1_json_01_4.html"> 2145</a></span>&#160;<span class="keyword">struct </span>std::hash&lt;fly::Json&gt;</div>
+<div class="line"><a name="l02146"></a><span class="lineno"> 2146</span>&#160;{</div>
+<div class="line"><a name="l02154"></a><span class="lineno"><a class="line" href="structstd_1_1hash_3_01fly_1_1_json_01_4.html#a82dcd736baaab894c9305ac52f18029f"> 2154</a></span>&#160;    std::size_t <a class="code" href="structstd_1_1hash_3_01fly_1_1_json_01_4.html#a82dcd736baaab894c9305ac52f18029f">operator()</a>(<span class="keyword">const</span> <a class="code" href="classfly_1_1_json.html">fly::Json</a> &amp;json)<span class="keyword"> const</span></div>
+<div class="line"><a name="l02155"></a><span class="lineno"> 2155</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l02156"></a><span class="lineno"> 2156</span>&#160;        std::size_t type = json.m_value.index();</div>
+<div class="line"><a name="l02157"></a><span class="lineno"> 2157</span>&#160; </div>
+<div class="line"><a name="l02158"></a><span class="lineno"> 2158</span>&#160;        <span class="keyword">auto</span> visitor = [type](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage) -&gt; std::size_t {</div>
+<div class="line"><a name="l02159"></a><span class="lineno"> 2159</span>&#160;            <span class="keyword">using</span> S = decltype(storage);</div>
 <div class="line"><a name="l02160"></a><span class="lineno"> 2160</span>&#160; </div>
-<div class="line"><a name="l02161"></a><span class="lineno"> 2161</span>&#160;        <span class="keyword">auto</span> visitor = [type](<span class="keyword">const</span> <span class="keyword">auto</span> &amp;storage) -&gt; std::size_t</div>
-<div class="line"><a name="l02162"></a><span class="lineno"> 2162</span>&#160;        {</div>
-<div class="line"><a name="l02163"></a><span class="lineno"> 2163</span>&#160;            <span class="keyword">using</span> S = decltype(storage);</div>
-<div class="line"><a name="l02164"></a><span class="lineno"> 2164</span>&#160; </div>
-<div class="line"><a name="l02165"></a><span class="lineno"> 2165</span>&#160;            <span class="keywordflow">if</span> constexpr (fly::JsonNull&lt;S&gt;)</div>
+<div class="line"><a name="l02161"></a><span class="lineno"> 2161</span>&#160;            <span class="keywordflow">if</span> constexpr (fly::JsonNull&lt;S&gt;)</div>
+<div class="line"><a name="l02162"></a><span class="lineno"> 2162</span>&#160;            {</div>
+<div class="line"><a name="l02163"></a><span class="lineno"> 2163</span>&#160;                <span class="keywordflow">return</span> hash_combine(type, 0);</div>
+<div class="line"><a name="l02164"></a><span class="lineno"> 2164</span>&#160;            }</div>
+<div class="line"><a name="l02165"></a><span class="lineno"> 2165</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (fly::JsonObject&lt;S&gt;)</div>
 <div class="line"><a name="l02166"></a><span class="lineno"> 2166</span>&#160;            {</div>
-<div class="line"><a name="l02167"></a><span class="lineno"> 2167</span>&#160;                <span class="keywordflow">return</span> hash_combine(type, 0);</div>
-<div class="line"><a name="l02168"></a><span class="lineno"> 2168</span>&#160;            }</div>
-<div class="line"><a name="l02169"></a><span class="lineno"> 2169</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (fly::JsonObject&lt;S&gt;)</div>
-<div class="line"><a name="l02170"></a><span class="lineno"> 2170</span>&#160;            {</div>
-<div class="line"><a name="l02171"></a><span class="lineno"> 2171</span>&#160;                std::hash&lt;typename fly::json_object_type::key_type&gt; key_hasher {};</div>
-<div class="line"><a name="l02172"></a><span class="lineno"> 2172</span>&#160;                std::hash&lt;typename fly::json_object_type::mapped_type&gt; value_hasher {};</div>
-<div class="line"><a name="l02173"></a><span class="lineno"> 2173</span>&#160;                std::size_t result = hash_combine(type, storage.size());</div>
-<div class="line"><a name="l02174"></a><span class="lineno"> 2174</span>&#160; </div>
-<div class="line"><a name="l02175"></a><span class="lineno"> 2175</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;value : storage)</div>
-<div class="line"><a name="l02176"></a><span class="lineno"> 2176</span>&#160;                {</div>
-<div class="line"><a name="l02177"></a><span class="lineno"> 2177</span>&#160;                    result = hash_combine(result, key_hasher(value.first));</div>
-<div class="line"><a name="l02178"></a><span class="lineno"> 2178</span>&#160;                    result = hash_combine(result, value_hasher(value.second));</div>
-<div class="line"><a name="l02179"></a><span class="lineno"> 2179</span>&#160;                }</div>
-<div class="line"><a name="l02180"></a><span class="lineno"> 2180</span>&#160; </div>
-<div class="line"><a name="l02181"></a><span class="lineno"> 2181</span>&#160;                <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l02182"></a><span class="lineno"> 2182</span>&#160;            }</div>
-<div class="line"><a name="l02183"></a><span class="lineno"> 2183</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (fly::JsonArray&lt;S&gt;)</div>
-<div class="line"><a name="l02184"></a><span class="lineno"> 2184</span>&#160;            {</div>
-<div class="line"><a name="l02185"></a><span class="lineno"> 2185</span>&#160;                std::hash&lt;typename fly::json_array_type::value_type&gt; hasher {};</div>
-<div class="line"><a name="l02186"></a><span class="lineno"> 2186</span>&#160;                std::size_t result = hash_combine(type, storage.size());</div>
-<div class="line"><a name="l02187"></a><span class="lineno"> 2187</span>&#160; </div>
-<div class="line"><a name="l02188"></a><span class="lineno"> 2188</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;value : storage)</div>
-<div class="line"><a name="l02189"></a><span class="lineno"> 2189</span>&#160;                {</div>
-<div class="line"><a name="l02190"></a><span class="lineno"> 2190</span>&#160;                    result = hash_combine(result, hasher(value));</div>
-<div class="line"><a name="l02191"></a><span class="lineno"> 2191</span>&#160;                }</div>
-<div class="line"><a name="l02192"></a><span class="lineno"> 2192</span>&#160; </div>
-<div class="line"><a name="l02193"></a><span class="lineno"> 2193</span>&#160;                <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l02194"></a><span class="lineno"> 2194</span>&#160;            }</div>
-<div class="line"><a name="l02195"></a><span class="lineno"> 2195</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l02196"></a><span class="lineno"> 2196</span>&#160;            {</div>
-<div class="line"><a name="l02197"></a><span class="lineno"> 2197</span>&#160;                std::hash&lt;std::remove_cvref_t&lt;S&gt;&gt; hasher {};</div>
-<div class="line"><a name="l02198"></a><span class="lineno"> 2198</span>&#160;                <span class="keywordflow">return</span> hash_combine(type, hasher(storage));</div>
-<div class="line"><a name="l02199"></a><span class="lineno"> 2199</span>&#160;            }</div>
-<div class="line"><a name="l02200"></a><span class="lineno"> 2200</span>&#160;        };</div>
-<div class="line"><a name="l02201"></a><span class="lineno"> 2201</span>&#160; </div>
-<div class="line"><a name="l02202"></a><span class="lineno"> 2202</span>&#160;        <span class="keywordflow">return</span> std::visit(std::move(visitor), json.m_value);</div>
-<div class="line"><a name="l02203"></a><span class="lineno"> 2203</span>&#160;    }</div>
-<div class="line"><a name="l02204"></a><span class="lineno"> 2204</span>&#160; </div>
-<div class="line"><a name="l02205"></a><span class="lineno"> 2205</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l02214"></a><span class="lineno"> 2214</span>&#160;    <span class="keyword">static</span> constexpr std::size_t hash_combine(std::size_t value1, std::size_t value2)</div>
-<div class="line"><a name="l02215"></a><span class="lineno"> 2215</span>&#160;    {</div>
-<div class="line"><a name="l02216"></a><span class="lineno"> 2216</span>&#160;        <span class="keyword">using namespace </span>fly::literals::numeric_literals;</div>
-<div class="line"><a name="l02217"></a><span class="lineno"> 2217</span>&#160; </div>
-<div class="line"><a name="l02218"></a><span class="lineno"> 2218</span>&#160;        value1 ^= value2 + 0x9e3779b9_zu + (value1 &lt;&lt; 6_zu) + (value1 &gt;&gt; 2_zu);</div>
-<div class="line"><a name="l02219"></a><span class="lineno"> 2219</span>&#160;        <span class="keywordflow">return</span> value1;</div>
-<div class="line"><a name="l02220"></a><span class="lineno"> 2220</span>&#160;    }</div>
-<div class="line"><a name="l02221"></a><span class="lineno"> 2221</span>&#160;};</div>
+<div class="line"><a name="l02167"></a><span class="lineno"> 2167</span>&#160;                std::hash&lt;typename fly::json_object_type::key_type&gt; key_hasher {};</div>
+<div class="line"><a name="l02168"></a><span class="lineno"> 2168</span>&#160;                std::hash&lt;typename fly::json_object_type::mapped_type&gt; value_hasher {};</div>
+<div class="line"><a name="l02169"></a><span class="lineno"> 2169</span>&#160;                std::size_t result = hash_combine(type, storage.size());</div>
+<div class="line"><a name="l02170"></a><span class="lineno"> 2170</span>&#160; </div>
+<div class="line"><a name="l02171"></a><span class="lineno"> 2171</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;value : storage)</div>
+<div class="line"><a name="l02172"></a><span class="lineno"> 2172</span>&#160;                {</div>
+<div class="line"><a name="l02173"></a><span class="lineno"> 2173</span>&#160;                    result = hash_combine(result, key_hasher(value.first));</div>
+<div class="line"><a name="l02174"></a><span class="lineno"> 2174</span>&#160;                    result = hash_combine(result, value_hasher(value.second));</div>
+<div class="line"><a name="l02175"></a><span class="lineno"> 2175</span>&#160;                }</div>
+<div class="line"><a name="l02176"></a><span class="lineno"> 2176</span>&#160; </div>
+<div class="line"><a name="l02177"></a><span class="lineno"> 2177</span>&#160;                <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l02178"></a><span class="lineno"> 2178</span>&#160;            }</div>
+<div class="line"><a name="l02179"></a><span class="lineno"> 2179</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> constexpr (fly::JsonArray&lt;S&gt;)</div>
+<div class="line"><a name="l02180"></a><span class="lineno"> 2180</span>&#160;            {</div>
+<div class="line"><a name="l02181"></a><span class="lineno"> 2181</span>&#160;                std::hash&lt;typename fly::json_array_type::value_type&gt; hasher {};</div>
+<div class="line"><a name="l02182"></a><span class="lineno"> 2182</span>&#160;                std::size_t result = hash_combine(type, storage.size());</div>
+<div class="line"><a name="l02183"></a><span class="lineno"> 2183</span>&#160; </div>
+<div class="line"><a name="l02184"></a><span class="lineno"> 2184</span>&#160;                <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;value : storage)</div>
+<div class="line"><a name="l02185"></a><span class="lineno"> 2185</span>&#160;                {</div>
+<div class="line"><a name="l02186"></a><span class="lineno"> 2186</span>&#160;                    result = hash_combine(result, hasher(value));</div>
+<div class="line"><a name="l02187"></a><span class="lineno"> 2187</span>&#160;                }</div>
+<div class="line"><a name="l02188"></a><span class="lineno"> 2188</span>&#160; </div>
+<div class="line"><a name="l02189"></a><span class="lineno"> 2189</span>&#160;                <span class="keywordflow">return</span> result;</div>
+<div class="line"><a name="l02190"></a><span class="lineno"> 2190</span>&#160;            }</div>
+<div class="line"><a name="l02191"></a><span class="lineno"> 2191</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l02192"></a><span class="lineno"> 2192</span>&#160;            {</div>
+<div class="line"><a name="l02193"></a><span class="lineno"> 2193</span>&#160;                std::hash&lt;std::remove_cvref_t&lt;S&gt;&gt; hasher {};</div>
+<div class="line"><a name="l02194"></a><span class="lineno"> 2194</span>&#160;                <span class="keywordflow">return</span> hash_combine(type, hasher(storage));</div>
+<div class="line"><a name="l02195"></a><span class="lineno"> 2195</span>&#160;            }</div>
+<div class="line"><a name="l02196"></a><span class="lineno"> 2196</span>&#160;        };</div>
+<div class="line"><a name="l02197"></a><span class="lineno"> 2197</span>&#160; </div>
+<div class="line"><a name="l02198"></a><span class="lineno"> 2198</span>&#160;        <span class="keywordflow">return</span> std::visit(std::move(visitor), json.m_value);</div>
+<div class="line"><a name="l02199"></a><span class="lineno"> 2199</span>&#160;    }</div>
+<div class="line"><a name="l02200"></a><span class="lineno"> 2200</span>&#160; </div>
+<div class="line"><a name="l02201"></a><span class="lineno"> 2201</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l02210"></a><span class="lineno"> 2210</span>&#160;    <span class="keyword">static</span> constexpr std::size_t hash_combine(std::size_t value1, std::size_t value2)</div>
+<div class="line"><a name="l02211"></a><span class="lineno"> 2211</span>&#160;    {</div>
+<div class="line"><a name="l02212"></a><span class="lineno"> 2212</span>&#160;        <span class="keyword">using namespace </span>fly::literals::numeric_literals;</div>
+<div class="line"><a name="l02213"></a><span class="lineno"> 2213</span>&#160; </div>
+<div class="line"><a name="l02214"></a><span class="lineno"> 2214</span>&#160;        value1 ^= value2 + 0x9e3779b9_zu + (value1 &lt;&lt; 6_zu) + (value1 &gt;&gt; 2_zu);</div>
+<div class="line"><a name="l02215"></a><span class="lineno"> 2215</span>&#160;        <span class="keywordflow">return</span> value1;</div>
+<div class="line"><a name="l02216"></a><span class="lineno"> 2216</span>&#160;    }</div>
+<div class="line"><a name="l02217"></a><span class="lineno"> 2217</span>&#160;};</div>
 <div class="ttc" id="aclassfly_1_1_basic_string_html"><div class="ttname"><a href="classfly_1_1_basic_string.html">fly::BasicString</a></div><div class="ttdef"><b>Definition:</b> string.hpp:51</div></div>
 <div class="ttc" id="aclassfly_1_1_basic_string_html_a30b604da44c9309c4737739e8063ba81"><div class="ttname"><a href="classfly_1_1_basic_string.html#a30b604da44c9309c4737739e8063ba81">fly::BasicString::format</a></div><div class="ttdeci">static string_type format(FormatString&lt; ParameterTypes... &gt; &amp;&amp;fmt, ParameterTypes &amp;&amp;...parameters)</div></div>
 <div class="ttc" id="aclassfly_1_1_json_exception_html"><div class="ttname"><a href="classfly_1_1_json_exception.html">fly::JsonException</a></div><div class="ttdef"><b>Definition:</b> json_exception.hpp:19</div></div>
 <div class="ttc" id="aclassfly_1_1_json_html"><div class="ttname"><a href="classfly_1_1_json.html">fly::Json</a></div><div class="ttdef"><b>Definition:</b> json.hpp:162</div></div>
 <div class="ttc" id="aclassfly_1_1_json_html_a01150efba1f01a083c761796e10738bd"><div class="ttname"><a href="classfly_1_1_json.html#a01150efba1f01a083c761796e10738bd">fly::Json::Json</a></div><div class="ttdeci">Json(T value) noexcept</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a0a01309f8ac1a2ef83d73415fd73a161"><div class="ttname"><a href="classfly_1_1_json.html#a0a01309f8ac1a2ef83d73415fd73a161">fly::Json::pop_back</a></div><div class="ttdeci">void pop_back()</div><div class="ttdef"><b>Definition:</b> json.cpp:622</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a0fff24e5e6209b45a5a22bc84fc59af8"><div class="ttname"><a href="classfly_1_1_json.html#a0fff24e5e6209b45a5a22bc84fc59af8">fly::Json::erase</a></div><div class="ttdeci">size_type erase(T key)</div><div class="ttdef"><b>Definition:</b> json.hpp:1872</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a0a01309f8ac1a2ef83d73415fd73a161"><div class="ttname"><a href="classfly_1_1_json.html#a0a01309f8ac1a2ef83d73415fd73a161">fly::Json::pop_back</a></div><div class="ttdeci">void pop_back()</div><div class="ttdef"><b>Definition:</b> json.cpp:612</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a0fff24e5e6209b45a5a22bc84fc59af8"><div class="ttname"><a href="classfly_1_1_json.html#a0fff24e5e6209b45a5a22bc84fc59af8">fly::Json::erase</a></div><div class="ttdeci">size_type erase(T key)</div><div class="ttdef"><b>Definition:</b> json.hpp:1869</div></div>
 <div class="ttc" id="aclassfly_1_1_json_html_a177d014542ca0e83017375cbd6d6fb04"><div class="ttname"><a href="classfly_1_1_json.html#a177d014542ca0e83017375cbd6d6fb04">fly::Json::Json</a></div><div class="ttdeci">Json()=default</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a17dc7c1be13db019ca015047a021e9e7"><div class="ttname"><a href="classfly_1_1_json.html#a17dc7c1be13db019ca015047a021e9e7">fly::Json::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdef"><b>Definition:</b> json.cpp:392</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a27fa32628d3625c7522a78ac249fd0ee"><div class="ttname"><a href="classfly_1_1_json.html#a27fa32628d3625c7522a78ac249fd0ee">fly::Json::cbegin</a></div><div class="ttdeci">const_iterator cbegin() const</div><div class="ttdef"><b>Definition:</b> json.cpp:332</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a36f9a7dcf1c5a3d3bb3bc6ca64ab47cc"><div class="ttname"><a href="classfly_1_1_json.html#a36f9a7dcf1c5a3d3bb3bc6ca64ab47cc">fly::Json::front</a></div><div class="ttdeci">reference front()</div><div class="ttdef"><b>Definition:</b> json.cpp:278</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a3883f85dede31b4058c0abad05d5811a"><div class="ttname"><a href="classfly_1_1_json.html#a3883f85dede31b4058c0abad05d5811a">fly::Json::operator=</a></div><div class="ttdeci">reference operator=(Json json) noexcept</div><div class="ttdef"><b>Definition:</b> json.cpp:58</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a4303f1cab029d63fd68cc2408a753deb"><div class="ttname"><a href="classfly_1_1_json.html#a4303f1cab029d63fd68cc2408a753deb">fly::Json::crend</a></div><div class="ttdeci">const_reverse_iterator crend() const</div><div class="ttdef"><b>Definition:</b> json.cpp:386</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a4b09aa7c037a3cdb810b1f67a84856e3"><div class="ttname"><a href="classfly_1_1_json.html#a4b09aa7c037a3cdb810b1f67a84856e3">fly::Json::is_signed_integer</a></div><div class="ttdeci">bool is_signed_integer() const</div><div class="ttdef"><b>Definition:</b> json.cpp:182</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a50b6a4f6811f9764c055e44032719c4a"><div class="ttname"><a href="classfly_1_1_json.html#a50b6a4f6811f9764c055e44032719c4a">fly::Json::capacity</a></div><div class="ttdeci">size_type capacity() const</div><div class="ttdef"><b>Definition:</b> json.cpp:460</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a602e19619c93e9a9eeef1b39ed463b21"><div class="ttname"><a href="classfly_1_1_json.html#a602e19619c93e9a9eeef1b39ed463b21">fly::Json::end</a></div><div class="ttdeci">iterator end()</div><div class="ttdef"><b>Definition:</b> json.cpp:338</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a6b364c146d4bbeda34cb967e512634e1"><div class="ttname"><a href="classfly_1_1_json.html#a6b364c146d4bbeda34cb967e512634e1">fly::Json::is_string</a></div><div class="ttdeci">bool is_string() const</div><div class="ttdef"><b>Definition:</b> json.cpp:150</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a6dc0941c4242c065021a0dd3dfd05482"><div class="ttname"><a href="classfly_1_1_json.html#a6dc0941c4242c065021a0dd3dfd05482">fly::Json::insert_or_assign</a></div><div class="ttdeci">std::pair&lt; iterator, bool &gt; insert_or_assign(Key key, Json &amp;&amp;value)</div><div class="ttdef"><b>Definition:</b> json.hpp:1836</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a72a6ce001b640616cc4db5d72a7e76c0"><div class="ttname"><a href="classfly_1_1_json.html#a72a6ce001b640616cc4db5d72a7e76c0">fly::Json::crbegin</a></div><div class="ttdeci">const_reverse_iterator crbegin() const</div><div class="ttdef"><b>Definition:</b> json.cpp:368</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a7a96dec16abae5a71b29f285350d45b4"><div class="ttname"><a href="classfly_1_1_json.html#a7a96dec16abae5a71b29f285350d45b4">fly::Json::is_null</a></div><div class="ttdeci">bool is_null() const</div><div class="ttdef"><b>Definition:</b> json.cpp:144</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a7e9101a9e0dc07d26e03716e4e217044"><div class="ttname"><a href="classfly_1_1_json.html#a7e9101a9e0dc07d26e03716e4e217044">fly::Json::is_boolean</a></div><div class="ttdeci">bool is_boolean() const</div><div class="ttdef"><b>Definition:</b> json.cpp:176</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a82fe937617a87a2a44cd6ef1392f8976"><div class="ttname"><a href="classfly_1_1_json.html#a82fe937617a87a2a44cd6ef1392f8976">fly::Json::is_float</a></div><div class="ttdeci">bool is_float() const</div><div class="ttdef"><b>Definition:</b> json.cpp:194</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a8d751164ff3978725bc684db80881903"><div class="ttname"><a href="classfly_1_1_json.html#a8d751164ff3978725bc684db80881903">fly::Json::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdef"><b>Definition:</b> json.cpp:516</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a916d13329e55ad2909bbf7572999ea2d"><div class="ttname"><a href="classfly_1_1_json.html#a916d13329e55ad2909bbf7572999ea2d">fly::Json::find</a></div><div class="ttdeci">iterator find(T key)</div><div class="ttdef"><b>Definition:</b> json.hpp:1970</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a93bfb658a0c5db198da62be3cbde3949"><div class="ttname"><a href="classfly_1_1_json.html#a93bfb658a0c5db198da62be3cbde3949">fly::Json::contains</a></div><div class="ttdeci">bool contains(T key) const</div><div class="ttdef"><b>Definition:</b> json.hpp:1994</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a96d82548ccfeae0ffb873d99f2c64b3c"><div class="ttname"><a href="classfly_1_1_json.html#a96d82548ccfeae0ffb873d99f2c64b3c">fly::Json::is_unsigned_integer</a></div><div class="ttdeci">bool is_unsigned_integer() const</div><div class="ttdef"><b>Definition:</b> json.cpp:188</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a9792be368dee22882ad4b65caa418fbe"><div class="ttname"><a href="classfly_1_1_json.html#a9792be368dee22882ad4b65caa418fbe">fly::Json::begin</a></div><div class="ttdeci">iterator begin()</div><div class="ttdef"><b>Definition:</b> json.cpp:320</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a982ce758d7cb31514679cab45a6281cd"><div class="ttname"><a href="classfly_1_1_json.html#a982ce758d7cb31514679cab45a6281cd">fly::Json::is_object_like</a></div><div class="ttdeci">bool is_object_like() const</div><div class="ttdef"><b>Definition:</b> json.cpp:162</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_a9f92fa1aaa22c447a15868064520664d"><div class="ttname"><a href="classfly_1_1_json.html#a9f92fa1aaa22c447a15868064520664d">fly::Json::back</a></div><div class="ttdeci">reference back()</div><div class="ttdef"><b>Definition:</b> json.cpp:290</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_aa307e1fed71581abbdbf85b306d0d579"><div class="ttname"><a href="classfly_1_1_json.html#aa307e1fed71581abbdbf85b306d0d579">fly::Json::cend</a></div><div class="ttdeci">const_iterator cend() const</div><div class="ttdef"><b>Definition:</b> json.cpp:350</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_aa36f88f96f2a3ac36fa806de3a65d042"><div class="ttname"><a href="classfly_1_1_json.html#aa36f88f96f2a3ac36fa806de3a65d042">fly::Json::serialize</a></div><div class="ttdeci">json_string_type serialize() const</div><div class="ttdef"><b>Definition:</b> json.cpp:65</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_aa7d800c890520ef5dec515a133c7ae04"><div class="ttname"><a href="classfly_1_1_json.html#aa7d800c890520ef5dec515a133c7ae04">fly::Json::is_object</a></div><div class="ttdeci">bool is_object() const</div><div class="ttdef"><b>Definition:</b> json.cpp:156</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_ab64f842a518c3a88bc2b4c57ad29f4b4"><div class="ttname"><a href="classfly_1_1_json.html#ab64f842a518c3a88bc2b4c57ad29f4b4">fly::Json::at</a></div><div class="ttdeci">reference at(T key)</div><div class="ttdef"><b>Definition:</b> json.hpp:1777</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_abb89c18ddda2e5bcba282c2369147522"><div class="ttname"><a href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522">fly::Json::insert</a></div><div class="ttdeci">std::pair&lt; iterator, bool &gt; insert(Key key, const Json &amp;value)</div><div class="ttdef"><b>Definition:</b> json.hpp:1822</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_ac59b7e16af76609186422b3d14059230"><div class="ttname"><a href="classfly_1_1_json.html#ac59b7e16af76609186422b3d14059230">fly::Json::merge</a></div><div class="ttdeci">void merge(Json &amp;other)</div><div class="ttdef"><b>Definition:</b> json.cpp:722</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_acc421074f77c64c3f715f58470e94889"><div class="ttname"><a href="classfly_1_1_json.html#acc421074f77c64c3f715f58470e94889">fly::Json::reserve</a></div><div class="ttdeci">void reserve(size_type capacity)</div><div class="ttdef"><b>Definition:</b> json.cpp:488</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_ad53e6822ebb30f8faef543b074aeca2a"><div class="ttname"><a href="classfly_1_1_json.html#ad53e6822ebb30f8faef543b074aeca2a">fly::Json::operator[]</a></div><div class="ttdeci">reference operator[](T key)</div><div class="ttdef"><b>Definition:</b> json.hpp:1807</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_adf28fcd3819b1fabc0758652533b726a"><div class="ttname"><a href="classfly_1_1_json.html#adf28fcd3819b1fabc0758652533b726a">fly::Json::rend</a></div><div class="ttdeci">reverse_iterator rend()</div><div class="ttdef"><b>Definition:</b> json.cpp:374</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_ae20988db56ce8264a926144d2b6ba98a"><div class="ttname"><a href="classfly_1_1_json.html#ae20988db56ce8264a926144d2b6ba98a">fly::Json::resize</a></div><div class="ttdeci">void resize(size_type size)</div><div class="ttdef"><b>Definition:</b> json.cpp:440</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a17dc7c1be13db019ca015047a021e9e7"><div class="ttname"><a href="classfly_1_1_json.html#a17dc7c1be13db019ca015047a021e9e7">fly::Json::empty</a></div><div class="ttdeci">bool empty() const</div><div class="ttdef"><b>Definition:</b> json.cpp:388</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a27fa32628d3625c7522a78ac249fd0ee"><div class="ttname"><a href="classfly_1_1_json.html#a27fa32628d3625c7522a78ac249fd0ee">fly::Json::cbegin</a></div><div class="ttdeci">const_iterator cbegin() const</div><div class="ttdef"><b>Definition:</b> json.cpp:328</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a36f9a7dcf1c5a3d3bb3bc6ca64ab47cc"><div class="ttname"><a href="classfly_1_1_json.html#a36f9a7dcf1c5a3d3bb3bc6ca64ab47cc">fly::Json::front</a></div><div class="ttdeci">reference front()</div><div class="ttdef"><b>Definition:</b> json.cpp:274</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a3883f85dede31b4058c0abad05d5811a"><div class="ttname"><a href="classfly_1_1_json.html#a3883f85dede31b4058c0abad05d5811a">fly::Json::operator=</a></div><div class="ttdeci">reference operator=(Json json) noexcept</div><div class="ttdef"><b>Definition:</b> json.cpp:57</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a4303f1cab029d63fd68cc2408a753deb"><div class="ttname"><a href="classfly_1_1_json.html#a4303f1cab029d63fd68cc2408a753deb">fly::Json::crend</a></div><div class="ttdeci">const_reverse_iterator crend() const</div><div class="ttdef"><b>Definition:</b> json.cpp:382</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a4b09aa7c037a3cdb810b1f67a84856e3"><div class="ttname"><a href="classfly_1_1_json.html#a4b09aa7c037a3cdb810b1f67a84856e3">fly::Json::is_signed_integer</a></div><div class="ttdeci">bool is_signed_integer() const</div><div class="ttdef"><b>Definition:</b> json.cpp:178</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a50b6a4f6811f9764c055e44032719c4a"><div class="ttname"><a href="classfly_1_1_json.html#a50b6a4f6811f9764c055e44032719c4a">fly::Json::capacity</a></div><div class="ttdeci">size_type capacity() const</div><div class="ttdef"><b>Definition:</b> json.cpp:453</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a602e19619c93e9a9eeef1b39ed463b21"><div class="ttname"><a href="classfly_1_1_json.html#a602e19619c93e9a9eeef1b39ed463b21">fly::Json::end</a></div><div class="ttdeci">iterator end()</div><div class="ttdef"><b>Definition:</b> json.cpp:334</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a6b364c146d4bbeda34cb967e512634e1"><div class="ttname"><a href="classfly_1_1_json.html#a6b364c146d4bbeda34cb967e512634e1">fly::Json::is_string</a></div><div class="ttdeci">bool is_string() const</div><div class="ttdef"><b>Definition:</b> json.cpp:146</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a6dc0941c4242c065021a0dd3dfd05482"><div class="ttname"><a href="classfly_1_1_json.html#a6dc0941c4242c065021a0dd3dfd05482">fly::Json::insert_or_assign</a></div><div class="ttdeci">std::pair&lt; iterator, bool &gt; insert_or_assign(Key key, Json &amp;&amp;value)</div><div class="ttdef"><b>Definition:</b> json.hpp:1833</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a72a6ce001b640616cc4db5d72a7e76c0"><div class="ttname"><a href="classfly_1_1_json.html#a72a6ce001b640616cc4db5d72a7e76c0">fly::Json::crbegin</a></div><div class="ttdeci">const_reverse_iterator crbegin() const</div><div class="ttdef"><b>Definition:</b> json.cpp:364</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a7a96dec16abae5a71b29f285350d45b4"><div class="ttname"><a href="classfly_1_1_json.html#a7a96dec16abae5a71b29f285350d45b4">fly::Json::is_null</a></div><div class="ttdeci">bool is_null() const</div><div class="ttdef"><b>Definition:</b> json.cpp:140</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a7e9101a9e0dc07d26e03716e4e217044"><div class="ttname"><a href="classfly_1_1_json.html#a7e9101a9e0dc07d26e03716e4e217044">fly::Json::is_boolean</a></div><div class="ttdeci">bool is_boolean() const</div><div class="ttdef"><b>Definition:</b> json.cpp:172</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a82fe937617a87a2a44cd6ef1392f8976"><div class="ttname"><a href="classfly_1_1_json.html#a82fe937617a87a2a44cd6ef1392f8976">fly::Json::is_float</a></div><div class="ttdeci">bool is_float() const</div><div class="ttdef"><b>Definition:</b> json.cpp:190</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a8d751164ff3978725bc684db80881903"><div class="ttname"><a href="classfly_1_1_json.html#a8d751164ff3978725bc684db80881903">fly::Json::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdef"><b>Definition:</b> json.cpp:507</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a916d13329e55ad2909bbf7572999ea2d"><div class="ttname"><a href="classfly_1_1_json.html#a916d13329e55ad2909bbf7572999ea2d">fly::Json::find</a></div><div class="ttdeci">iterator find(T key)</div><div class="ttdef"><b>Definition:</b> json.hpp:1967</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a93bfb658a0c5db198da62be3cbde3949"><div class="ttname"><a href="classfly_1_1_json.html#a93bfb658a0c5db198da62be3cbde3949">fly::Json::contains</a></div><div class="ttdeci">bool contains(T key) const</div><div class="ttdef"><b>Definition:</b> json.hpp:1991</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a96d82548ccfeae0ffb873d99f2c64b3c"><div class="ttname"><a href="classfly_1_1_json.html#a96d82548ccfeae0ffb873d99f2c64b3c">fly::Json::is_unsigned_integer</a></div><div class="ttdeci">bool is_unsigned_integer() const</div><div class="ttdef"><b>Definition:</b> json.cpp:184</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a9792be368dee22882ad4b65caa418fbe"><div class="ttname"><a href="classfly_1_1_json.html#a9792be368dee22882ad4b65caa418fbe">fly::Json::begin</a></div><div class="ttdeci">iterator begin()</div><div class="ttdef"><b>Definition:</b> json.cpp:316</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a982ce758d7cb31514679cab45a6281cd"><div class="ttname"><a href="classfly_1_1_json.html#a982ce758d7cb31514679cab45a6281cd">fly::Json::is_object_like</a></div><div class="ttdeci">bool is_object_like() const</div><div class="ttdef"><b>Definition:</b> json.cpp:158</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_a9f92fa1aaa22c447a15868064520664d"><div class="ttname"><a href="classfly_1_1_json.html#a9f92fa1aaa22c447a15868064520664d">fly::Json::back</a></div><div class="ttdeci">reference back()</div><div class="ttdef"><b>Definition:</b> json.cpp:286</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_aa307e1fed71581abbdbf85b306d0d579"><div class="ttname"><a href="classfly_1_1_json.html#aa307e1fed71581abbdbf85b306d0d579">fly::Json::cend</a></div><div class="ttdeci">const_iterator cend() const</div><div class="ttdef"><b>Definition:</b> json.cpp:346</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_aa36f88f96f2a3ac36fa806de3a65d042"><div class="ttname"><a href="classfly_1_1_json.html#aa36f88f96f2a3ac36fa806de3a65d042">fly::Json::serialize</a></div><div class="ttdeci">json_string_type serialize() const</div><div class="ttdef"><b>Definition:</b> json.cpp:64</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_aa7d800c890520ef5dec515a133c7ae04"><div class="ttname"><a href="classfly_1_1_json.html#aa7d800c890520ef5dec515a133c7ae04">fly::Json::is_object</a></div><div class="ttdeci">bool is_object() const</div><div class="ttdef"><b>Definition:</b> json.cpp:152</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_ab64f842a518c3a88bc2b4c57ad29f4b4"><div class="ttname"><a href="classfly_1_1_json.html#ab64f842a518c3a88bc2b4c57ad29f4b4">fly::Json::at</a></div><div class="ttdeci">reference at(T key)</div><div class="ttdef"><b>Definition:</b> json.hpp:1774</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_abb89c18ddda2e5bcba282c2369147522"><div class="ttname"><a href="classfly_1_1_json.html#abb89c18ddda2e5bcba282c2369147522">fly::Json::insert</a></div><div class="ttdeci">std::pair&lt; iterator, bool &gt; insert(Key key, const Json &amp;value)</div><div class="ttdef"><b>Definition:</b> json.hpp:1819</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_ac59b7e16af76609186422b3d14059230"><div class="ttname"><a href="classfly_1_1_json.html#ac59b7e16af76609186422b3d14059230">fly::Json::merge</a></div><div class="ttdeci">void merge(Json &amp;other)</div><div class="ttdef"><b>Definition:</b> json.cpp:710</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_acc421074f77c64c3f715f58470e94889"><div class="ttname"><a href="classfly_1_1_json.html#acc421074f77c64c3f715f58470e94889">fly::Json::reserve</a></div><div class="ttdeci">void reserve(size_type capacity)</div><div class="ttdef"><b>Definition:</b> json.cpp:480</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_ad53e6822ebb30f8faef543b074aeca2a"><div class="ttname"><a href="classfly_1_1_json.html#ad53e6822ebb30f8faef543b074aeca2a">fly::Json::operator[]</a></div><div class="ttdeci">reference operator[](T key)</div><div class="ttdef"><b>Definition:</b> json.hpp:1804</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_adf28fcd3819b1fabc0758652533b726a"><div class="ttname"><a href="classfly_1_1_json.html#adf28fcd3819b1fabc0758652533b726a">fly::Json::rend</a></div><div class="ttdeci">reverse_iterator rend()</div><div class="ttdef"><b>Definition:</b> json.cpp:370</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_ae20988db56ce8264a926144d2b6ba98a"><div class="ttname"><a href="classfly_1_1_json.html#ae20988db56ce8264a926144d2b6ba98a">fly::Json::resize</a></div><div class="ttdeci">void resize(size_type size)</div><div class="ttdef"><b>Definition:</b> json.cpp:434</div></div>
 <div class="ttc" id="aclassfly_1_1_json_html_ae51bb2b1bcf1761228bb1b229cffd911"><div class="ttname"><a href="classfly_1_1_json.html#ae51bb2b1bcf1761228bb1b229cffd911">fly::Json::Json</a></div><div class="ttdeci">Json(T value) noexcept(false)</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_aeeadf6188e594e0d5b3e1b598ff91799"><div class="ttname"><a href="classfly_1_1_json.html#aeeadf6188e594e0d5b3e1b598ff91799">fly::Json::rbegin</a></div><div class="ttdeci">reverse_iterator rbegin()</div><div class="ttdef"><b>Definition:</b> json.cpp:356</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_af0c8f4cf6bb996aeee8e646536e40370"><div class="ttname"><a href="classfly_1_1_json.html#af0c8f4cf6bb996aeee8e646536e40370">fly::Json::count</a></div><div class="ttdeci">size_type count(T key) const</div><div class="ttdef"><b>Definition:</b> json.hpp:1962</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_af580a70fc0909d8d3a2e492ecdee1291"><div class="ttname"><a href="classfly_1_1_json.html#af580a70fc0909d8d3a2e492ecdee1291">fly::Json::push_back</a></div><div class="ttdeci">void push_back(const Json &amp;value)</div><div class="ttdef"><b>Definition:</b> json.cpp:608</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_af6e6da52177dbc09ddb6a0c2c1dedda6"><div class="ttname"><a href="classfly_1_1_json.html#af6e6da52177dbc09ddb6a0c2c1dedda6">fly::Json::emplace</a></div><div class="ttdeci">std::pair&lt; iterator, bool &gt; emplace(Key key, Value &amp;&amp;value)</div><div class="ttdef"><b>Definition:</b> json.hpp:1851</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_af6f141b493b5befa927a48f613fe47ca"><div class="ttname"><a href="classfly_1_1_json.html#af6f141b493b5befa927a48f613fe47ca">fly::Json::emplace_back</a></div><div class="ttdeci">Json::reference emplace_back(Args &amp;&amp;...args)</div><div class="ttdef"><b>Definition:</b> json.hpp:1864</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_af8068468ea8bc725cb375321285e14c2"><div class="ttname"><a href="classfly_1_1_json.html#af8068468ea8bc725cb375321285e14c2">fly::Json::size</a></div><div class="ttdeci">size_type size() const</div><div class="ttdef"><b>Definition:</b> json.cpp:416</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_af8f407a020b9b25dfaeea60a1e387308"><div class="ttname"><a href="classfly_1_1_json.html#af8f407a020b9b25dfaeea60a1e387308">fly::Json::is_array</a></div><div class="ttdeci">bool is_array() const</div><div class="ttdef"><b>Definition:</b> json.cpp:170</div></div>
-<div class="ttc" id="aclassfly_1_1_json_html_af9103a462af195b9c3ceb64525cdfbce"><div class="ttname"><a href="classfly_1_1_json.html#af9103a462af195b9c3ceb64525cdfbce">fly::Json::swap</a></div><div class="ttdeci">void swap(reference json)</div><div class="ttdef"><b>Definition:</b> json.cpp:716</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_aeeadf6188e594e0d5b3e1b598ff91799"><div class="ttname"><a href="classfly_1_1_json.html#aeeadf6188e594e0d5b3e1b598ff91799">fly::Json::rbegin</a></div><div class="ttdeci">reverse_iterator rbegin()</div><div class="ttdef"><b>Definition:</b> json.cpp:352</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_af0c8f4cf6bb996aeee8e646536e40370"><div class="ttname"><a href="classfly_1_1_json.html#af0c8f4cf6bb996aeee8e646536e40370">fly::Json::count</a></div><div class="ttdeci">size_type count(T key) const</div><div class="ttdef"><b>Definition:</b> json.hpp:1959</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_af580a70fc0909d8d3a2e492ecdee1291"><div class="ttname"><a href="classfly_1_1_json.html#af580a70fc0909d8d3a2e492ecdee1291">fly::Json::push_back</a></div><div class="ttdeci">void push_back(const Json &amp;value)</div><div class="ttdef"><b>Definition:</b> json.cpp:598</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_af6e6da52177dbc09ddb6a0c2c1dedda6"><div class="ttname"><a href="classfly_1_1_json.html#af6e6da52177dbc09ddb6a0c2c1dedda6">fly::Json::emplace</a></div><div class="ttdeci">std::pair&lt; iterator, bool &gt; emplace(Key key, Value &amp;&amp;value)</div><div class="ttdef"><b>Definition:</b> json.hpp:1848</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_af6f141b493b5befa927a48f613fe47ca"><div class="ttname"><a href="classfly_1_1_json.html#af6f141b493b5befa927a48f613fe47ca">fly::Json::emplace_back</a></div><div class="ttdeci">Json::reference emplace_back(Args &amp;&amp;...args)</div><div class="ttdef"><b>Definition:</b> json.hpp:1861</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_af8068468ea8bc725cb375321285e14c2"><div class="ttname"><a href="classfly_1_1_json.html#af8068468ea8bc725cb375321285e14c2">fly::Json::size</a></div><div class="ttdeci">size_type size() const</div><div class="ttdef"><b>Definition:</b> json.cpp:411</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_af8f407a020b9b25dfaeea60a1e387308"><div class="ttname"><a href="classfly_1_1_json.html#af8f407a020b9b25dfaeea60a1e387308">fly::Json::is_array</a></div><div class="ttdeci">bool is_array() const</div><div class="ttdef"><b>Definition:</b> json.cpp:166</div></div>
+<div class="ttc" id="aclassfly_1_1_json_html_af9103a462af195b9c3ceb64525cdfbce"><div class="ttname"><a href="classfly_1_1_json.html#af9103a462af195b9c3ceb64525cdfbce">fly::Json::swap</a></div><div class="ttdeci">void swap(reference json)</div><div class="ttdef"><b>Definition:</b> json.cpp:704</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_iterator_html"><div class="ttname"><a href="classfly_1_1detail_1_1_json_iterator.html">fly::detail::JsonIterator</a></div><div class="ttdef"><b>Definition:</b> json_iterator.hpp:58</div></div>
 <div class="ttc" id="aclassfly_1_1detail_1_1_json_reverse_iterator_html"><div class="ttname"><a href="classfly_1_1detail_1_1_json_reverse_iterator.html">fly::detail::JsonReverseIterator</a></div><div class="ttdef"><b>Definition:</b> json_reverse_iterator.hpp:22</div></div>
-<div class="ttc" id="astructfly_1_1_formatter_3_01fly_1_1_json_00_01_char_type_01_4_html_a34c0823211003267a47e8fd161ab4ee2"><div class="ttname"><a href="structfly_1_1_formatter_3_01fly_1_1_json_00_01_char_type_01_4.html#a34c0823211003267a47e8fd161ab4ee2">fly::Formatter&lt; fly::Json, CharType &gt;::format</a></div><div class="ttdeci">void format(const fly::Json &amp;json, FormatContext &amp;context)</div><div class="ttdef"><b>Definition:</b> json.hpp:2130</div></div>
-<div class="ttc" id="astructfly_1_1_formatter_html"><div class="ttname"><a href="structfly_1_1_formatter.html">fly::Formatter</a></div><div class="ttdef"><b>Definition:</b> formatters.hpp:36</div></div>
-<div class="ttc" id="astructstd_1_1hash_3_01fly_1_1_json_01_4_html_a82dcd736baaab894c9305ac52f18029f"><div class="ttname"><a href="structstd_1_1hash_3_01fly_1_1_json_01_4.html#a82dcd736baaab894c9305ac52f18029f">std::hash&lt; fly::Json &gt;::operator()</a></div><div class="ttdeci">std::size_t operator()(const fly::Json &amp;json) const</div><div class="ttdef"><b>Definition:</b> json.hpp:2157</div></div>
+<div class="ttc" id="astructfly_1_1_formatter_3_01fly_1_1_json_00_01_char_type_01_4_html_a34c0823211003267a47e8fd161ab4ee2"><div class="ttname"><a href="structfly_1_1_formatter_3_01fly_1_1_json_00_01_char_type_01_4.html#a34c0823211003267a47e8fd161ab4ee2">fly::Formatter&lt; fly::Json, CharType &gt;::format</a></div><div class="ttdeci">void format(const fly::Json &amp;json, FormatContext &amp;context)</div><div class="ttdef"><b>Definition:</b> json.hpp:2127</div></div>
+<div class="ttc" id="astructfly_1_1_formatter_html"><div class="ttname"><a href="structfly_1_1_formatter.html">fly::Formatter</a></div><div class="ttdef"><b>Definition:</b> formatters.hpp:42</div></div>
+<div class="ttc" id="astructstd_1_1hash_3_01fly_1_1_json_01_4_html_a82dcd736baaab894c9305ac52f18029f"><div class="ttname"><a href="structstd_1_1hash_3_01fly_1_1_json_01_4.html#a82dcd736baaab894c9305ac52f18029f">std::hash&lt; fly::Json &gt;::operator()</a></div><div class="ttdeci">std::size_t operator()(const fly::Json &amp;json) const</div><div class="ttdef"><b>Definition:</b> json.hpp:2154</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

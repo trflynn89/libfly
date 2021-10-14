@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">6.2.1</span>
+   &#160;<span id="projectnumber">6.2.2</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -342,129 +342,125 @@ $(document).ready(function(){initNavTree('task__runner_8hpp_source.html',''); in
 <div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160; </div>
 <div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;    TaskHolder&lt;TaskType&gt; holder {std::forward&lt;TaskType&gt;(task)};</div>
 <div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160; </div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;    <span class="keywordflow">return</span> [holder = std::move(holder)](<a class="code" href="classfly_1_1task_1_1_task_runner.html#a49fd588798623952dc99f6dd9e6eae3f">TaskRunner</a> *, TaskLocation) <span class="keyword">mutable</span></div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;    {</div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;        FLY_UNUSED(std::invoke(std::move(holder.m_task)));</div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;    };</div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;}</div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160; </div>
-<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> OwnerType, <span class="keyword">typename</span> TaskType&gt;</div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;Task TaskRunner::wrap_task(std::weak_ptr&lt;OwnerType&gt; weak_owner, TaskType &amp;&amp;task)</div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;{</div>
-<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;    <span class="keyword">using</span> StrongOwnerType = std::shared_ptr&lt;OwnerType&gt;;</div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160; </div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;    static_assert(</div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;        std::is_invocable_v&lt;TaskType, StrongOwnerType&gt;,</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;        <span class="stringliteral">&quot;Task must be invocable with only a strong pointer to its owner&quot;</span>);</div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160; </div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;    TaskHolder&lt;TaskType&gt; holder {std::forward&lt;TaskType&gt;(task)};</div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160; </div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;    <span class="keywordflow">return</span> [weak_owner = std::move(weak_owner),</div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;            holder = std::move(holder)](<a class="code" href="classfly_1_1task_1_1_task_runner.html#a49fd588798623952dc99f6dd9e6eae3f">TaskRunner</a> *, TaskLocation) <span class="keyword">mutable</span></div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;    {</div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;        <span class="keywordflow">if</span> (StrongOwnerType owner = weak_owner.lock(); owner)</div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;        {</div>
-<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;            FLY_UNUSED(std::invoke(std::move(holder.m_task), std::move(owner)));</div>
-<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;        }</div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;    };</div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;}</div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160; </div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> TaskType, <span class="keyword">typename</span> ReplyType&gt;</div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;Task TaskRunner::wrap_task(TaskType &amp;&amp;task, ReplyType &amp;&amp;reply)</div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;{</div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;    static_assert(std::is_invocable_v&lt;TaskType&gt;, <span class="stringliteral">&quot;Task must be invocable without any arguments&quot;</span>);</div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160; </div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;    <span class="keyword">using</span> ResultType = std::invoke_result_t&lt;TaskType&gt;;</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;    <span class="keyword">static</span> constexpr <span class="keywordtype">bool</span> s_result_is_void = std::is_void_v&lt;ResultType&gt;;</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160; </div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;    static_assert(</div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;        (s_result_is_void &amp;&amp; std::is_invocable_v&lt;ReplyType&gt;) ||</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;            (!s_result_is_void &amp;&amp; std::is_invocable_v&lt;ReplyType, ResultType&gt;),</div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;        <span class="stringliteral">&quot;Either the task must return a non-void type and the reply must be invocable with only &quot;</span></div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;        <span class="stringliteral">&quot;that type, or the task must return void and the reply must be invocable without any &quot;</span></div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;        <span class="stringliteral">&quot;arguments&quot;</span>);</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160; </div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;    TaskHolder&lt;TaskType&gt; task_holder {std::forward&lt;TaskType&gt;(task)};</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    TaskHolder&lt;ReplyType&gt; reply_holder {std::forward&lt;ReplyType&gt;(reply)};</div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160; </div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;    <span class="keywordflow">return</span></div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;        [task_holder = std::move(task_holder),</div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;         reply_holder = std::move(reply_holder)](<a class="code" href="classfly_1_1task_1_1_task_runner.html#a49fd588798623952dc99f6dd9e6eae3f">TaskRunner</a> *runner, TaskLocation location) <span class="keyword">mutable</span></div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;    {</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;        <span class="keywordflow">if</span> constexpr (s_result_is_void)</div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;        {</div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;            std::invoke(std::move(task_holder.m_task));</div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;            runner-&gt;post_task(std::move(location), std::move(reply_holder.m_task));</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;        }</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;        {</div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;            <span class="keyword">auto</span> result = std::invoke(std::move(task_holder.m_task));</div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160; </div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;            runner-&gt;post_task(</div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;                std::move(location),</div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;                std::bind(std::move(reply_holder.m_task), std::move(result)));</div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;        }</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;    };</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;}</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160; </div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> OwnerType, <span class="keyword">typename</span> TaskType, <span class="keyword">typename</span> ReplyType&gt;</div>
-<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;Task TaskRunner::wrap_task(std::weak_ptr&lt;OwnerType&gt; weak_owner, TaskType &amp;&amp;task, ReplyType &amp;&amp;reply)</div>
-<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;{</div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;    <span class="keyword">using</span> StrongOwnerType = std::shared_ptr&lt;OwnerType&gt;;</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160; </div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;    static_assert(</div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;        std::is_invocable_v&lt;TaskType, StrongOwnerType&gt;,</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;        <span class="stringliteral">&quot;Task must be invocable with only a strong pointer to its owner&quot;</span>);</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;    <span class="keywordflow">return</span> [holder = std::move(holder)](<a class="code" href="classfly_1_1task_1_1_task_runner.html#a49fd588798623952dc99f6dd9e6eae3f">TaskRunner</a> *, TaskLocation) <span class="keyword">mutable</span> {</div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;        FLY_UNUSED(std::invoke(std::move(holder.m_task)));</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;    };</div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;}</div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160; </div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> OwnerType, <span class="keyword">typename</span> TaskType&gt;</div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;Task TaskRunner::wrap_task(std::weak_ptr&lt;OwnerType&gt; weak_owner, TaskType &amp;&amp;task)</div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;{</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;    <span class="keyword">using</span> StrongOwnerType = std::shared_ptr&lt;OwnerType&gt;;</div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160; </div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;    static_assert(</div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;        std::is_invocable_v&lt;TaskType, StrongOwnerType&gt;,</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;        <span class="stringliteral">&quot;Task must be invocable with only a strong pointer to its owner&quot;</span>);</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160; </div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;    TaskHolder&lt;TaskType&gt; holder {std::forward&lt;TaskType&gt;(task)};</div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160; </div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;    <span class="keywordflow">return</span> [weak_owner = std::move(weak_owner),</div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;            holder = std::move(holder)](<a class="code" href="classfly_1_1task_1_1_task_runner.html#a49fd588798623952dc99f6dd9e6eae3f">TaskRunner</a> *, TaskLocation) <span class="keyword">mutable</span> {</div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;        <span class="keywordflow">if</span> (StrongOwnerType owner = weak_owner.lock(); owner)</div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;        {</div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;            FLY_UNUSED(std::invoke(std::move(holder.m_task), std::move(owner)));</div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;        }</div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;    };</div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;}</div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160; </div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> TaskType, <span class="keyword">typename</span> ReplyType&gt;</div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;Task TaskRunner::wrap_task(TaskType &amp;&amp;task, ReplyType &amp;&amp;reply)</div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;{</div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;    static_assert(std::is_invocable_v&lt;TaskType&gt;, <span class="stringliteral">&quot;Task must be invocable without any arguments&quot;</span>);</div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160; </div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;    <span class="keyword">using</span> ResultType = std::invoke_result_t&lt;TaskType&gt;;</div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;    <span class="keyword">static</span> constexpr <span class="keywordtype">bool</span> s_result_is_void = std::is_void_v&lt;ResultType&gt;;</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160; </div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;    static_assert(</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;        (s_result_is_void &amp;&amp; std::is_invocable_v&lt;ReplyType&gt;) ||</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;            (!s_result_is_void &amp;&amp; std::is_invocable_v&lt;ReplyType, ResultType&gt;),</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;        <span class="stringliteral">&quot;Either the task must return a non-void type and the reply must be invocable with only &quot;</span></div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;        <span class="stringliteral">&quot;that type, or the task must return void and the reply must be invocable without any &quot;</span></div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;        <span class="stringliteral">&quot;arguments&quot;</span>);</div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160; </div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;    TaskHolder&lt;TaskType&gt; task_holder {std::forward&lt;TaskType&gt;(task)};</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;    TaskHolder&lt;ReplyType&gt; reply_holder {std::forward&lt;ReplyType&gt;(reply)};</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160; </div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    <span class="keywordflow">return</span> [task_holder = std::move(task_holder),</div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;            reply_holder =</div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;                std::move(reply_holder)](<a class="code" href="classfly_1_1task_1_1_task_runner.html#a49fd588798623952dc99f6dd9e6eae3f">TaskRunner</a> *runner, TaskLocation location) <span class="keyword">mutable</span> {</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;        <span class="keywordflow">if</span> constexpr (s_result_is_void)</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;        {</div>
+<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;            std::invoke(std::move(task_holder.m_task));</div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;            runner-&gt;post_task(std::move(location), std::move(reply_holder.m_task));</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;        }</div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;        {</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;            <span class="keyword">auto</span> result = std::invoke(std::move(task_holder.m_task));</div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160; </div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;            runner-&gt;post_task(</div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;                std::move(location),</div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;                std::bind(std::move(reply_holder.m_task), std::move(result)));</div>
+<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;        }</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;    };</div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;}</div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160; </div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> OwnerType, <span class="keyword">typename</span> TaskType, <span class="keyword">typename</span> ReplyType&gt;</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;Task TaskRunner::wrap_task(std::weak_ptr&lt;OwnerType&gt; weak_owner, TaskType &amp;&amp;task, ReplyType &amp;&amp;reply)</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;{</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;    <span class="keyword">using</span> StrongOwnerType = std::shared_ptr&lt;OwnerType&gt;;</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160; </div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;    static_assert(</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;        std::is_invocable_v&lt;TaskType, StrongOwnerType&gt;,</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;        <span class="stringliteral">&quot;Task must be invocable with only a strong pointer to its owner&quot;</span>);</div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160; </div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;    <span class="keyword">using</span> ResultType = std::invoke_result_t&lt;TaskType, StrongOwnerType&gt;;</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;    <span class="keyword">static</span> constexpr <span class="keywordtype">bool</span> s_result_is_void = std::is_void_v&lt;ResultType&gt;;</div>
 <div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160; </div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;    <span class="keyword">using</span> ResultType = std::invoke_result_t&lt;TaskType, StrongOwnerType&gt;;</div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;    <span class="keyword">static</span> constexpr <span class="keywordtype">bool</span> s_result_is_void = std::is_void_v&lt;ResultType&gt;;</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160; </div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;    static_assert(</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;        (s_result_is_void &amp;&amp; std::is_invocable_v&lt;ReplyType, StrongOwnerType&gt;) ||</div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;            (!s_result_is_void &amp;&amp; std::is_invocable_v&lt;ReplyType, ResultType, StrongOwnerType&gt;),</div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;        <span class="stringliteral">&quot;Either the task must return a non-void type and the reply must be invocable with that &quot;</span></div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;        <span class="stringliteral">&quot;type and a strong pointer to its owner, or the task must return void and the reply must &quot;</span></div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;        <span class="stringliteral">&quot;be invocable with only a strong pointer to its owner&quot;</span>);</div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;    static_assert(</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;        (s_result_is_void &amp;&amp; std::is_invocable_v&lt;ReplyType, StrongOwnerType&gt;) ||</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;            (!s_result_is_void &amp;&amp; std::is_invocable_v&lt;ReplyType, ResultType, StrongOwnerType&gt;),</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;        <span class="stringliteral">&quot;Either the task must return a non-void type and the reply must be invocable with that &quot;</span></div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;        <span class="stringliteral">&quot;type and a strong pointer to its owner, or the task must return void and the reply must &quot;</span></div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;        <span class="stringliteral">&quot;be invocable with only a strong pointer to its owner&quot;</span>);</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160; </div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;    TaskHolder&lt;TaskType&gt; task_holder {std::forward&lt;TaskType&gt;(task)};</div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;    TaskHolder&lt;ReplyType&gt; reply_holder {std::forward&lt;ReplyType&gt;(reply)};</div>
 <div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160; </div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;    TaskHolder&lt;TaskType&gt; task_holder {std::forward&lt;TaskType&gt;(task)};</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;    TaskHolder&lt;ReplyType&gt; reply_holder {std::forward&lt;ReplyType&gt;(reply)};</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160; </div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;    <span class="keywordflow">return</span></div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;        [weak_owner = std::move(weak_owner),</div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;         task_holder = std::move(task_holder),</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;         reply_holder = std::move(reply_holder)](<a class="code" href="classfly_1_1task_1_1_task_runner.html#a49fd588798623952dc99f6dd9e6eae3f">TaskRunner</a> *runner, TaskLocation location) <span class="keyword">mutable</span></div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    {</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;        <span class="keywordflow">if</span> (StrongOwnerType owner = weak_owner.lock(); owner)</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;        {</div>
-<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;            <span class="keywordflow">if</span> constexpr (s_result_is_void)</div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;            {</div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;                std::invoke(std::move(task_holder.m_task), std::move(owner));</div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160; </div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;                runner-&gt;post_task(</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;                    std::move(location),</div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;                    std::move(weak_owner),</div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;                    std::move(reply_holder.m_task));</div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;            }</div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;            {</div>
-<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;                <span class="keyword">auto</span> result = std::invoke(std::move(task_holder.m_task), std::move(owner));</div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160; </div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;                runner-&gt;post_task(</div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;                    std::move(location),</div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;                    std::move(weak_owner),</div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;                    std::bind(</div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;                        std::move(reply_holder.m_task),</div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;                        std::move(result),</div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;                        std::placeholders::_1));</div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;            }</div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;        }</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;    };</div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;}</div>
-<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160; </div>
-<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;} <span class="comment">// namespace fly::task</span></div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;    <span class="keywordflow">return</span> [weak_owner = std::move(weak_owner),</div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;            task_holder = std::move(task_holder),</div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;            reply_holder =</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;                std::move(reply_holder)](<a class="code" href="classfly_1_1task_1_1_task_runner.html#a49fd588798623952dc99f6dd9e6eae3f">TaskRunner</a> *runner, TaskLocation location) <span class="keyword">mutable</span> {</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;        <span class="keywordflow">if</span> (StrongOwnerType owner = weak_owner.lock(); owner)</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;        {</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;            <span class="keywordflow">if</span> constexpr (s_result_is_void)</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;            {</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;                std::invoke(std::move(task_holder.m_task), std::move(owner));</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160; </div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;                runner-&gt;post_task(</div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;                    std::move(location),</div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;                    std::move(weak_owner),</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;                    std::move(reply_holder.m_task));</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;            }</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;            {</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;                <span class="keyword">auto</span> result = std::invoke(std::move(task_holder.m_task), std::move(owner));</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160; </div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;                runner-&gt;post_task(</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;                    std::move(location),</div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;                    std::move(weak_owner),</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;                    std::bind(</div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;                        std::move(reply_holder.m_task),</div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;                        std::move(result),</div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;                        std::placeholders::_1));</div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;            }</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;        }</div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;    };</div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;}</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160; </div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;} <span class="comment">// namespace fly::task</span></div>
 <div class="ttc" id="aclassfly_1_1task_1_1_parallel_task_runner_html"><div class="ttname"><a href="classfly_1_1task_1_1_parallel_task_runner.html">fly::task::ParallelTaskRunner</a></div><div class="ttdef"><b>Definition:</b> task_runner.hpp:443</div></div>
 <div class="ttc" id="aclassfly_1_1task_1_1_parallel_task_runner_html_a400eeec3f9034e275469f070e2aacf25"><div class="ttname"><a href="classfly_1_1task_1_1_parallel_task_runner.html#a400eeec3f9034e275469f070e2aacf25">fly::task::ParallelTaskRunner::post_task_internal</a></div><div class="ttdeci">bool post_task_internal(TaskLocation &amp;&amp;location, Task &amp;&amp;task) override</div><div class="ttdef"><b>Definition:</b> task_runner.cpp:76</div></div>
 <div class="ttc" id="aclassfly_1_1task_1_1_parallel_task_runner_html_ac9299bd5279bea968b2449c9ddb28cd0"><div class="ttname"><a href="classfly_1_1task_1_1_parallel_task_runner.html#ac9299bd5279bea968b2449c9ddb28cd0">fly::task::ParallelTaskRunner::task_complete</a></div><div class="ttdeci">void task_complete(TaskLocation &amp;&amp;location) override</div><div class="ttdef"><b>Definition:</b> task_runner.cpp:82</div></div>

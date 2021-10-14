@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">libfly
-   &#160;<span id="projectnumber">6.2.1</span>
+   &#160;<span id="projectnumber">6.2.2</span>
    </div>
    <div id="projectbrief">C++20 utility library for Linux, macOS, and Windows</div>
   </td>
@@ -183,45 +183,44 @@ $(document).ready(function(){initNavTree('path__monitor_8hpp_source.html',''); i
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> FormatContext&gt;</div>
 <div class="line"><a name="l00221"></a><span class="lineno"><a class="line" href="structfly_1_1_formatter_3_01fly_1_1path_1_1_path_event_01_4.html#af1db226615897d236cc853e1842dbe4e">  221</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="structfly_1_1_formatter_3_01fly_1_1path_1_1_path_event_01_4.html#af1db226615897d236cc853e1842dbe4e">format</a>(fly::path::PathEvent event, FormatContext &amp;context)</div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    {</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        <span class="keyword">auto</span> append = [&amp;context](std::string_view value)</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;        {</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;            <span class="keywordflow">for</span> (<span class="keyword">auto</span> ch : value)</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;            {</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;                context.out()++ = ch;</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;            }</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        };</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160; </div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        <span class="keywordflow">switch</span> (event)</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        {</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;            <span class="keywordflow">case</span> fly::path::PathEvent::None:</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;                append(<span class="stringliteral">&quot;None&quot;</span>);</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;                <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160; </div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            <span class="keywordflow">case</span> fly::path::PathEvent::Created:</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;                append(<span class="stringliteral">&quot;Created&quot;</span>);</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;                <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            <span class="keywordflow">case</span> fly::path::PathEvent::Deleted:</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;                append(<span class="stringliteral">&quot;Deleted&quot;</span>);</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;                <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160; </div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;            <span class="keywordflow">case</span> fly::path::PathEvent::Changed:</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;                append(<span class="stringliteral">&quot;Changed&quot;</span>);</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;                <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        }</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    }</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;};</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160; </div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;<span class="comment">//==================================================================================================</span></div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;<span class="keyword">template</span> &lt;&gt;</div>
-<div class="line"><a name="l00254"></a><span class="lineno"><a class="line" href="structfly_1_1_formatter_3_01std_1_1filesystem_1_1path_01_4.html">  254</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structfly_1_1_formatter.html">fly::Formatter</a>&lt;std::filesystem::path&gt; : <span class="keyword">public</span> <a class="code" href="structfly_1_1_formatter.html">fly::Formatter</a>&lt;std::string&gt;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;{</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> FormatContext&gt;</div>
-<div class="line"><a name="l00265"></a><span class="lineno"><a class="line" href="structfly_1_1_formatter_3_01std_1_1filesystem_1_1path_01_4.html#a929482a103c8dd121b7c91b02c0c6177">  265</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="structfly_1_1_formatter_3_01std_1_1filesystem_1_1path_01_4.html#a929482a103c8dd121b7c91b02c0c6177">format</a>(<span class="keyword">const</span> std::filesystem::path &amp;path, FormatContext &amp;context)</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    {</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        <a class="code" href="structfly_1_1_formatter.html">fly::Formatter&lt;std::string&gt;::format</a>(path.string(), context);</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    }</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;};</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        <span class="keyword">auto</span> append = [&amp;context](std::string_view value) {</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;            <span class="keywordflow">for</span> (<span class="keyword">auto</span> ch : value)</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;            {</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;                context.out()++ = ch;</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;            }</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        };</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160; </div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;        <span class="keywordflow">switch</span> (event)</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        {</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;            <span class="keywordflow">case</span> fly::path::PathEvent::None:</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;                append(<span class="stringliteral">&quot;None&quot;</span>);</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;                <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160; </div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;            <span class="keywordflow">case</span> fly::path::PathEvent::Created:</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;                append(<span class="stringliteral">&quot;Created&quot;</span>);</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;                <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            <span class="keywordflow">case</span> fly::path::PathEvent::Deleted:</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;                append(<span class="stringliteral">&quot;Deleted&quot;</span>);</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;                <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;            <span class="keywordflow">case</span> fly::path::PathEvent::Changed:</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;                append(<span class="stringliteral">&quot;Changed&quot;</span>);</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;                <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        }</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    }</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;};</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160; </div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;<span class="comment">//==================================================================================================</span></div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;<span class="keyword">template</span> &lt;&gt;</div>
+<div class="line"><a name="l00253"></a><span class="lineno"><a class="line" href="structfly_1_1_formatter_3_01std_1_1filesystem_1_1path_01_4.html">  253</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structfly_1_1_formatter.html">fly::Formatter</a>&lt;std::filesystem::path&gt; : <span class="keyword">public</span> <a class="code" href="structfly_1_1_formatter.html">fly::Formatter</a>&lt;std::string&gt;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;{</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> FormatContext&gt;</div>
+<div class="line"><a name="l00264"></a><span class="lineno"><a class="line" href="structfly_1_1_formatter_3_01std_1_1filesystem_1_1path_01_4.html#a929482a103c8dd121b7c91b02c0c6177">  264</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="structfly_1_1_formatter_3_01std_1_1filesystem_1_1path_01_4.html#a929482a103c8dd121b7c91b02c0c6177">format</a>(<span class="keyword">const</span> std::filesystem::path &amp;path, FormatContext &amp;context)</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    {</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        <a class="code" href="structfly_1_1_formatter.html">fly::Formatter&lt;std::string&gt;::format</a>(path.string(), context);</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    }</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;};</div>
 <div class="ttc" id="aclassfly_1_1path_1_1_path_monitor_html"><div class="ttname"><a href="classfly_1_1path_1_1_path_monitor.html">fly::path::PathMonitor</a></div><div class="ttdef"><b>Definition:</b> path_monitor.hpp:41</div></div>
 <div class="ttc" id="aclassfly_1_1path_1_1_path_monitor_html_a01457ab659d1c0dd9dbfe05a7d06a989"><div class="ttname"><a href="classfly_1_1path_1_1_path_monitor.html#a01457ab659d1c0dd9dbfe05a7d06a989">fly::path::PathMonitor::PathEventCallback</a></div><div class="ttdeci">std::function&lt; void(std::filesystem::path, PathEvent)&gt; PathEventCallback</div><div class="ttdef"><b>Definition:</b> path_monitor.hpp:46</div></div>
 <div class="ttc" id="aclassfly_1_1path_1_1_path_monitor_html_a01baab4ba5c96b4e82125a4bbd8620e6"><div class="ttname"><a href="classfly_1_1path_1_1_path_monitor.html#a01baab4ba5c96b4e82125a4bbd8620e6">fly::path::PathMonitor::PathMonitor</a></div><div class="ttdeci">PathMonitor(std::shared_ptr&lt; fly::task::SequencedTaskRunner &gt; task_runner, std::shared_ptr&lt; PathConfig &gt; config) noexcept</div><div class="ttdef"><b>Definition:</b> path_monitor.cpp:25</div></div>
@@ -237,8 +236,8 @@ $(document).ready(function(){initNavTree('path__monitor_8hpp_source.html',''); i
 <div class="ttc" id="aclassfly_1_1path_1_1_path_monitor_html_ac00f923115d5a505fb483818676ab508"><div class="ttname"><a href="classfly_1_1path_1_1_path_monitor.html#ac00f923115d5a505fb483818676ab508">fly::path::PathMonitor::~PathMonitor</a></div><div class="ttdeci">virtual ~PathMonitor()</div><div class="ttdef"><b>Definition:</b> path_monitor.cpp:34</div></div>
 <div class="ttc" id="aclassfly_1_1path_1_1_path_monitor_html_ad7a77f9d4c0c410d69084b6dd597f642"><div class="ttname"><a href="classfly_1_1path_1_1_path_monitor.html#ad7a77f9d4c0c410d69084b6dd597f642">fly::path::PathMonitor::add_file</a></div><div class="ttdeci">bool add_file(const std::filesystem::path &amp;file, PathEventCallback callback)</div><div class="ttdef"><b>Definition:</b> path_monitor.cpp:99</div></div>
 <div class="ttc" id="astructfly_1_1_formatter_3_01fly_1_1path_1_1_path_event_01_4_html_af1db226615897d236cc853e1842dbe4e"><div class="ttname"><a href="structfly_1_1_formatter_3_01fly_1_1path_1_1_path_event_01_4.html#af1db226615897d236cc853e1842dbe4e">fly::Formatter&lt; fly::path::PathEvent &gt;::format</a></div><div class="ttdeci">void format(fly::path::PathEvent event, FormatContext &amp;context)</div><div class="ttdef"><b>Definition:</b> path_monitor.hpp:221</div></div>
-<div class="ttc" id="astructfly_1_1_formatter_3_01std_1_1filesystem_1_1path_01_4_html_a929482a103c8dd121b7c91b02c0c6177"><div class="ttname"><a href="structfly_1_1_formatter_3_01std_1_1filesystem_1_1path_01_4.html#a929482a103c8dd121b7c91b02c0c6177">fly::Formatter&lt; std::filesystem::path &gt;::format</a></div><div class="ttdeci">void format(const std::filesystem::path &amp;path, FormatContext &amp;context)</div><div class="ttdef"><b>Definition:</b> path_monitor.hpp:265</div></div>
-<div class="ttc" id="astructfly_1_1_formatter_html"><div class="ttname"><a href="structfly_1_1_formatter.html">fly::Formatter</a></div><div class="ttdef"><b>Definition:</b> formatters.hpp:36</div></div>
+<div class="ttc" id="astructfly_1_1_formatter_3_01std_1_1filesystem_1_1path_01_4_html_a929482a103c8dd121b7c91b02c0c6177"><div class="ttname"><a href="structfly_1_1_formatter_3_01std_1_1filesystem_1_1path_01_4.html#a929482a103c8dd121b7c91b02c0c6177">fly::Formatter&lt; std::filesystem::path &gt;::format</a></div><div class="ttdeci">void format(const std::filesystem::path &amp;path, FormatContext &amp;context)</div><div class="ttdef"><b>Definition:</b> path_monitor.hpp:264</div></div>
+<div class="ttc" id="astructfly_1_1_formatter_html"><div class="ttname"><a href="structfly_1_1_formatter.html">fly::Formatter</a></div><div class="ttdef"><b>Definition:</b> formatters.hpp:42</div></div>
 <div class="ttc" id="astructfly_1_1path_1_1_path_monitor_1_1_path_info_html"><div class="ttname"><a href="structfly_1_1path_1_1_path_monitor_1_1_path_info.html">fly::path::PathMonitor::PathInfo</a></div><div class="ttdef"><b>Definition:</b> path_monitor.hpp:118</div></div>
 <div class="ttc" id="astructfly_1_1path_1_1_path_monitor_1_1_path_info_html_ab7be7fa9043d0e827d92d3a8ec1436a9"><div class="ttname"><a href="structfly_1_1path_1_1_path_monitor_1_1_path_info.html#ab7be7fa9043d0e827d92d3a8ec1436a9">fly::path::PathMonitor::PathInfo::is_valid</a></div><div class="ttdeci">virtual bool is_valid() const =0</div></div>
 <div class="ttc" id="astructfly_1_1path_1_1_path_monitor_1_1_path_info_html_ae11016ca3202e5bc8186bd935c1da82c"><div class="ttname"><a href="structfly_1_1path_1_1_path_monitor_1_1_path_info.html#ae11016ca3202e5bc8186bd935c1da82c">fly::path::PathMonitor::PathInfo::~PathInfo</a></div><div class="ttdeci">virtual ~PathInfo()=default</div></div>
