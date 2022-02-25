@@ -3,6 +3,7 @@ parameters:
   mode: 'debug'
   arch: 'x64'
   coverage: '0'
+  sanitize: ''
 
 jobs:
   - job: 'Linux_${{ parameters.toolchain }}_${{ parameters.mode }}_${{ parameters.arch }}'
@@ -29,7 +30,7 @@ jobs:
         arch: ${{ parameters.arch }}
 
     - script: |
-        echo "##vso[task.setvariable variable=config]mode=${{ parameters.mode }} toolchain=${{ parameters.toolchain }} arch=${{ parameters.arch }} cacher=ccache coverage=${{ parameters.coverage }}"
+        echo "##vso[task.setvariable variable=config]mode=${{ parameters.mode }} toolchain=${{ parameters.toolchain }} arch=${{ parameters.arch }} coverage=${{ parameters.coverage }} sanitize=${{ parameters.sanitize }}"
       displayName: 'Configure'
 
     - ${{ if eq(parameters.mode, 'debug') }}:
