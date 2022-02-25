@@ -17,10 +17,10 @@ SRC_$(d) := \
     $(d)/Catch2/src/catch2/interfaces/catch_interfaces_combined_tu.cpp \
     $(d)/Catch2/src/catch2/interfaces/catch_interfaces_reporter.cpp \
     $(d)/Catch2/src/catch2/internal/catch_assertion_handler.cpp \
+    $(d)/Catch2/src/catch2/internal/catch_case_insensitive_comparisons.cpp \
     $(d)/Catch2/src/catch2/internal/catch_clara.cpp \
     $(d)/Catch2/src/catch2/internal/catch_combined_tu.cpp \
     $(d)/Catch2/src/catch2/internal/catch_commandline.cpp \
-    $(d)/Catch2/src/catch2/internal/catch_common.cpp \
     $(d)/Catch2/src/catch2/internal/catch_console_colour.cpp \
     $(d)/Catch2/src/catch2/internal/catch_context.cpp \
     $(d)/Catch2/src/catch2/internal/catch_debug_console.cpp \
@@ -29,14 +29,17 @@ SRC_$(d) := \
     $(d)/Catch2/src/catch2/internal/catch_enum_values_registry.cpp \
     $(d)/Catch2/src/catch2/internal/catch_exception_translator_registry.cpp \
     $(d)/Catch2/src/catch2/internal/catch_fatal_condition_handler.cpp \
+    $(d)/Catch2/src/catch2/internal/catch_floating_point_helpers.cpp \
     $(d)/Catch2/src/catch2/internal/catch_list.cpp \
     $(d)/Catch2/src/catch2/internal/catch_output_redirect.cpp \
     $(d)/Catch2/src/catch2/internal/catch_random_number_generator.cpp \
+    $(d)/Catch2/src/catch2/internal/catch_random_seed_generation.cpp \
     $(d)/Catch2/src/catch2/internal/catch_reporter_registry.cpp \
     $(d)/Catch2/src/catch2/internal/catch_result_type.cpp \
     $(d)/Catch2/src/catch2/internal/catch_run_context.cpp \
     $(d)/Catch2/src/catch2/internal/catch_section.cpp \
     $(d)/Catch2/src/catch2/internal/catch_singletons.cpp \
+    $(d)/Catch2/src/catch2/internal/catch_source_line_info.cpp \
     $(d)/Catch2/src/catch2/internal/catch_stream.cpp \
     $(d)/Catch2/src/catch2/internal/catch_string_manip.cpp \
     $(d)/Catch2/src/catch2/internal/catch_stringref.cpp \
@@ -48,7 +51,7 @@ SRC_$(d) := \
     $(d)/Catch2/src/catch2/internal/catch_textflow.cpp \
     $(d)/Catch2/src/catch2/internal/catch_wildcard_pattern.cpp \
     $(d)/Catch2/src/catch2/internal/catch_xmlwriter.cpp \
-    $(d)/Catch2/src/catch2/matchers/catch_matchers_floating.cpp \
+    $(d)/Catch2/src/catch2/matchers/catch_matchers_floating_point.cpp \
     $(d)/Catch2/src/catch2/matchers/catch_matchers_string.cpp \
     $(d)/Catch2/src/catch2/matchers/catch_matchers_templated.cpp \
     $(d)/Catch2/src/catch2/matchers/internal/catch_matchers_combined_tu.cpp \
@@ -66,6 +69,4 @@ SRC_$(d) := \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_xml.cpp
 
 CXXFLAGS_$(d) += \
-    -Wno-float-equal \
-    -Wno-sign-conversion \
-    -Wno-unused-variable
+    -Wno-sign-conversion

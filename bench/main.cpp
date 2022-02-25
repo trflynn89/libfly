@@ -4,14 +4,9 @@
 #include "fly/logger/styler.hpp"
 #include "fly/types/string/string.hpp"
 
-//clang-format off
-// Due to a missing #include in catch_reporter_registrars.hpp, this must be included first.
-#include "catch2/interfaces/catch_interfaces_reporter.hpp"
-//clang-format on
-
-#include "catch2/catch_reporter_registrars.hpp"
 #include "catch2/catch_session.hpp"
 #include "catch2/catch_test_case_info.hpp"
+#include "catch2/reporters/catch_reporter_registrars.hpp"
 #include "catch2/reporters/catch_reporter_streaming_base.hpp"
 
 #include <string>
@@ -50,19 +45,18 @@ public:
         return "Catch2 silent reporter for libfly benchmarking";
     }
 
-    void assertionStarting(const Catch::AssertionInfo &) final
+    void assertionStarting(const Catch::AssertionInfo &) override
     {
     }
 
-    bool assertionEnded(const Catch::AssertionStats &) final
+    void assertionEnded(const Catch::AssertionStats &) override
     {
-        return true;
     }
 
     void testCaseStarting(const Catch::TestCaseInfo &info) override
     {
         const auto style = fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Cyan);
-        stream << style << fly::String::format("[{:=>13}{}{:=<13}]\n\n", ' ', info.name, ' ');
+        m_stream << style << fly::String::format("[{:=>13}{}{:=<13}]\n\n", ' ', info.name, ' ');
     }
 };
 
