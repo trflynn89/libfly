@@ -139,9 +139,6 @@
     <ClInclude Include="..\..\..\fly\logger\detail\file_sink.hpp">
       <Filter>logger\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\fly\logger\detail\logger_macros.hpp">
-      <Filter>logger\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\fly\logger\detail\registry.hpp">
       <Filter>logger\detail</Filter>
     </ClInclude>
