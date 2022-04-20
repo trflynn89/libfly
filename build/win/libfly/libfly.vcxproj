@@ -106,6 +106,7 @@
       <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -120,6 +121,7 @@
       <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -135,6 +137,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PreprocessorDefinitions>NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -155,6 +158,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PreprocessorDefinitions>NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
