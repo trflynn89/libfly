@@ -13,16 +13,11 @@
 /**
  * Wrapper logging macros to format logs with socket handles in a consistent manner.
  */
-#define SLOGD(handle, ...)                                                                         \
-    LOGD("[{}] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
-#define SLOGI(handle, ...)                                                                         \
-    LOGI("[{}] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
-#define SLOGW(handle, ...)                                                                         \
-    LOGW("[{}] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
-#define SLOGS(handle, ...)                                                                         \
-    LOGS("[{}] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
-#define SLOGE(handle, ...)                                                                         \
-    LOGE("[{}] " FLY_FORMAT_STRING(__VA_ARGS__), handle FLY_FORMAT_ARGS(__VA_ARGS__))
+#define SLOGD(handle, format, ...) LOGD("[{}] " format, handle __VA_OPT__(, ) __VA_ARGS__)
+#define SLOGI(handle, format, ...) LOGI("[{}] " format, handle __VA_OPT__(, ) __VA_ARGS__)
+#define SLOGW(handle, format, ...) LOGW("[{}] " format, handle __VA_OPT__(, ) __VA_ARGS__)
+#define SLOGS(handle, format, ...) LOGS("[{}] " format, handle __VA_OPT__(, ) __VA_ARGS__)
+#define SLOGE(handle, format, ...) LOGE("[{}] " format, handle __VA_OPT__(, ) __VA_ARGS__)
 
 namespace fly::net {
 

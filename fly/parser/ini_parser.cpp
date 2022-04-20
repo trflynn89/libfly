@@ -7,8 +7,7 @@
 
 namespace fly::parser {
 
-#define ILOG(...)                                                                                  \
-    LOGW("[line {}]: " FLY_FORMAT_STRING(__VA_ARGS__), line() FLY_FORMAT_ARGS(__VA_ARGS__));
+#define ILOG(format, ...) LOGW("[line {}]: " format, line() __VA_OPT__(, ) __VA_ARGS__)
 
 //==================================================================================================
 std::optional<fly::Json> IniParser::parse_internal()

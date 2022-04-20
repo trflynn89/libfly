@@ -1,6 +1,5 @@
 #pragma once
 
-#include "fly/logger/detail/logger_macros.hpp"
 #include "fly/logger/log.hpp"
 #include "fly/system/system.hpp"
 #include "fly/types/string/string.hpp"
@@ -21,12 +20,12 @@
  *   LOGD("This is a message");
  *   LOGD("This is message number {:d}", 10);
  */
-#define LOGD(...)                                                                                  \
+#define LOGD(format, ...)                                                                          \
     do                                                                                             \
     {                                                                                              \
         fly::logger::Logger::get_default_logger()->debug(                                          \
             {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
-            FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
+            format __VA_OPT__(, ) __VA_ARGS__);                                                    \
     } while (0)
 
 /**
@@ -38,12 +37,12 @@
  *   LOGI("This is a message");
  *   LOGI("This is message number {:d}", 10);
  */
-#define LOGI(...)                                                                                  \
+#define LOGI(format, ...)                                                                          \
     do                                                                                             \
     {                                                                                              \
         fly::logger::Logger::get_default_logger()->info(                                           \
             {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
-            FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
+            format __VA_OPT__(, ) __VA_ARGS__);                                                    \
     } while (0)
 
 /**
@@ -55,12 +54,12 @@
  *   LOGW("This is a message");
  *   LOGW("This is message number {:d}", 10);
  */
-#define LOGW(...)                                                                                  \
+#define LOGW(format, ...)                                                                          \
     do                                                                                             \
     {                                                                                              \
         fly::logger::Logger::get_default_logger()->warn(                                           \
             {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
-            FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
+            format __VA_OPT__(, ) __VA_ARGS__);                                                    \
     } while (0)
 
 /**
@@ -73,12 +72,12 @@
  *   LOGS("This is a message");
  *   LOGS("This is message number {:d}", 10);
  */
-#define LOGS(...)                                                                                  \
+#define LOGS(format, ...)                                                                          \
     do                                                                                             \
     {                                                                                              \
         fly::logger::Logger::get_default_logger()->warn(                                           \
             {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
-            FLY_FORMAT_STRING(__VA_ARGS__) ": {}" FLY_FORMAT_ARGS(__VA_ARGS__),                    \
+            format ": {}" __VA_OPT__(, ) __VA_ARGS__,                                              \
             fly::system::get_error_string());                                                      \
     } while (0)
 
@@ -91,12 +90,12 @@
  *   LOGE("This is a message");
  *   LOGE("This is message number {:d}", 10);
  */
-#define LOGE(...)                                                                                  \
+#define LOGE(format, ...)                                                                          \
     do                                                                                             \
     {                                                                                              \
         fly::logger::Logger::get_default_logger()->error(                                          \
             {__FILE__, __FUNCTION__, static_cast<std::uint32_t>(__LINE__)},                        \
-            FLY_FORMAT_STRING(__VA_ARGS__) FLY_FORMAT_ARGS(__VA_ARGS__));                          \
+            format __VA_OPT__(, ) __VA_ARGS__);                                                    \
     } while (0)
 
 namespace fly::coders {
