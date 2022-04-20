@@ -5,11 +5,8 @@
 
 namespace fly::parser {
 
-#define JLOG(...)                                                                                  \
-    LOGW(                                                                                          \
-        "[line {}, column {}]: " FLY_FORMAT_STRING(__VA_ARGS__),                                   \
-        line(),                                                                                    \
-        column() FLY_FORMAT_ARGS(__VA_ARGS__));
+#define JLOG(format, ...)                                                                          \
+    LOGW("[line {}, column {}]: " format, line(), column() __VA_OPT__(, ) __VA_ARGS__)
 
 namespace {
 
