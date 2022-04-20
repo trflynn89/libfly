@@ -180,7 +180,6 @@
     <ClInclude Include="..\..\..\fly\config\config_manager.hpp" />
     <ClInclude Include="..\..\..\fly\logger\detail\console_sink.hpp" />
     <ClInclude Include="..\..\..\fly\logger\detail\file_sink.hpp" />
-    <ClInclude Include="..\..\..\fly\logger\detail\logger_macros.hpp" />
     <ClInclude Include="..\..\..\fly\logger\detail\registry.hpp" />
     <ClInclude Include="..\..\..\fly\logger\detail\styler_proxy.hpp" />
     <ClInclude Include="..\..\..\fly\logger\detail\win\styler_proxy_impl.hpp" />
