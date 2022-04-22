@@ -25,7 +25,7 @@ jobs:
         mode: ${{ parameters.mode }}
 
     - script: |
-        echo "##vso[task.setvariable variable=config]mode=${{ parameters.mode }} sanitize=${{ parameters.sanitize }} XCODE=/Applications/Xcode_13.0.app/Contents/Developer"
+        echo "##vso[task.setvariable variable=config]mode=${{ parameters.mode }} sanitize=${{ parameters.sanitize }}"
       displayName: 'Configure'
 
     - ${{ if eq(parameters.mode, 'debug') }}:
