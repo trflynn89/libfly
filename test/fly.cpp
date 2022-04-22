@@ -3,6 +3,7 @@
 #include "catch2/catch_test_macros.hpp"
 
 #include <string>
+#include <version>
 
 CATCH_TEST_CASE("Fly", "[fly]")
 {
@@ -71,17 +72,20 @@ CATCH_TEST_CASE("Fly", "[fly]")
 
     CATCH_SECTION("Language feature helpers")
     {
-#if defined(__clang__)
+#if defined(__cpp_consteval)
+#    if defined(_MSC_VER)
         CATCH_CHECK_FALSE(fly::supports_consteval());
-        CATCH_CHECK_FALSE(fly::supports_floating_point_charconv());
-#elif defined(__GNUC__)
+#    else
         CATCH_CHECK(fly::supports_consteval());
-        CATCH_CHECK(fly::supports_floating_point_charconv());
-#elif defined(_MSC_VER)
+#    endif
+#else
         CATCH_CHECK_FALSE(fly::supports_consteval());
+#endif
+
+#if defined(__cpp_lib_to_chars)
         CATCH_CHECK(fly::supports_floating_point_charconv());
 #else
-        static_assert(false, "Unknown compiler");
+        CATCH_CHECK_FALSE(fly::supports_floating_point_charconv());
 #endif
     }
 }
