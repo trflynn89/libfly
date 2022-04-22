@@ -169,11 +169,11 @@ public:
     using difference_type = std::ptrdiff_t;
     using allocator_type = std::allocator<value_type>;
     using reference = value_type &;
-    using const_reference = const value_type &;
+    using const_reference = value_type const &;
     using pointer = typename std::allocator_traits<allocator_type>::pointer;
     using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
     using iterator = detail::JsonIterator<Json>;
-    using const_iterator = detail::JsonIterator<const Json>;
+    using const_iterator = detail::JsonIterator<Json const>;
     using reverse_iterator = detail::JsonReverseIterator<iterator>;
     using const_reverse_iterator = detail::JsonReverseIterator<const_iterator>;
 
@@ -919,7 +919,7 @@ public:
      * @throws JsonException If the Json instance is not an object or the key value is invalid.
      */
     template <JsonStringLike Key>
-    std::pair<iterator, bool> insert(Key key, const Json &value);
+    std::pair<iterator, bool> insert(Key key, Json const &value);
 
     /**
      * Insert a moved key-value pair into the Json instance. Only valid if the Json instance is an
@@ -965,7 +965,7 @@ public:
      * @throws JsonException If the Json instance is not an array or the provided position is not
      *         for this Json instance.
      */
-    iterator insert(const_iterator position, const Json &value);
+    iterator insert(const_iterator position, Json const &value);
 
     /**
      * Insert a moved Json value into the Json instance before the provided position. Only valid if
@@ -994,7 +994,7 @@ public:
      * @throws JsonException If the Json instance is not an array or the provided position is not
      *         for this Json instance.
      */
-    iterator insert(const_iterator position, size_type count, const Json &value);
+    iterator insert(const_iterator position, size_type count, Json const &value);
 
     /**
      * Insert all values into the Json instance in the range [first, last) before the provided
@@ -1094,7 +1094,7 @@ public:
      *
      * @throws JsonException If the Json instance is neither an array nor null.
      */
-    void push_back(const Json &value);
+    void push_back(Json const &value);
 
     /**
      * Append a moved Json value to the end of the Json instance. Only valid if the Json instance is
@@ -1486,7 +1486,7 @@ private:
     static void write_escaped_character(
         json_string_type &output,
         json_string_type::const_iterator &it,
-        const json_string_type::const_iterator &end);
+        json_string_type::const_iterator const &end);
 
     /**
      * Helper trait to determine the return type of an object insertion method. If that method
@@ -1546,7 +1546,7 @@ private:
      * @throws JsonException If this Json instance does not hold the provided type.
      */
     template <typename T>
-    T &get(const char *error_message);
+    T &get(char const *error_message);
 
     /**
      * Retrieve a reference to the Json instance's underlying storage if it holds the provided type.
@@ -1562,7 +1562,7 @@ private:
      * @throws JsonException If this Json instance holds neither the provided type nor null.
      */
     template <typename T>
-    T &get_or_promote(const char *error_message);
+    T &get_or_promote(char const *error_message);
 
     /**
      * Retrieve a reference to the Json instance's underlying storage if it holds the provided type.
@@ -1577,20 +1577,22 @@ private:
      * @throws JsonException If this Json instance does not hold the provided type.
      */
     template <typename T>
-    const T &get(const char *error_message) const;
+    T const &get(char const *error_message) const;
 
     json_type m_value {nullptr};
 };
 
 //==================================================================================================
 template <JsonStringLike T>
-Json::Json(T value) noexcept(false) : m_value(convert_to_string(std::move(value)))
+Json::Json(T value) noexcept(false) :
+    m_value(convert_to_string(std::move(value)))
 {
 }
 
 //==================================================================================================
 template <JsonObject T>
-Json::Json(T value) noexcept(false) : m_value(json_object_type())
+Json::Json(T value) noexcept(false) :
+    m_value(json_object_type())
 {
     for (auto &it : value)
     {
@@ -1600,7 +1602,8 @@ Json::Json(T value) noexcept(false) : m_value(json_object_type())
 
 //==================================================================================================
 template <JsonArray T>
-Json::Json(T value) noexcept(false) : m_value(json_array_type())
+Json::Json(T value) noexcept(false) :
+    m_value(json_array_type())
 {
     reserve(detail::json_array_size(value));
 
@@ -1612,25 +1615,29 @@ Json::Json(T value) noexcept(false) : m_value(json_array_type())
 
 //==================================================================================================
 template <JsonBoolean T>
-Json::Json(T value) noexcept : m_value(static_cast<json_boolean_type>(value))
+Json::Json(T value) noexcept :
+    m_value(static_cast<json_boolean_type>(value))
 {
 }
 
 //==================================================================================================
 template <JsonSignedInteger T>
-Json::Json(T value) noexcept : m_value(static_cast<json_signed_integer_type>(value))
+Json::Json(T value) noexcept :
+    m_value(static_cast<json_signed_integer_type>(value))
 {
 }
 
 //==================================================================================================
 template <JsonUnsignedInteger T>
-Json::Json(T value) noexcept : m_value(static_cast<json_unsigned_integer_type>(value))
+Json::Json(T value) noexcept :
+    m_value(static_cast<json_unsigned_integer_type>(value))
 {
 }
 
 //==================================================================================================
 template <JsonFloatingPoint T>
-Json::Json(T value) noexcept : m_value(static_cast<json_floating_point_type>(value))
+Json::Json(T value) noexcept :
+    m_value(static_cast<json_floating_point_type>(value))
 {
 }
 
@@ -1638,7 +1645,7 @@ Json::Json(T value) noexcept : m_value(static_cast<json_floating_point_type>(val
 template <JsonString T>
 Json::operator T() const &noexcept(false)
 {
-    auto visitor = [this](const auto &storage) -> T {
+    auto visitor = [this](auto const &storage) -> T {
         using S = decltype(storage);
 
         if constexpr (JsonString<S>)
@@ -1672,10 +1679,10 @@ Json::operator T() const &noexcept(false)
 template <JsonObject T>
 Json::operator T() const &noexcept(false)
 {
-    const auto &storage = get<json_object_type>("JSON type is not an object");
+    auto const &storage = get<json_object_type>("JSON type is not an object");
     T result;
 
-    for (const auto &it : storage)
+    for (auto const &it : storage)
     {
         // The JSON string will have been validated for Unicode compliance during construction.
         auto key = *std::move(JsonStringType::convert<typename T::key_type>(it.first));
@@ -1689,10 +1696,10 @@ Json::operator T() const &noexcept(false)
 template <JsonArray T>
 Json::operator T() const &noexcept(false)
 {
-    const auto &storage = get<json_array_type>("JSON type is not an array");
+    auto const &storage = get<json_array_type>("JSON type is not an array");
     T result {};
 
-    for (const auto &it : storage)
+    for (auto const &it : storage)
     {
         auto copy = static_cast<typename T::value_type>(it);
         detail::json_array_append(result, std::move(copy));
@@ -1705,7 +1712,7 @@ Json::operator T() const &noexcept(false)
 template <typename T, std::size_t N>
 Json::operator std::array<T, N>() const noexcept(false)
 {
-    const auto &storage = get<json_array_type>("JSON type is not an array");
+    auto const &storage = get<json_array_type>("JSON type is not an array");
     std::array<T, N> result {};
 
     for (std::size_t i = 0; i < std::min(N, storage.size()); ++i)
@@ -1720,7 +1727,7 @@ Json::operator std::array<T, N>() const noexcept(false)
 template <JsonBoolean T>
 Json::operator T() const noexcept
 {
-    auto visitor = [](const auto &storage) noexcept -> T {
+    auto visitor = [](auto const &storage) noexcept -> T {
         using S = decltype(storage);
 
         if constexpr (JsonContainer<S>)
@@ -1748,7 +1755,7 @@ Json::operator T() const noexcept
 template <JsonNumber T>
 Json::operator T() const noexcept(false)
 {
-    auto visitor = [this](const auto &storage) -> T {
+    auto visitor = [this](auto const &storage) -> T {
         using S = decltype(storage);
 
         if constexpr (JsonString<S>)
@@ -1788,8 +1795,8 @@ Json::reference Json::at(T key)
 template <JsonStringLike T>
 Json::const_reference Json::at(T key) const
 {
-    const auto &storage = get<json_object_type>("JSON type invalid for operator[key]");
-    const auto it = storage.find(convert_to_string(std::move(key)));
+    auto const &storage = get<json_object_type>("JSON type invalid for operator[key]");
+    auto const it = storage.find(convert_to_string(std::move(key)));
 
     if (it == storage.end())
     {
@@ -1816,7 +1823,7 @@ Json::const_reference Json::operator[](T key) const
 
 //==================================================================================================
 template <JsonStringLike Key>
-std::pair<Json::iterator, bool> Json::insert(Key key, const Json &value)
+std::pair<Json::iterator, bool> Json::insert(Key key, Json const &value)
 {
     return object_inserter(std::make_pair(convert_to_string(std::move(key)), value));
 }
@@ -1958,7 +1965,7 @@ void Json::merge(T &&other)
 template <JsonStringLike T>
 Json::size_type Json::count(T key) const
 {
-    const auto &storage = get<json_object_type>("JSON type invalid for count(key)");
+    auto const &storage = get<json_object_type>("JSON type invalid for count(key)");
     return storage.count(convert_to_string(std::move(key)));
 }
 
@@ -1978,7 +1985,7 @@ Json::iterator Json::find(T key)
 template <JsonStringLike T>
 Json::const_iterator Json::find(T key) const
 {
-    const auto &storage = get<json_object_type>("JSON type invalid for find(key)");
+    auto const &storage = get<json_object_type>("JSON type invalid for find(key)");
 
     auto it = cend();
     it.m_iterator = storage.find(convert_to_string(std::move(key)));
@@ -1990,7 +1997,7 @@ Json::const_iterator Json::find(T key) const
 template <JsonStringLike T>
 bool Json::contains(T key) const
 {
-    const auto &storage = get<json_object_type>("JSON type invalid for contains(key)");
+    auto const &storage = get<json_object_type>("JSON type invalid for contains(key)");
     return storage.contains(convert_to_string(std::move(key)));
 }
 
@@ -2050,7 +2057,7 @@ Json::iterator Json::array_inserter(const_iterator position, Args &&...args)
         throw JsonException("Provided iterator is for a different Json instance");
     }
 
-    const auto &position_iterator =
+    auto const &position_iterator =
         std::get<typename const_iterator::array_iterator_type>(position.m_iterator);
 
     auto it = end();
@@ -2061,7 +2068,7 @@ Json::iterator Json::array_inserter(const_iterator position, Args &&...args)
 
 //==================================================================================================
 template <typename T>
-inline T &Json::get(const char *error_message)
+inline T &Json::get(char const *error_message)
 {
     auto *storage = std::get_if<T>(&m_value);
 
@@ -2075,7 +2082,7 @@ inline T &Json::get(const char *error_message)
 
 //==================================================================================================
 template <typename T>
-inline T &Json::get_or_promote(const char *error_message)
+inline T &Json::get_or_promote(char const *error_message)
 {
     auto *storage = std::get_if<T>(&m_value);
 
@@ -2094,9 +2101,9 @@ inline T &Json::get_or_promote(const char *error_message)
 
 //==================================================================================================
 template <typename T>
-inline const T &Json::get(const char *error_message) const
+inline T const &Json::get(char const *error_message) const
 {
-    const auto *storage = std::get_if<T>(&m_value);
+    auto const *storage = std::get_if<T>(&m_value);
 
     if (storage == nullptr)
     {
@@ -2124,7 +2131,7 @@ struct fly::Formatter<fly::Json, CharType> :
      * @param context The context holding the formatting state.
      */
     template <typename FormatContext>
-    void format(const fly::Json &json, FormatContext &context)
+    void format(fly::Json const &json, FormatContext &context)
     {
         if constexpr (fly::SameAs<CharType, fly::json_char_type>)
         {
@@ -2151,11 +2158,11 @@ struct std::hash<fly::Json>
      *
      * @return The hashed JSON value.
      */
-    std::size_t operator()(const fly::Json &json) const
+    std::size_t operator()(fly::Json const &json) const
     {
         std::size_t type = json.m_value.index();
 
-        auto visitor = [type](const auto &storage) -> std::size_t {
+        auto visitor = [type](auto const &storage) -> std::size_t {
             using S = decltype(storage);
 
             if constexpr (fly::JsonNull<S>)
@@ -2168,7 +2175,7 @@ struct std::hash<fly::Json>
                 std::hash<typename fly::json_object_type::mapped_type> value_hasher {};
                 std::size_t result = hash_combine(type, storage.size());
 
-                for (const auto &value : storage)
+                for (auto const &value : storage)
                 {
                     result = hash_combine(result, key_hasher(value.first));
                     result = hash_combine(result, value_hasher(value.second));
@@ -2181,7 +2188,7 @@ struct std::hash<fly::Json>
                 std::hash<typename fly::json_array_type::value_type> hasher {};
                 std::size_t result = hash_combine(type, storage.size());
 
-                for (const auto &value : storage)
+                for (auto const &value : storage)
                 {
                     result = hash_combine(result, hasher(value));
                 }

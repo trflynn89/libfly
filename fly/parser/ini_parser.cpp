@@ -40,7 +40,7 @@ std::optional<fly::Json> IniParser::parse_internal()
                         auto it = values.insert_or_assign(*std::move(section), json_object_type());
                         current = it.first;
                     }
-                    catch (const JsonException &ex)
+                    catch (JsonException const &ex)
                     {
                         ILOG("{}", ex.what());
                         return std::nullopt;
@@ -67,7 +67,7 @@ std::optional<fly::Json> IniParser::parse_internal()
                             std::move(value->first),
                             std::move(value->second));
                     }
-                    catch (const JsonException &ex)
+                    catch (JsonException const &ex)
                     {
                         ILOG("{}", ex.what());
                         return std::nullopt;
@@ -88,7 +88,7 @@ std::optional<fly::Json> IniParser::parse_internal()
 //==================================================================================================
 bool IniParser::getline(std::string &result)
 {
-    static constexpr const int s_new_line = 0x0a;
+    static constexpr int const s_new_line = 0x0a;
 
     result.clear();
     int ch;
@@ -118,7 +118,7 @@ std::optional<std::string> IniParser::on_section(std::string &section)
 
 //==================================================================================================
 std::optional<std::pair<std::string, std::string>>
-IniParser::on_name_value_pair(const std::string &name_value)
+IniParser::on_name_value_pair(std::string const &name_value)
 {
     static constexpr std::uint32_t s_size = 2;
 

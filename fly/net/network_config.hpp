@@ -16,7 +16,7 @@ namespace fly::net {
 class NetworkConfig : public fly::config::Config
 {
 public:
-    static constexpr const char *identifier = "network";
+    static constexpr char const *identifier = "network";
 
     /**
      * @return Sleep time for socket polling sequence.

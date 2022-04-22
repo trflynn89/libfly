@@ -27,10 +27,10 @@ struct MonoState
 template <typename FormatContext>
 struct UserDefinedValue
 {
-    const void *m_value;
+    void const *m_value;
 
     void (*m_format)(
-        const void *value,
+        void const *value,
         BasicFormatParseContext<typename FormatContext::char_type> &,
         FormatContext &context,
         BasicFormatSpecifier<typename FormatContext::char_type> &&specifier);
@@ -43,11 +43,11 @@ struct UserDefinedValue
 template <typename FormatContext>
 struct StringValue
 {
-    const void *m_value;
+    void const *m_value;
     std::size_t m_size;
 
     void (*m_format)(
-        const void *value,
+        void const *value,
         std::size_t size,
         FormatContext &context,
         BasicFormatSpecifier<typename FormatContext::char_type> &&specifier);
@@ -61,7 +61,7 @@ struct StandardValue
 {
     union
     {
-        const void *m_pointer;
+        void const *m_pointer;
         std::int64_t m_signed_int;
         std::uint64_t m_unsigned_int;
         float m_float;
@@ -89,7 +89,7 @@ struct StandardValue
  */
 template <typename FormatContext, typename T>
 void format_user_defined_value(
-    const void *value,
+    void const *value,
     BasicFormatParseContext<typename FormatContext::char_type> &parse_context,
     FormatContext &context,
     BasicFormatSpecifier<typename FormatContext::char_type> &&specifier);
@@ -107,7 +107,7 @@ void format_user_defined_value(
  */
 template <typename FormatContext, typename T>
 void format_string_value(
-    const void *value,
+    void const *value,
     std::size_t size,
     FormatContext &context,
     BasicFormatSpecifier<typename FormatContext::char_type> &&specifier);
@@ -153,7 +153,7 @@ public:
      * @param value The user-defined value.
      */
     template <fly::FormattableUserDefined T>
-    explicit constexpr BasicFormatParameter(const T &value) noexcept;
+    explicit constexpr BasicFormatParameter(T const &value) noexcept;
 
     /**
      * Constructor. Initialize the format parameter to store a type-erased string from any
@@ -164,7 +164,7 @@ public:
      * @param value The string-like value.
      */
     template <fly::FormattableString T>
-    explicit constexpr BasicFormatParameter(const T &value) noexcept;
+    explicit constexpr BasicFormatParameter(T const &value) noexcept;
 
     /**
      * Constructor. Initialize the format parameter to store a pointer value.
@@ -282,7 +282,7 @@ public:
 private:
     friend FormatContext;
 
-    const std::array<FormatParameter, sizeof...(ParameterTypes)> m_parameters;
+    std::array<FormatParameter, sizeof...(ParameterTypes)> const m_parameters;
 };
 
 /**
@@ -303,7 +303,7 @@ constexpr auto make_format_parameters(ParameterTypes &&...parameters)
 //==================================================================================================
 template <typename FormatContext, typename T>
 inline void format_user_defined_value(
-    const void *value,
+    void const *value,
     BasicFormatParseContext<typename FormatContext::char_type> &parse_context,
     FormatContext &context,
     BasicFormatSpecifier<typename FormatContext::char_type> &&specifier)
@@ -328,13 +328,13 @@ inline void format_user_defined_value(
         }
     }
 
-    formatter.format(*static_cast<const T *>(value), context);
+    formatter.format(*static_cast<T const *>(value), context);
 }
 
 //==================================================================================================
 template <typename FormatContext, typename T>
 inline void format_string_value(
-    const void *value,
+    void const *value,
     std::size_t size,
     FormatContext &context,
     BasicFormatSpecifier<typename FormatContext::char_type> &&specifier)
@@ -343,7 +343,7 @@ inline void format_string_value(
 
     typename FormatContext::template formatter_type<view_type> formatter(std::move(specifier));
 
-    view_type view(static_cast<const T *>(value), size);
+    view_type view(static_cast<T const *>(value), size);
     formatter.format(view, context);
 }
 
@@ -408,7 +408,7 @@ constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter() noexcept :
 //==================================================================================================
 template <typename FormatContext>
 template <fly::FormattableUserDefined T>
-constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &value) noexcept :
+constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(T const &value) noexcept :
     m_type(Type::UserDefined),
     m_value {.m_user_defined {&value, format_user_defined_value<FormatContext, T>}}
 {
@@ -417,7 +417,7 @@ constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &val
 //==================================================================================================
 template <typename FormatContext>
 template <fly::FormattableString T>
-constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &value) noexcept :
+constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(T const &value) noexcept :
     m_type(Type::String)
 {
     using U = std::remove_cvref_t<T>;
@@ -437,7 +437,7 @@ constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(const T &val
     }
 
     m_value.m_string = {
-        static_cast<const void *>(view.data()),
+        static_cast<void const *>(view.data()),
         view.size(),
         format_string_value<FormatContext, standard_character_type>};
 }

@@ -21,10 +21,10 @@ CATCH_TEST_CASE("BitStream", "[bit_stream]")
     };
 
     auto verify_header = [&output_stream](fly::byte_type expected_remainder) {
-        const std::string buffer = output_stream.str();
+        std::string const buffer = output_stream.str();
         CATCH_REQUIRE_FALSE(buffer.empty());
 
-        const fly::byte_type header = static_cast<fly::byte_type>(buffer[0]);
+        fly::byte_type const header = static_cast<fly::byte_type>(buffer[0]);
 
         fly::byte_type magic = (header >> fly::detail::s_magic_shift) & fly::detail::s_magic_mask;
         fly::byte_type remainder =

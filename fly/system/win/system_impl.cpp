@@ -11,7 +11,7 @@ namespace fly::system {
 void print_backtrace()
 {
     void *trace[10];
-    const USHORT trace_size = ::CaptureStackBackTrace(0, 10, trace, nullptr);
+    USHORT const trace_size = ::CaptureStackBackTrace(0, 10, trace, nullptr);
 
     for (USHORT i = 0; i < trace_size; ++i)
     {

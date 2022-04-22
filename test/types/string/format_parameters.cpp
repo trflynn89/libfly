@@ -24,7 +24,7 @@ template <typename CharType>
 struct fly::Formatter<UserDefinedType, CharType>
 {
     template <typename FormatContext>
-    void format(const UserDefinedType &, FormatContext &)
+    void format(UserDefinedType const &, FormatContext &)
     {
     }
 };
@@ -114,7 +114,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("String values are type-erased")
     {
-        const auto &arr = FLY_ARR(char_type, "str");
+        auto const &arr = FLY_ARR(char_type, "str");
         string_type str(FLY_STR(char_type, "str"));
 
         auto verify = [&str](auto value) {
@@ -122,7 +122,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
             if constexpr (std::is_same_v<decltype(value), StringValue>)
             {
-                view_type view(static_cast<const char_type *>(value.m_value), value.m_size);
+                view_type view(static_cast<char_type const *>(value.m_value), value.m_size);
                 CATCH_CHECK(view == str);
                 CATCH_CHECK(value.m_format != nullptr);
             }
@@ -144,7 +144,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
         std::nullptr_t p1 = nullptr;
         void *p2 = &i;
-        const void *p3 = &i;
+        void const *p3 = &i;
 
         auto params = fly::detail::make_format_parameters<FormatContext>(p1, p2, p3);
         FormatContext context(out, params);

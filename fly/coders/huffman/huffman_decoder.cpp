@@ -11,7 +11,9 @@ using namespace fly::literals::numeric_literals;
 namespace fly::coders {
 
 //==================================================================================================
-HuffmanDecoder::HuffmanDecoder() noexcept : m_huffman_codes_size(0), m_max_code_length(0)
+HuffmanDecoder::HuffmanDecoder() noexcept :
+    m_huffman_codes_size(0),
+    m_max_code_length(0)
 {
 }
 
@@ -185,9 +187,9 @@ bool HuffmanDecoder::decode_codes(fly::BitStreamReader &encoded, length_type &ma
             // enough to maintain the right code length.
             if (m_huffman_codes_size != 0)
             {
-                const HuffmanCode &last = m_huffman_codes[m_huffman_codes_size - 1_u16];
+                HuffmanCode const &last = m_huffman_codes[m_huffman_codes_size - 1_u16];
 
-                const length_type shift = length - last.m_length;
+                length_type const shift = length - last.m_length;
                 code = (last.m_code + 1) << shift;
             }
 
@@ -211,12 +213,12 @@ void HuffmanDecoder::convert_to_prefix_table(length_type max_code_length)
 {
     for (std::uint16_t i = 0; i < m_huffman_codes_size; ++i)
     {
-        const HuffmanCode code = std::move(m_huffman_codes[i]);
-        const length_type shift = max_code_length - code.m_length;
+        HuffmanCode const code = std::move(m_huffman_codes[i]);
+        length_type const shift = max_code_length - code.m_length;
 
         for (code_type j = 0; j < (1_u16 << shift); ++j)
         {
-            const code_type index = (code.m_code << shift) + j;
+            code_type const index = (code.m_code << shift) + j;
             m_prefix_table[index].m_symbol = code.m_symbol;
             m_prefix_table[index].m_length = code.m_length;
         }
@@ -235,7 +237,7 @@ bool HuffmanDecoder::decode_symbols(
 
     while ((bytes < chunk_size) && (encoded.peek_bits(prefix, max_code_length) != 0))
     {
-        const HuffmanCode &code = m_prefix_table[prefix];
+        HuffmanCode const &code = m_prefix_table[prefix];
 
         m_chunk_buffer[bytes++] = code.m_symbol;
         encoded.discard_bits(code.m_length);
@@ -244,7 +246,7 @@ bool HuffmanDecoder::decode_symbols(
     if (bytes > 0)
     {
         decoded.write(
-            reinterpret_cast<const std::ios::char_type *>(m_chunk_buffer.get()),
+            reinterpret_cast<std::ios::char_type const *>(m_chunk_buffer.get()),
             static_cast<std::streamsize>(bytes));
     }
 

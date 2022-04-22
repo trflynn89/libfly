@@ -68,7 +68,7 @@ private:
     std::shared_ptr<fly::logger::LoggerConfig> m_logger_config;
     std::shared_ptr<fly::coders::CoderConfig> m_coder_config;
 
-    const std::filesystem::path m_log_directory;
+    std::filesystem::path const m_log_directory;
     std::filesystem::path m_log_file;
     std::ofstream m_log_stream;
     std::uint32_t m_log_index {0};

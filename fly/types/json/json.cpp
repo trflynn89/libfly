@@ -10,23 +10,27 @@
 namespace fly {
 
 //==================================================================================================
-Json::Json(json_null_type value) noexcept : m_value(value)
+Json::Json(json_null_type value) noexcept :
+    m_value(value)
 {
 }
 
 //==================================================================================================
-Json::Json(const_reference json) noexcept : m_value(json.m_value)
+Json::Json(const_reference json) noexcept :
+    m_value(json.m_value)
 {
 }
 
 //==================================================================================================
-Json::Json(Json &&json) noexcept : m_value(std::move(json.m_value))
+Json::Json(Json &&json) noexcept :
+    m_value(std::move(json.m_value))
 {
     json.m_value = nullptr;
 }
 
 //==================================================================================================
-Json::Json(std::initializer_list<Json> initializer) noexcept : m_value()
+Json::Json(std::initializer_list<Json> initializer) noexcept :
+    m_value()
 {
     auto object_test = [](const_reference json) {
         return json.is_object_like();
@@ -65,8 +69,8 @@ json_string_type Json::serialize() const
 {
     json_string_type serialized;
 
-    auto serialize_string = [&serialized](const json_string_type &value) {
-        const auto end = value.cend();
+    auto serialize_string = [&serialized](json_string_type const &value) {
+        auto const end = value.cend();
         serialized += FLY_JSON_CHR('"');
 
         for (auto it = value.cbegin(); it != end;)
@@ -77,7 +81,7 @@ json_string_type Json::serialize() const
         serialized += FLY_JSON_CHR('"');
     };
 
-    auto visitor = [&serialized, &serialize_string](const auto &storage) {
+    auto visitor = [&serialized, &serialize_string](auto const &storage) {
         using S = decltype(storage);
 
         if constexpr (JsonNull<S>)
@@ -157,7 +161,7 @@ bool Json::is_object() const
 //==================================================================================================
 bool Json::is_object_like() const
 {
-    const auto *storage = std::get_if<json_array_type>(&m_value);
+    auto const *storage = std::get_if<json_array_type>(&m_value);
 
     return (storage != nullptr) && (storage->size() == 2) && storage->at(0).is_string();
 }
@@ -387,7 +391,7 @@ Json::const_reverse_iterator Json::crend() const
 //==================================================================================================
 bool Json::empty() const
 {
-    auto visitor = [](const auto &storage) -> bool {
+    auto visitor = [](auto const &storage) -> bool {
         using S = decltype(storage);
 
         if constexpr (JsonNull<S>)
@@ -410,7 +414,7 @@ bool Json::empty() const
 //==================================================================================================
 Json::size_type Json::size() const
 {
-    auto visitor = [](const auto &storage) -> size_type {
+    auto visitor = [](auto const &storage) -> size_type {
         using S = decltype(storage);
 
         if constexpr (JsonNull<S>)
@@ -452,7 +456,7 @@ void Json::resize(size_type size)
 //==================================================================================================
 Json::size_type Json::capacity() const
 {
-    auto visitor = [](const auto &storage) -> size_type {
+    auto visitor = [](auto const &storage) -> size_type {
         using S = decltype(storage);
 
         if constexpr (JsonNull<S>)
@@ -540,14 +544,14 @@ void Json::insert(const_iterator first, const_iterator last)
 
     using object_iterator_type = typename const_iterator::object_iterator_type;
 
-    const auto &first_iterator = std::get<object_iterator_type>(first.m_iterator);
-    const auto &last_iterator = std::get<object_iterator_type>(last.m_iterator);
+    auto const &first_iterator = std::get<object_iterator_type>(first.m_iterator);
+    auto const &last_iterator = std::get<object_iterator_type>(last.m_iterator);
 
     object_inserter(first_iterator, last_iterator);
 }
 
 //==================================================================================================
-Json::iterator Json::insert(const_iterator position, const Json &value)
+Json::iterator Json::insert(const_iterator position, Json const &value)
 {
     return array_inserter(position, value);
 }
@@ -559,7 +563,7 @@ Json::iterator Json::insert(const_iterator position, Json &&value)
 }
 
 //==================================================================================================
-Json::iterator Json::insert(const_iterator position, size_type count, const Json &value)
+Json::iterator Json::insert(const_iterator position, size_type count, Json const &value)
 {
     return array_inserter(position, count, value);
 }
@@ -582,8 +586,8 @@ Json::iterator Json::insert(const_iterator position, const_iterator first, const
 
     using array_iterator_type = typename const_iterator::array_iterator_type;
 
-    const auto &first_iterator = std::get<array_iterator_type>(first.m_iterator);
-    const auto &last_iterator = std::get<array_iterator_type>(last.m_iterator);
+    auto const &first_iterator = std::get<array_iterator_type>(first.m_iterator);
+    auto const &last_iterator = std::get<array_iterator_type>(last.m_iterator);
 
     return array_inserter(position, first_iterator, last_iterator);
 }
@@ -595,7 +599,7 @@ Json::iterator Json::insert(const_iterator position, std::initializer_list<Json>
 }
 
 //==================================================================================================
-void Json::push_back(const Json &value)
+void Json::push_back(Json const &value)
 {
     auto &storage = get_or_promote<json_array_type>("JSON type invalid for array insertion");
     storage.push_back(value);
@@ -638,7 +642,7 @@ Json::iterator Json::erase(const_iterator position)
                 throw JsonException("Provided iterator must not be past-the-end");
             }
 
-            const auto &position_iterator = std::get<iterator_type>(position.m_iterator);
+            auto const &position_iterator = std::get<iterator_type>(position.m_iterator);
             it.m_iterator = storage.erase(position_iterator);
 
             return it;
@@ -672,8 +676,8 @@ Json::iterator Json::erase(const_iterator first, const_iterator last)
                 throw JsonException("Provided iterators are for a different Json instance");
             }
 
-            const auto &first_iterator = std::get<iterator_type>(first.m_iterator);
-            const auto &last_iterator = std::get<iterator_type>(last.m_iterator);
+            auto const &first_iterator = std::get<iterator_type>(first.m_iterator);
+            auto const &last_iterator = std::get<iterator_type>(last.m_iterator);
             it.m_iterator = storage.erase(first_iterator, last_iterator);
 
             return it;
@@ -727,7 +731,7 @@ void Json::merge(fly::Json &&other)
 //==================================================================================================
 bool operator==(Json::const_reference json1, Json::const_reference json2)
 {
-    auto visitor = [](const auto &value1, const auto &value2) -> bool {
+    auto visitor = [](auto const &value1, auto const &value2) -> bool {
         using S1 = decltype(value1);
         using S2 = decltype(value2);
 
@@ -736,8 +740,8 @@ bool operator==(Json::const_reference json1, Json::const_reference json2)
         {
             constexpr auto epsilon = std::numeric_limits<json_floating_point_type>::epsilon();
 
-            const auto fvalue1 = static_cast<json_floating_point_type>(value1);
-            const auto fvalue2 = static_cast<json_floating_point_type>(value2);
+            auto const fvalue1 = static_cast<json_floating_point_type>(value1);
+            auto const fvalue2 = static_cast<json_floating_point_type>(value2);
 
             return std::abs(fvalue1 - fvalue2) <= epsilon;
         }
@@ -767,7 +771,7 @@ bool operator!=(Json::const_reference json1, Json::const_reference json2)
 //==================================================================================================
 bool operator<(Json::const_reference json1, Json::const_reference json2)
 {
-    auto visitor = [&json1, &json2](const auto &value1, const auto &value2) -> bool {
+    auto visitor = [&json1, &json2](auto const &value1, auto const &value2) -> bool {
         using S1 = decltype(value1);
         using S2 = decltype(value2);
 
@@ -778,8 +782,8 @@ bool operator<(Json::const_reference json1, Json::const_reference json2)
         else if constexpr (
             (JsonFloatingPoint<S1> && JsonNumber<S2>) || (JsonFloatingPoint<S2> && JsonNumber<S1>))
         {
-            const auto fvalue1 = static_cast<json_floating_point_type>(value1);
-            const auto fvalue2 = static_cast<json_floating_point_type>(value2);
+            auto const fvalue1 = static_cast<json_floating_point_type>(value1);
+            auto const fvalue2 = static_cast<json_floating_point_type>(value2);
 
             return fvalue1 < fvalue2;
         }
@@ -821,14 +825,14 @@ bool operator>=(Json::const_reference json1, Json::const_reference json2)
 //==================================================================================================
 json_string_type Json::validate_string(json_string_type &&value)
 {
-    static constexpr const auto s_null = FLY_JSON_CHR('\0');
-    static constexpr const auto s_space = FLY_JSON_CHR(' ');
-    static constexpr const auto s_quote = FLY_JSON_CHR('"');
-    static constexpr const auto s_reverse_solidus = FLY_JSON_CHR('\\');
+    static constexpr auto const s_null = FLY_JSON_CHR('\0');
+    static constexpr auto const s_space = FLY_JSON_CHR(' ');
+    static constexpr auto const s_quote = FLY_JSON_CHR('"');
+    static constexpr auto const s_reverse_solidus = FLY_JSON_CHR('\\');
 
     for (auto it = value.begin(); it != value.end(); ++it)
     {
-        const auto &ch = *it;
+        auto const &ch = *it;
 
         if (ch == '\\')
         {
@@ -850,7 +854,7 @@ json_string_type Json::validate_string(json_string_type &&value)
 //==================================================================================================
 void Json::read_escaped_character(json_string_type &value, json_string_type::iterator &it)
 {
-    const auto next = it + 1;
+    auto const next = it + 1;
 
     if (next == value.end())
     {
@@ -893,7 +897,7 @@ void Json::read_escaped_character(json_string_type &value, json_string_type::ite
         case 'u':
             if (auto result = JsonStringType::unescape_codepoint(it, value.end()); result)
             {
-                const auto distance = std::distance(it, value.end());
+                auto const distance = std::distance(it, value.end());
 
                 value.replace(next - 1, it, *std::move(result));
                 it = value.end() - distance - 1;
@@ -914,7 +918,7 @@ void Json::read_escaped_character(json_string_type &value, json_string_type::ite
 void Json::write_escaped_character(
     json_string_type &output,
     json_string_type::const_iterator &it,
-    const json_string_type::const_iterator &end)
+    json_string_type::const_iterator const &end)
 {
     switch (*it)
     {

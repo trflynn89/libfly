@@ -79,8 +79,8 @@ struct Color
     {
     }
 
-    const std::uint8_t m_color;
-    const Plane m_plane;
+    std::uint8_t const m_color;
+    Plane const m_plane;
 };
 
 /**
@@ -111,8 +111,8 @@ struct Cursor
     {
     }
 
-    const Direction m_direction;
-    const std::uint8_t m_distance;
+    Direction const m_direction;
+    std::uint8_t const m_distance;
 };
 
 /**
@@ -206,7 +206,7 @@ public:
      *
      * @return A reference to the created StylerProxy instance.
      */
-    friend detail::StylerProxy &operator<<(std::ostream &stream, const Styler &styler);
+    friend detail::StylerProxy &operator<<(std::ostream &stream, Styler const &styler);
 
 private:
     /**
@@ -262,7 +262,7 @@ inline namespace literals {
         FLY_CONSTEVAL inline fly::logger::Color operator"" _c()
         {
             // Convert to std::uint8_t via numeric literal to ensure the provided color is valid.
-            const std::uint8_t validated_color = operator"" _u8<Literals...>();
+            std::uint8_t const validated_color = operator"" _u8<Literals...>();
             return fly::logger::Color(validated_color);
         }
 

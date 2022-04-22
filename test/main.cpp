@@ -20,22 +20,22 @@ using namespace fly::literals::numeric_literals;
 class FlyReporter final : public Catch::StreamingReporterBase
 {
 public:
-    explicit FlyReporter(const Catch::ReporterConfig &config);
+    explicit FlyReporter(Catch::ReporterConfig const &config);
     ~FlyReporter() override = default;
 
     static std::string getDescription();
 
-    void testRunStarting(const Catch::TestRunInfo &info) override;
-    void testCaseStarting(const Catch::TestCaseInfo &info) override;
-    void sectionStarting(const Catch::SectionInfo &info) override;
-    void assertionEnded(const Catch::AssertionStats &) override;
-    void sectionEnded(const Catch::SectionStats &stats) override;
-    void testCaseEnded(const Catch::TestCaseStats &stats) override;
-    void testRunEnded(const Catch::TestRunStats &stats) override;
+    void testRunStarting(Catch::TestRunInfo const &info) override;
+    void testCaseStarting(Catch::TestCaseInfo const &info) override;
+    void sectionStarting(Catch::SectionInfo const &info) override;
+    void assertionEnded(Catch::AssertionStats const &) override;
+    void sectionEnded(Catch::SectionStats const &stats) override;
+    void testCaseEnded(Catch::TestCaseStats const &stats) override;
+    void testRunEnded(Catch::TestRunStats const &stats) override;
 
 private:
     void stream_header(fly::logger::Color::StandardColor color, std::string message);
-    void stream_summary(const Catch::Totals &totals);
+    void stream_summary(Catch::Totals const &totals);
 
     std::chrono::steady_clock::time_point m_test_start;
     std::chrono::steady_clock::time_point m_current_test_case_start;
@@ -50,21 +50,22 @@ private:
 class FailedAssertionLogger
 {
 public:
-    explicit FailedAssertionLogger(const Catch::AssertionStats &stats);
-    friend std::ostream &operator<<(std::ostream &stream, const FailedAssertionLogger &logger);
+    explicit FailedAssertionLogger(Catch::AssertionStats const &stats);
+    friend std::ostream &operator<<(std::ostream &stream, FailedAssertionLogger const &logger);
 
 private:
     void stream_source_info(std::ostream &stream) const;
     void stream_expression(std::ostream &stream) const;
     void stream_message(std::ostream &stream) const;
 
-    const Catch::AssertionResult &m_result;
-    const std::vector<Catch::MessageInfo> &m_messages;
+    Catch::AssertionResult const &m_result;
+    std::vector<Catch::MessageInfo> const &m_messages;
     std::string_view m_label;
 };
 
 //==================================================================================================
-FlyReporter::FlyReporter(const Catch::ReporterConfig &config) : Catch::StreamingReporterBase(config)
+FlyReporter::FlyReporter(Catch::ReporterConfig const &config) :
+    Catch::StreamingReporterBase(config)
 {
 }
 
@@ -75,14 +76,14 @@ std::string FlyReporter::getDescription()
 }
 
 //==================================================================================================
-void FlyReporter::testRunStarting(const Catch::TestRunInfo &info)
+void FlyReporter::testRunStarting(Catch::TestRunInfo const &info)
 {
     Catch::StreamingReporterBase::testRunStarting(info);
     m_test_start = std::chrono::steady_clock::now();
 }
 
 //==================================================================================================
-void FlyReporter::testCaseStarting(const Catch::TestCaseInfo &info)
+void FlyReporter::testCaseStarting(Catch::TestCaseInfo const &info)
 {
     Catch::StreamingReporterBase::testCaseStarting(info);
 
@@ -91,7 +92,7 @@ void FlyReporter::testCaseStarting(const Catch::TestCaseInfo &info)
 }
 
 //==================================================================================================
-void FlyReporter::sectionStarting(const Catch::SectionInfo &info)
+void FlyReporter::sectionStarting(Catch::SectionInfo const &info)
 {
     Catch::StreamingReporterBase::sectionStarting(info);
     std::size_t level = m_section_level++;
@@ -110,7 +111,7 @@ void FlyReporter::sectionStarting(const Catch::SectionInfo &info)
         return;
     }
 
-    const fly::logger::Styler style(fly::logger::Color::Cyan, fly::logger::Style::Italic);
+    fly::logger::Styler const style(fly::logger::Color::Cyan, fly::logger::Style::Italic);
     m_stream << style << "[ ";
 
     if (level != 1)
@@ -124,7 +125,7 @@ void FlyReporter::sectionStarting(const Catch::SectionInfo &info)
 }
 
 //==================================================================================================
-void FlyReporter::assertionEnded(const Catch::AssertionStats &stats)
+void FlyReporter::assertionEnded(Catch::AssertionStats const &stats)
 {
     if (!stats.assertionResult.isOk())
     {
@@ -134,21 +135,21 @@ void FlyReporter::assertionEnded(const Catch::AssertionStats &stats)
 }
 
 //==================================================================================================
-void FlyReporter::sectionEnded(const Catch::SectionStats &stats)
+void FlyReporter::sectionEnded(Catch::SectionStats const &stats)
 {
     Catch::StreamingReporterBase::sectionEnded(stats);
     --m_section_level;
 }
 
 //==================================================================================================
-void FlyReporter::testCaseEnded(const Catch::TestCaseStats &stats)
+void FlyReporter::testCaseEnded(Catch::TestCaseStats const &stats)
 {
     Catch::StreamingReporterBase::testCaseEnded(stats);
 
-    const auto end = std::chrono::steady_clock::now();
-    const auto duration = std::chrono::duration<double>(end - m_current_test_case_start);
+    auto const end = std::chrono::steady_clock::now();
+    auto const duration = std::chrono::duration<double>(end - m_current_test_case_start);
 
-    const std::string &name = stats.testInfo->name;
+    std::string const &name = stats.testInfo->name;
 
     if (stats.totals.assertions.allOk())
     {
@@ -168,12 +169,12 @@ void FlyReporter::testCaseEnded(const Catch::TestCaseStats &stats)
 }
 
 //==================================================================================================
-void FlyReporter::testRunEnded(const Catch::TestRunStats &stats)
+void FlyReporter::testRunEnded(Catch::TestRunStats const &stats)
 {
     Catch::StreamingReporterBase::testRunEnded(stats);
 
-    const auto end = std::chrono::steady_clock::now();
-    const auto duration = std::chrono::duration<double>(end - m_test_start);
+    auto const end = std::chrono::steady_clock::now();
+    auto const duration = std::chrono::duration<double>(end - m_test_start);
 
     stream_summary(stats.totals);
 
@@ -190,7 +191,7 @@ void FlyReporter::stream_header(fly::logger::Color::StandardColor color, std::st
 }
 
 //==================================================================================================
-void FlyReporter::stream_summary(const Catch::Totals &totals)
+void FlyReporter::stream_summary(Catch::Totals const &totals)
 {
     static constexpr std::size_t s_divider_width = 80;
 
@@ -255,7 +256,7 @@ void FlyReporter::stream_summary(const Catch::Totals &totals)
 }
 
 //==================================================================================================
-FailedAssertionLogger::FailedAssertionLogger(const Catch::AssertionStats &stats) :
+FailedAssertionLogger::FailedAssertionLogger(Catch::AssertionStats const &stats) :
     m_result(stats.assertionResult),
     m_messages(stats.infoMessages)
 {
@@ -288,7 +289,7 @@ FailedAssertionLogger::FailedAssertionLogger(const Catch::AssertionStats &stats)
 }
 
 //==================================================================================================
-std::ostream &operator<<(std::ostream &stream, const FailedAssertionLogger &logger)
+std::ostream &operator<<(std::ostream &stream, FailedAssertionLogger const &logger)
 {
     logger.stream_source_info(stream);
     logger.stream_expression(stream);
@@ -321,7 +322,7 @@ void FailedAssertionLogger::stream_message(std::ostream &stream) const
         stream << m_label << ':' << '\n';
     }
 
-    for (const auto &message : m_messages)
+    for (auto const &message : m_messages)
     {
         stream << "    " << message.message << '\n';
     }

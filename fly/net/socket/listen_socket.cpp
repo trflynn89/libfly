@@ -29,7 +29,7 @@ ListenSocket<EndpointType>::ListenSocket(
 //==================================================================================================
 template <IPEndpoint EndpointType>
 ListenSocket<EndpointType>::ListenSocket(
-    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<SocketService> const &service,
     std::shared_ptr<NetworkConfig> config) noexcept :
     BaseSocket(service, std::move(config), detail::socket<EndpointType, TcpSocket<EndpointType>>())
 {
@@ -47,7 +47,7 @@ ListenSocket<EndpointType>::ListenSocket(ListenSocket &&socket) noexcept :
 //==================================================================================================
 template <IPEndpoint EndpointType>
 auto ListenSocket<EndpointType>::create_socket(
-    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<SocketService> const &service,
     std::shared_ptr<NetworkConfig> config) -> std::shared_ptr<ListenSocket>
 {
     // ListenSocket's constructor for socket-service-based sockets is private, thus cannot be used
@@ -55,7 +55,7 @@ auto ListenSocket<EndpointType>::create_socket(
     struct ListenSocketImpl final : public ListenSocket
     {
         ListenSocketImpl(
-            const std::shared_ptr<SocketService> &service,
+            std::shared_ptr<SocketService> const &service,
             std::shared_ptr<NetworkConfig> config) noexcept :
             ListenSocket(service, std::move(config))
         {

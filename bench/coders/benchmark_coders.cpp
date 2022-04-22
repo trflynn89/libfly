@@ -21,25 +21,26 @@ public:
     virtual ~Coder() = default;
 
     virtual void
-    encode(const std::filesystem::path &input, const std::filesystem::path &output) = 0;
+    encode(std::filesystem::path const &input, std::filesystem::path const &output) = 0;
 
     virtual void
-    decode(const std::filesystem::path &input, const std::filesystem::path &output) = 0;
+    decode(std::filesystem::path const &input, std::filesystem::path const &output) = 0;
 };
 
 class Huffman final : public Coder
 {
 public:
-    Huffman() : m_encoder(std::make_shared<fly::coders::CoderConfig>())
+    Huffman() :
+        m_encoder(std::make_shared<fly::coders::CoderConfig>())
     {
     }
 
-    void encode(const std::filesystem::path &input, const std::filesystem::path &output) final
+    void encode(std::filesystem::path const &input, std::filesystem::path const &output) final
     {
         FLY_UNUSED(m_encoder.encode_file(input, output));
     }
 
-    void decode(const std::filesystem::path &input, const std::filesystem::path &output) final
+    void decode(std::filesystem::path const &input, std::filesystem::path const &output) final
     {
         FLY_UNUSED(m_decoder.decode_file(input, output));
     }
@@ -52,12 +53,12 @@ private:
 class Base64 final : public Coder
 {
 public:
-    void encode(const std::filesystem::path &input, const std::filesystem::path &output) final
+    void encode(std::filesystem::path const &input, std::filesystem::path const &output) final
     {
         FLY_UNUSED(m_coder.encode_file(input, output));
     }
 
-    void decode(const std::filesystem::path &input, const std::filesystem::path &output) final
+    void decode(std::filesystem::path const &input, std::filesystem::path const &output) final
     {
         FLY_UNUSED(m_coder.decode_file(input, output));
     }
@@ -69,8 +70,8 @@ private:
 template <typename CoderType, typename Encode>
 void run_enwik8_impl(
     CoderTable &table,
-    const std::filesystem::path &input,
-    const std::filesystem::path &output)
+    std::filesystem::path const &input,
+    std::filesystem::path const &output)
 {
     static constexpr std::size_t s_iterations = 11;
 
@@ -84,7 +85,7 @@ void run_enwik8_impl(
             std::filesystem::remove(output);
         }
 
-        const auto start = std::chrono::steady_clock::now();
+        auto const start = std::chrono::steady_clock::now();
 
         if constexpr (std::is_same_v<Encode, std::true_type>)
         {
@@ -95,27 +96,27 @@ void run_enwik8_impl(
             coder.decode(input, output);
         }
 
-        const auto end = std::chrono::steady_clock::now();
+        auto const end = std::chrono::steady_clock::now();
 
-        const auto duration = std::chrono::duration<double>(end - start);
+        auto const duration = std::chrono::duration<double>(end - start);
         results.push_back(duration.count());
     }
 
     std::sort(results.rbegin(), results.rend());
 
-    const auto input_size = std::filesystem::file_size(input);
-    const auto output_size = std::filesystem::file_size(output);
+    auto const input_size = std::filesystem::file_size(input);
+    auto const output_size = std::filesystem::file_size(output);
 
-    const auto duration = results[s_iterations / 2];
-    const auto speed = input_size / duration / 1024.0 / 1024.0;
-    const auto ratio = static_cast<double>(output_size) / input_size;
+    auto const duration = results[s_iterations / 2];
+    auto const speed = input_size / duration / 1024.0 / 1024.0;
+    auto const ratio = static_cast<double>(output_size) / input_size;
 
     std::string direction(std::is_same_v<Encode, std::true_type> ? "Encode" : "Decode");
     table.append_row(std::move(direction), duration * 1000, speed, ratio * 100.0);
 }
 
 template <typename CoderType>
-void run_enwik8_test(std::string &&name, const std::filesystem::path &file)
+void run_enwik8_test(std::string &&name, std::filesystem::path const &file)
 {
     CoderTable table(
         std::move(name) + ": " + file.filename().string(),
@@ -134,8 +135,8 @@ void run_enwik8_test(std::string &&name, const std::filesystem::path &file)
 
 CATCH_TEST_CASE("Coders", "[bench]")
 {
-    const auto here = std::filesystem::path(__FILE__).parent_path();
-    const auto file = here / "data" / "enwik8";
+    auto const here = std::filesystem::path(__FILE__).parent_path();
+    auto const file = here / "data" / "enwik8";
 
     if (!std::filesystem::exists(file))
     {

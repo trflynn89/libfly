@@ -10,7 +10,7 @@ namespace fly::system {
 
 namespace {
 
-    std::uint64_t time_value_to_microseconds(const time_value_t &time_value)
+    std::uint64_t time_value_to_microseconds(time_value_t const &time_value)
     {
         return (static_cast<std::uint64_t>(time_value.seconds) * 1'000'000) +
             static_cast<std::uint64_t>(time_value.microseconds);
@@ -42,17 +42,17 @@ void SystemMonitorImpl::update_system_cpu_usage()
         return;
     }
 
-    const auto user = static_cast<std::uint64_t>(cpu_load.cpu_ticks[CPU_STATE_USER]);
-    const auto system = static_cast<std::uint64_t>(cpu_load.cpu_ticks[CPU_STATE_SYSTEM]);
-    const auto idle = static_cast<std::uint64_t>(cpu_load.cpu_ticks[CPU_STATE_IDLE]);
-    const auto nice = static_cast<std::uint64_t>(cpu_load.cpu_ticks[CPU_STATE_NICE]);
+    auto const user = static_cast<std::uint64_t>(cpu_load.cpu_ticks[CPU_STATE_USER]);
+    auto const system = static_cast<std::uint64_t>(cpu_load.cpu_ticks[CPU_STATE_SYSTEM]);
+    auto const idle = static_cast<std::uint64_t>(cpu_load.cpu_ticks[CPU_STATE_IDLE]);
+    auto const nice = static_cast<std::uint64_t>(cpu_load.cpu_ticks[CPU_STATE_NICE]);
 
     if ((user >= m_prev_system_user_time) && (system >= m_prev_system_system_time) &&
         (idle >= m_prev_system_idle_time) && (nice >= m_prev_system_nice_time))
     {
-        const std::uint64_t active = (user - m_prev_system_user_time) +
+        std::uint64_t const active = (user - m_prev_system_user_time) +
             (system - m_prev_system_system_time) + (nice - m_prev_system_nice_time);
-        const std::uint64_t total = active + (idle - m_prev_system_idle_time);
+        std::uint64_t const total = active + (idle - m_prev_system_idle_time);
 
         m_system_cpu_usage.store(100.0 * active / total);
     }
@@ -72,16 +72,16 @@ void SystemMonitorImpl::update_process_cpu_usage()
         return;
     }
 
-    const auto now = std::chrono::steady_clock::now();
-    const auto user = time_value_to_microseconds(thread_times.user_time);
-    const auto system = time_value_to_microseconds(thread_times.system_time);
+    auto const now = std::chrono::steady_clock::now();
+    auto const user = time_value_to_microseconds(thread_times.user_time);
+    auto const system = time_value_to_microseconds(thread_times.system_time);
 
     if ((m_prev_process_user_time != 0) && (now > m_prev_time) &&
         (user >= m_prev_process_user_time) && (system >= m_prev_process_system_time))
     {
-        const std::uint64_t cpu =
+        std::uint64_t const cpu =
             (user - m_prev_process_user_time) + (system - m_prev_process_system_time);
-        const auto time = std::chrono::duration_cast<std::chrono::microseconds>(now - m_prev_time);
+        auto const time = std::chrono::duration_cast<std::chrono::microseconds>(now - m_prev_time);
 
         m_process_cpu_usage.store(100.0 * cpu / time.count() / m_system_cpu_count.load());
     }
@@ -112,8 +112,8 @@ void SystemMonitorImpl::update_system_memory_usage()
         return;
     }
 
-    const auto total_memory = static_cast<std::uint64_t>(basic_info.max_mem);
-    const auto free_memory = static_cast<std::uint64_t>(vm_info.free_count) * page_size;
+    auto const total_memory = static_cast<std::uint64_t>(basic_info.max_mem);
+    auto const free_memory = static_cast<std::uint64_t>(vm_info.free_count) * page_size;
 
     m_total_system_memory.store(total_memory);
     m_system_memory_usage.store(total_memory - free_memory);

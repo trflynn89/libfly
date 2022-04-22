@@ -15,7 +15,7 @@ namespace fly::path {
 class PathConfig : public fly::config::Config
 {
 public:
-    static constexpr const char *identifier = "path";
+    static constexpr char const *identifier = "path";
 
     /**
      * @return Delay between path monitor poll intervals.

@@ -15,7 +15,7 @@ namespace fly::detail {
 // std::array
 
 template <typename T, std::size_t N>
-inline std::size_t json_array_size(const std::array<T, N> &array)
+inline std::size_t json_array_size(std::array<T, N> const &array)
 {
     return array.size();
 }
@@ -30,7 +30,7 @@ json_array_append(std::deque<Args...> &array, typename std::deque<Args...>::valu
 }
 
 template <typename... Args>
-inline std::size_t json_array_size(const std::deque<Args...> &array)
+inline std::size_t json_array_size(std::deque<Args...> const &array)
 {
     return array.size();
 }
@@ -44,7 +44,7 @@ inline void json_array_append(
 {
     auto before_end = array.before_begin();
 
-    for (const auto &element : array)
+    for (auto const &element : array)
     {
         FLY_UNUSED(element);
         ++before_end;
@@ -54,11 +54,11 @@ inline void json_array_append(
 }
 
 template <typename... Args>
-inline std::size_t json_array_size(const std::forward_list<Args...> &array)
+inline std::size_t json_array_size(std::forward_list<Args...> const &array)
 {
     std::size_t elements = 0;
 
-    for (const auto &element : array)
+    for (auto const &element : array)
     {
         FLY_UNUSED(element);
         ++elements;
@@ -77,7 +77,7 @@ json_array_append(std::list<Args...> &array, typename std::list<Args...>::value_
 }
 
 template <typename... Args>
-inline std::size_t json_array_size(const std::list<Args...> &array)
+inline std::size_t json_array_size(std::list<Args...> const &array)
 {
     return array.size();
 }
@@ -93,7 +93,7 @@ inline void json_array_append(
 }
 
 template <typename... Args>
-inline std::size_t json_array_size(const std::multiset<Args...> &array)
+inline std::size_t json_array_size(std::multiset<Args...> const &array)
 {
     return array.size();
 }
@@ -108,7 +108,7 @@ json_array_append(std::set<Args...> &array, typename std::set<Args...>::value_ty
 }
 
 template <typename... Args>
-inline std::size_t json_array_size(const std::set<Args...> &array)
+inline std::size_t json_array_size(std::set<Args...> const &array)
 {
     return array.size();
 }
@@ -124,7 +124,7 @@ inline void json_array_append(
 }
 
 template <typename... Args>
-inline std::size_t json_array_size(const std::unordered_multiset<Args...> &array)
+inline std::size_t json_array_size(std::unordered_multiset<Args...> const &array)
 {
     return array.size();
 }
@@ -140,7 +140,7 @@ inline void json_array_append(
 }
 
 template <typename... Args>
-inline std::size_t json_array_size(const std::unordered_set<Args...> &array)
+inline std::size_t json_array_size(std::unordered_set<Args...> const &array)
 {
     return array.size();
 }
@@ -155,7 +155,7 @@ json_array_append(std::vector<Args...> &array, typename std::vector<Args...>::va
 }
 
 template <typename... Args>
-inline std::size_t json_array_size(const std::vector<Args...> &array)
+inline std::size_t json_array_size(std::vector<Args...> const &array)
 {
     return array.size();
 }

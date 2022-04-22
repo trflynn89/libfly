@@ -10,7 +10,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
     using json_type = TestType;
 
     fly::Json json1 = fly::test::create_json<json_type>();
-    const fly::Json json2 = fly::test::create_json<json_type>();
+    fly::Json const json2 = fly::test::create_json<json_type>();
 
     CATCH_SECTION("Access a JSON array's values via the accessor 'at'")
     {
@@ -86,7 +86,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
             auto &front1 = json1.front();
             CATCH_CHECK(front1 == *(json1.begin()));
 
-            const auto &front2 = json2.front();
+            auto const &front2 = json2.front();
             CATCH_CHECK(front2 == *(json2.begin()));
 
             fly::Json empty = json_type();
@@ -112,7 +112,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
             auto &back1 = json1.back();
             CATCH_CHECK(back1 == *(--(json1.end())));
 
-            const auto &back2 = json2.back();
+            auto const &back2 = json2.back();
             CATCH_CHECK(back2 == *(--(json2.end())));
 
             fly::Json empty = json_type();
@@ -186,7 +186,7 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
 
         if constexpr (is_string_or_array)
         {
-            const auto size_before = json1.size();
+            auto const size_before = json1.size();
 
             json1.resize(size_before * 2);
             CATCH_CHECK(json1.size() == (size_before * 2));
@@ -215,8 +215,8 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
         }
         else if constexpr (is_string_or_array)
         {
-            const auto capacity1 = json1.capacity();
-            const auto capacity2 = json2.capacity();
+            auto const capacity1 = json1.capacity();
+            auto const capacity2 = json2.capacity();
             CATCH_CHECK(capacity1 == capacity2);
             CATCH_CHECK(capacity1 > 0);
         }
@@ -239,9 +239,9 @@ CATCH_JSON_TEST_CASE("JsonAccessors")
 
         if constexpr (is_string_or_array)
         {
-            const auto capacity_before = json1.capacity();
+            auto const capacity_before = json1.capacity();
             json1.reserve(capacity_before * 2);
-            const auto capacity_after = json1.capacity();
+            auto const capacity_after = json1.capacity();
             CATCH_CHECK(capacity_after > capacity_before);
 
             json1.reserve(capacity_before);
@@ -264,7 +264,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
     using char_type = typename string_type::value_type;
 
     fly::Json json1 = fly::test::create_json<json_type, string_type>();
-    const fly::Json json2 = fly::test::create_json<json_type, string_type>();
+    fly::Json const json2 = fly::test::create_json<json_type, string_type>();
 
     CATCH_SECTION("Access a JSON object's values via the accessor 'at'")
     {
@@ -335,7 +335,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
     {
         if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
-            const fly::Json empty = fly::json_object_type();
+            fly::Json const empty = fly::json_object_type();
             CATCH_CHECK(empty.count(J_STR("a")) == 0);
             CATCH_CHECK(empty.count(J_STR("b")) == 0);
             CATCH_CHECK(empty.count(J_STR("c")) == 0);
@@ -400,7 +400,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonAccessorsByString")
     {
         if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
-            const fly::Json empty = fly::json_object_type();
+            fly::Json const empty = fly::json_object_type();
             CATCH_CHECK_FALSE(empty.contains(J_STR("a")));
             CATCH_CHECK_FALSE(empty.contains(J_STR("b")));
             CATCH_CHECK_FALSE(empty.contains(J_STR("c")));

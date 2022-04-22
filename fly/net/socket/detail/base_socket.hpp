@@ -99,7 +99,7 @@ public:
      *
      * @return True if the binding was successful.
      */
-    bool bind(const EndpointType &endpoint, BindMode mode) const;
+    bool bind(EndpointType const &endpoint, BindMode mode) const;
 
     /**
      * Bind this socket to a local endpoint.
@@ -134,7 +134,7 @@ protected:
      * @param handle Native socket handle opened by the concrete socket type.
      */
     BaseSocket(
-        const std::shared_ptr<fly::net::SocketService> &service,
+        std::shared_ptr<fly::net::SocketService> const &service,
         std::shared_ptr<fly::net::NetworkConfig> config,
         socket_type handle) noexcept;
 
@@ -175,8 +175,8 @@ protected:
     std::size_t packet_size() const;
 
 private:
-    BaseSocket(const BaseSocket &) = delete;
-    BaseSocket &operator=(const BaseSocket &) = delete;
+    BaseSocket(BaseSocket const &) = delete;
+    BaseSocket &operator=(BaseSocket const &) = delete;
 
     std::weak_ptr<fly::net::SocketService> m_weak_socket_service;
 

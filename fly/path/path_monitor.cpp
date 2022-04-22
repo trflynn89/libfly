@@ -43,7 +43,7 @@ bool PathMonitor::start()
 }
 
 //==================================================================================================
-bool PathMonitor::add_path(const std::filesystem::path &path, PathEventCallback callback)
+bool PathMonitor::add_path(std::filesystem::path const &path, PathEventCallback callback)
 {
     std::error_code error;
 
@@ -72,7 +72,7 @@ bool PathMonitor::add_path(const std::filesystem::path &path, PathEventCallback 
 }
 
 //==================================================================================================
-bool PathMonitor::remove_path(const std::filesystem::path &path)
+bool PathMonitor::remove_path(std::filesystem::path const &path)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -96,7 +96,7 @@ void PathMonitor::remove_all_paths()
 }
 
 //==================================================================================================
-bool PathMonitor::add_file(const std::filesystem::path &file, PathEventCallback callback)
+bool PathMonitor::add_file(std::filesystem::path const &file, PathEventCallback callback)
 {
     std::error_code error;
 
@@ -129,7 +129,7 @@ bool PathMonitor::add_file(const std::filesystem::path &file, PathEventCallback 
 }
 
 //==================================================================================================
-bool PathMonitor::remove_file(const std::filesystem::path &file)
+bool PathMonitor::remove_file(std::filesystem::path const &file)
 {
     bool prune_path = false;
     {
@@ -161,7 +161,7 @@ bool PathMonitor::remove_file(const std::filesystem::path &file)
 }
 
 //==================================================================================================
-PathMonitor::PathInfo *PathMonitor::get_or_create_path_info(const std::filesystem::path &path)
+PathMonitor::PathInfo *PathMonitor::get_or_create_path_info(std::filesystem::path const &path)
 {
     PathInfo *info = nullptr;
 

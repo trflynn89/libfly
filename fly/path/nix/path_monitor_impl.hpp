@@ -56,7 +56,7 @@ protected:
     void poll(std::chrono::milliseconds timeout) override;
 
     std::unique_ptr<PathMonitor::PathInfo>
-    create_path_info(const std::filesystem::path &path) const override;
+    create_path_info(std::filesystem::path const &path) const override;
 
 private:
     /**
@@ -65,7 +65,7 @@ private:
      */
     struct PathInfoImpl : PathMonitor::PathInfo
     {
-        PathInfoImpl(int monitor_descriptor, const std::filesystem::path &path) noexcept;
+        PathInfoImpl(int monitor_descriptor, std::filesystem::path const &path) noexcept;
         ~PathInfoImpl() override;
 
         /**
@@ -90,7 +90,7 @@ private:
      *
      * @param event The inotify event to handle.
      */
-    void handle_event(const inotify_event *event) const;
+    void handle_event(inotify_event const *event) const;
 
     /**
      * Convert an inotify event mask to a PathEvent.

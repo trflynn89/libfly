@@ -5,7 +5,7 @@ namespace fly::coders {
 //==================================================================================================
 std::uint32_t CoderConfig::huffman_encoder_chunk_size() const
 {
-    const auto encoder_chunk_size_kb =
+    auto const encoder_chunk_size_kb =
         get_value<std::uint16_t>("encoder_chunk_size_kb", m_default_huffman_encoder_chunk_size_kb);
 
     return static_cast<std::uint32_t>(encoder_chunk_size_kb) << 10;

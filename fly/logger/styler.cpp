@@ -10,7 +10,7 @@
 namespace fly::logger {
 
 //==================================================================================================
-detail::StylerProxy &operator<<(std::ostream &stream, const Styler &styler)
+detail::StylerProxy &operator<<(std::ostream &stream, Styler const &styler)
 {
     // The input styler parameter must be const in order to allow inline streaming of Styler
     // instances. Otherwise, this method would require an lvalue reference.

@@ -113,7 +113,7 @@ private:
      * @return The created socket.
      */
     static std::shared_ptr<ListenSocket> create_socket(
-        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<SocketService> const &service,
         std::shared_ptr<NetworkConfig> config);
 
     /**
@@ -124,7 +124,7 @@ private:
      * @param config Reference to network configuration.
      */
     ListenSocket(
-        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<SocketService> const &service,
         std::shared_ptr<NetworkConfig> config) noexcept;
 
     /**

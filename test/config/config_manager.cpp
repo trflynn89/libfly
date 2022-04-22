@@ -21,7 +21,7 @@ using namespace fly::literals::numeric_literals;
 
 namespace {
 
-constexpr const char *s_config_manager_file = "config_manager.cpp";
+constexpr char const *s_config_manager_file = "config_manager.cpp";
 
 /**
  * Subclass of the path config to decrease the poll interval for faster testing.
@@ -29,7 +29,8 @@ constexpr const char *s_config_manager_file = "config_manager.cpp";
 class TestPathConfig : public fly::path::PathConfig
 {
 public:
-    TestPathConfig() noexcept : fly::path::PathConfig()
+    TestPathConfig() noexcept :
+        fly::path::PathConfig()
     {
         m_default_poll_interval = 10_u64;
     }
@@ -41,7 +42,7 @@ public:
 class BadConfig : public fly::config::Config
 {
 public:
-    [[maybe_unused]] static constexpr const char *identifier = fly::test::TestConfig::identifier;
+    [[maybe_unused]] static constexpr char const *identifier = fly::test::TestConfig::identifier;
 };
 
 } // namespace
@@ -140,7 +141,7 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
     {
         CATCH_CHECK(config_manager->prune() == initial_size);
 
-        const fly::Json json {
+        fly::Json const json {
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
 
         CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json.serialize()));
@@ -163,7 +164,7 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
 
     CATCH_SECTION("Config manager respects file created before config object")
     {
-        const fly::Json json {
+        fly::Json const json {
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
 
         CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json.serialize()));
@@ -180,7 +181,7 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
     {
         auto config = config_manager->create_config<fly::test::TestConfig>();
 
-        const fly::Json json {
+        fly::Json const json {
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
 
         CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json.serialize()));
@@ -195,7 +196,7 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
     {
         auto config = config_manager->create_config<fly::test::TestConfig>();
 
-        const fly::Json json1 {
+        fly::Json const json1 {
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
 
         CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json1.serialize()));
@@ -206,7 +207,7 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
         CATCH_CHECK(config->get_value<std::string>("address", "") == "MA");
         CATCH_CHECK(config->get_value<int>("age", -1) == -1);
 
-        const fly::Json json2 {
+        fly::Json const json2 {
             {fly::test::TestConfig::identifier, {{"name", "Jane Doe"}, {"age", 27}}}};
 
         CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json2.serialize()));
@@ -228,7 +229,7 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
     {
         auto config = config_manager->create_config<fly::test::TestConfig>();
 
-        const fly::Json json {
+        fly::Json const json {
             {fly::test::TestConfig::identifier, {{"name", "John Doe"}, {"address", "MA"}}}};
 
         CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, json.serialize()));
@@ -249,7 +250,7 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
     {
         auto config = config_manager->create_config<fly::test::TestConfig>();
 
-        const std::string contents(" ");
+        std::string const contents(" ");
 
         CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
         task_runner->wait_for_task_to_complete(s_config_manager_file);
@@ -263,7 +264,7 @@ CATCH_TEST_CASE("ConfigManager", "[config]")
     {
         auto config = config_manager->create_config<fly::test::TestConfig>();
 
-        const std::string contents("[1, 2, 3]");
+        std::string const contents("[1, 2, 3]");
 
         CATCH_REQUIRE(fly::test::PathUtil::write_file(config_file, contents));
         task_runner->wait_for_task_to_complete(s_config_manager_file);

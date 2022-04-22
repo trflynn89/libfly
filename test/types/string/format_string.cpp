@@ -45,7 +45,7 @@ public:
         ++s_default_constructor_count;
     }
 
-    ConstructorCounter(const ConstructorCounter &)
+    ConstructorCounter(ConstructorCounter const &)
     {
         ++s_copy_constructor_count;
     }
@@ -84,16 +84,16 @@ private:
 };
 
 template <typename CharType, std::size_t N, typename... Types>
-FLY_CONSTEVAL auto make_format(const CharType (&format)[N], Types &&...)
+FLY_CONSTEVAL auto make_format(CharType const (&format)[N], Types &&...)
 {
     using FormatString = fly::detail::BasicFormatString<CharType, std::type_identity_t<Types>...>;
     return FormatString(format);
 }
 
 template <typename FormatStringType, typename... SpecifierType>
-void test_format(FormatStringType &&format, const SpecifierType &...specifiers)
+void test_format(FormatStringType &&format, SpecifierType const &...specifiers)
 {
-    [[maybe_unused]] auto equals = [&format](const auto &specifier) {
+    [[maybe_unused]] auto equals = [&format](auto const &specifier) {
         auto actual_specifier = format.next_specifier();
         CATCH_REQUIRE(actual_specifier);
         CATCH_CHECK(actual_specifier == specifier);
@@ -118,39 +118,39 @@ void test_error(FormatStringType &&format, std::string &&error)
 // Copies of all of the error messages that BasicFormatString might raise. Ideally, these could be
 // defined in a common header, but when FLY_CONSTEVAL evaluates to 'consteval', the error message
 // raised would not display in the compile error (the variable name or macro name would display).
-constexpr const char *s_unclosed_string = "Detected unclosed replacement field - must end with }";
-constexpr const char *s_unescaped_close = "Closing brace } must be escaped";
-constexpr const char *s_too_many_specifiers = "Exceeded maximum allowed number of specifiers";
-constexpr const char *s_bad_position = "Argument position exceeds number of provided arguments";
-constexpr const char *s_position_mismatch =
+constexpr char const *s_unclosed_string = "Detected unclosed replacement field - must end with }";
+constexpr char const *s_unescaped_close = "Closing brace } must be escaped";
+constexpr char const *s_too_many_specifiers = "Exceeded maximum allowed number of specifiers";
+constexpr char const *s_bad_position = "Argument position exceeds number of provided arguments";
+constexpr char const *s_position_mismatch =
     "Argument position must be provided on all or not on any specifier";
-constexpr const char *s_bad_fill = "Characters { and } are not allowed as fill characters";
-constexpr const char *s_non_ascii_fill = "Non-ascii characters are not allowed as fill characters";
-constexpr const char *s_bad_sign = "Sign may only be used with numeric presentation types";
-constexpr const char *s_bad_alternate_form =
+constexpr char const *s_bad_fill = "Characters { and } are not allowed as fill characters";
+constexpr char const *s_non_ascii_fill = "Non-ascii characters are not allowed as fill characters";
+constexpr char const *s_bad_sign = "Sign may only be used with numeric presentation types";
+constexpr char const *s_bad_alternate_form =
     "Alternate form may only be used with non-decimal numeric presentation types";
-constexpr const char *s_bad_zero_padding =
+constexpr char const *s_bad_zero_padding =
     "Zero-padding may only be used with numeric presentation types";
-constexpr const char *s_bad_width = "Width must be a positive (non-zero) value";
-constexpr const char *s_bad_width_position = "Position of width parameter must be an integral type";
-constexpr const char *s_missing_precision =
+constexpr char const *s_bad_width = "Width must be a positive (non-zero) value";
+constexpr char const *s_bad_width_position = "Position of width parameter must be an integral type";
+constexpr char const *s_missing_precision =
     "Expected a non-negative precision or nested replacement field after decimal";
-constexpr const char *s_bad_precision =
+constexpr char const *s_bad_precision =
     "Precision may only be used for string and floating-point types";
-constexpr const char *s_bad_precision_position =
+constexpr char const *s_bad_precision_position =
     "Position of precision parameter must be an integral type";
-constexpr const char *s_bad_locale =
+constexpr char const *s_bad_locale =
     "Locale-specific form may only be used for numeric and boolean types";
-constexpr const char *s_bad_user_defined =
+constexpr char const *s_bad_user_defined =
     "User-defined formatter without a parser may not have formatting options";
-constexpr const char *s_bad_character = "Character types must be formatted with {} or {:cbBodxX}";
-constexpr const char *s_bad_string = "String types must be formatted with {} or {:s}";
-constexpr const char *s_bad_pointer = "Pointer types must be formatted with {} or {:p}";
-constexpr const char *s_bad_integer =
+constexpr char const *s_bad_character = "Character types must be formatted with {} or {:cbBodxX}";
+constexpr char const *s_bad_string = "String types must be formatted with {} or {:s}";
+constexpr char const *s_bad_pointer = "Pointer types must be formatted with {} or {:p}";
+constexpr char const *s_bad_integer =
     "Integral types must be formatted with {} or one of {:cbBodxX}";
-constexpr const char *s_bad_float =
+constexpr char const *s_bad_float =
     "Floating-point types must be formatted with {} or one of {:aAeEfFgG}";
-constexpr const char *s_bad_bool = "Boolean types must be formatted with {} or one of {:csbBodxX}";
+constexpr char const *s_bad_bool = "Boolean types must be formatted with {} or one of {:csbBodxX}";
 
 #endif
 
@@ -230,14 +230,14 @@ CATCH_TEMPLATE_TEST_CASE(
     using char_type = TestType;
     using Specifier = fly::detail::BasicFormatSpecifier<char_type>;
 
-    constexpr const UserDefinedType u {};
-    constexpr const UserDefinedTypeWithParser up {};
-    constexpr const auto c = FLY_CHR(char_type, 'a');
-    constexpr const auto s = FLY_STR(char_type, "a");
-    constexpr const auto &a = FLY_ARR(char_type, "a");
-    constexpr const int i = 1;
-    constexpr const float f = 3.14f;
-    constexpr const bool b = true;
+    constexpr UserDefinedType u {};
+    constexpr UserDefinedTypeWithParser up {};
+    constexpr auto c = FLY_CHR(char_type, 'a');
+    constexpr auto s = FLY_STR(char_type, "a");
+    constexpr auto &a = FLY_ARR(char_type, "a");
+    constexpr int i = 1;
+    constexpr float f = 3.14f;
+    constexpr bool b = true;
 
     CATCH_SECTION("No specifiers are parsed from empty string")
     {
@@ -273,7 +273,7 @@ CATCH_TEMPLATE_TEST_CASE(
             1);
         CATCH_CHECK_FALSE(format.context().has_error());
 
-        const std::size_t specifiers_created = format.context().view().size() / 3;
+        std::size_t const specifiers_created = format.context().view().size() / 3;
         std::size_t specifiers_parsed = 0;
 
         while (format.next_specifier())
@@ -774,13 +774,13 @@ CATCH_TEMPLATE_TEST_CASE(
 {
     using char_type = TestType;
 
-    constexpr const UserDefinedType u {};
-    constexpr const UserDefinedTypeWithParserWhichFails upf {};
-    constexpr const auto c = FLY_CHR(char_type, 'a');
-    constexpr const auto s = FLY_STR(char_type, "a");
-    constexpr const int i = 1;
-    constexpr const float f = 3.14f;
-    constexpr const bool b = true;
+    constexpr UserDefinedType u {};
+    constexpr UserDefinedTypeWithParserWhichFails upf {};
+    constexpr auto c = FLY_CHR(char_type, 'a');
+    constexpr auto s = FLY_STR(char_type, "a");
+    constexpr int i = 1;
+    constexpr float f = 3.14f;
+    constexpr bool b = true;
 
     CATCH_SECTION("Cannot parse single opening brace")
     {
@@ -837,7 +837,7 @@ CATCH_TEMPLATE_TEST_CASE(
     CATCH_SECTION("Fill character must be ASCII")
     {
         {
-            constexpr const char_type fmt[] {
+            constexpr char_type const fmt[] {
                 static_cast<char_type>(0x7b), // {
                 static_cast<char_type>(0x3a), // :
                 static_cast<char_type>(0x80), // Non-ASCII
@@ -848,7 +848,7 @@ CATCH_TEMPLATE_TEST_CASE(
             test_error(make_format(fmt, 1), s_non_ascii_fill);
         }
         {
-            constexpr const char_type fmt[] {
+            constexpr char_type const fmt[] {
                 static_cast<char_type>(0x7b), // {
                 static_cast<char_type>(0x3a), // :
                 static_cast<char_type>(0xff), // Non-ASCII

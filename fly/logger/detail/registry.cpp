@@ -8,7 +8,7 @@ namespace fly::logger::detail {
 
 namespace {
 
-    constexpr const char *s_default_logger_name = "_libfly_default_";
+    constexpr char const *s_default_logger_name = "_libfly_default_";
 
 } // namespace
 
@@ -75,7 +75,7 @@ bool Registry::register_logger(std::shared_ptr<fly::logger::Logger> logger)
 }
 
 //==================================================================================================
-void Registry::unregister_logger(const std::string &name)
+void Registry::unregister_logger(std::string const &name)
 {
     if (name == s_default_logger_name)
     {
@@ -87,7 +87,7 @@ void Registry::unregister_logger(const std::string &name)
 }
 
 //==================================================================================================
-std::shared_ptr<fly::logger::Logger> Registry::get_logger(const std::string &name)
+std::shared_ptr<fly::logger::Logger> Registry::get_logger(std::string const &name)
 {
     std::lock_guard<std::mutex> lock(m_registry_mutex);
 

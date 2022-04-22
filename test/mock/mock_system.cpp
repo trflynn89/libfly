@@ -8,7 +8,8 @@ bool MockSystem::s_mock_system_enabled = false;
 MockCalls MockSystem::s_mocked_calls;
 
 //==================================================================================================
-MockSystem::MockSystem(MockCall mock) noexcept : m_mock(mock)
+MockSystem::MockSystem(MockCall mock) noexcept :
+    m_mock(mock)
 {
     std::lock_guard<std::mutex> lock(s_mock_system_mutex);
 
@@ -16,7 +17,8 @@ MockSystem::MockSystem(MockCall mock) noexcept : m_mock(mock)
     s_mock_system_enabled = true;
 }
 //==================================================================================================
-MockSystem::MockSystem(MockCall mock, bool fail) noexcept : m_mock(mock)
+MockSystem::MockSystem(MockCall mock, bool fail) noexcept :
+    m_mock(mock)
 {
     std::lock_guard<std::mutex> lock(s_mock_system_mutex);
 

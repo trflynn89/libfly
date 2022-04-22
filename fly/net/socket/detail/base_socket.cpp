@@ -34,7 +34,7 @@ BaseSocket<EndpointType>::BaseSocket(
 //==================================================================================================
 template <fly::net::IPEndpoint EndpointType>
 BaseSocket<EndpointType>::BaseSocket(
-    const std::shared_ptr<fly::net::SocketService> &service,
+    std::shared_ptr<fly::net::SocketService> const &service,
     std::shared_ptr<fly::net::NetworkConfig> config,
     socket_type handle) noexcept :
     BaseSocket(std::move(config), handle, fly::net::IOMode::Asynchronous)
@@ -159,7 +159,7 @@ void BaseSocket<EndpointType>::close()
 
 //==================================================================================================
 template <fly::net::IPEndpoint EndpointType>
-bool BaseSocket<EndpointType>::bind(const EndpointType &endpoint, BindMode option) const
+bool BaseSocket<EndpointType>::bind(EndpointType const &endpoint, BindMode option) const
 {
     return fly::net::detail::bind(m_socket_handle, endpoint, option);
 }

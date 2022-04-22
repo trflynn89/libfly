@@ -78,7 +78,7 @@ public:
      * @param callback The callback to invoke when the socket is ready for writing.
      */
     template <Socket SocketType, SocketNotification<SocketType> Callback>
-    void notify_when_writable(const std::shared_ptr<SocketType> &socket, Callback &&callback);
+    void notify_when_writable(std::shared_ptr<SocketType> const &socket, Callback &&callback);
 
     /**
      * Monitor a socket handle for readiness to be read from.
@@ -99,7 +99,7 @@ public:
      * @param callback The callback to invoke when the socket is ready for reading.
      */
     template <Socket SocketType, SocketNotification<SocketType> Callback>
-    void notify_when_readable(const std::shared_ptr<SocketType> &socket, Callback &&callback);
+    void notify_when_readable(std::shared_ptr<SocketType> const &socket, Callback &&callback);
 
 private:
     using Notification = std::function<void()>;
@@ -159,7 +159,7 @@ private:
      * @return The wrapped callback.
      */
     template <Socket SocketType, SocketNotification<SocketType> Callback>
-    Notification wrap_callback(const std::shared_ptr<SocketType> &socket, Callback &&callback);
+    Notification wrap_callback(std::shared_ptr<SocketType> const &socket, Callback &&callback);
 
     /**
      * Check if any sockets are ready for IO. Trigger the callback for all ready sockets. Upon
@@ -185,7 +185,7 @@ std::shared_ptr<SocketType> SocketService::create_socket()
 //==================================================================================================
 template <Socket SocketType, SocketNotification<SocketType> Callback>
 void SocketService::notify_when_writable(
-    const std::shared_ptr<SocketType> &socket,
+    std::shared_ptr<SocketType> const &socket,
     Callback &&callback)
 {
     notify_when_writable(socket->handle(), wrap_callback(socket, std::forward<Callback>(callback)));
@@ -194,7 +194,7 @@ void SocketService::notify_when_writable(
 //==================================================================================================
 template <Socket SocketType, SocketNotification<SocketType> Callback>
 void SocketService::notify_when_readable(
-    const std::shared_ptr<SocketType> &socket,
+    std::shared_ptr<SocketType> const &socket,
     Callback &&callback)
 {
     notify_when_readable(socket->handle(), wrap_callback(socket, std::forward<Callback>(callback)));
@@ -202,7 +202,7 @@ void SocketService::notify_when_readable(
 
 //==================================================================================================
 template <Socket SocketType, SocketNotification<SocketType> Callback>
-auto SocketService::wrap_callback(const std::shared_ptr<SocketType> &socket, Callback &&callback)
+auto SocketService::wrap_callback(std::shared_ptr<SocketType> const &socket, Callback &&callback)
     -> Notification
 {
     // Further wrap the callback in a structure to allow perfect forwarding into the lambda below.

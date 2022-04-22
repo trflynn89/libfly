@@ -27,7 +27,7 @@ void test_styler(std::string &&expected_escape, Modifiers &&...modifiers)
         fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
         std::cout << fly::logger::Styler(modifiers...) << "stylized text";
 
-        const std::string contents = capture();
+        std::string const contents = capture();
         CATCH_REQUIRE_FALSE(contents.empty());
 
         CATCH_CHECK(contents.starts_with(expected_escape));
@@ -41,7 +41,7 @@ void test_styler(std::string &&expected_escape, Modifiers &&...modifiers)
         fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
         std::cerr << fly::logger::Styler(modifiers...) << "stylized text";
 
-        const std::string contents = capture();
+        std::string const contents = capture();
         CATCH_REQUIRE_FALSE(contents.empty());
 
         CATCH_CHECK(contents.starts_with(expected_escape));
@@ -60,7 +60,7 @@ CATCH_TEST_CASE("Styler", "[logger]")
         std::stringstream stream;
 
         stream << fly::logger::Styler(fly::logger::Color::Red) << "non-stylized text";
-        const std::string contents = stream.str();
+        std::string const contents = stream.str();
 
         CATCH_CHECK_FALSE(contents.starts_with("\x1b[38;5;1m"));
         CATCH_CHECK_FALSE(contents.ends_with("\x1b[0m"));

@@ -14,7 +14,9 @@ template <typename CharType>
 class UserDefinedType
 {
 public:
-    UserDefinedType(std::basic_string_view<CharType> str, int num) noexcept : m_str(str), m_num(num)
+    UserDefinedType(std::basic_string_view<CharType> str, int num) noexcept :
+        m_str(str),
+        m_num(num)
     {
     }
 
@@ -39,7 +41,7 @@ template <typename CharType>
 struct fly::Formatter<UserDefinedType<CharType>, CharType>
 {
     template <typename FormatContext>
-    void format(const UserDefinedType<CharType> &value, FormatContext &context)
+    void format(UserDefinedType<CharType> const &value, FormatContext &context)
     {
         fly::BasicString<CharType>::format_to(
             context.out(),
@@ -67,13 +69,13 @@ CATCH_TEMPLATE_TEST_CASE("BasicString", "[string]", char, wchar_t, char8_t, char
 
         for (size_type i = 0; i < s_size; ++i)
         {
-            const string_type curr = BasicString::generate_random_string(10);
+            string_type const curr = BasicString::generate_random_string(10);
 
             input += curr + delim;
             input_split[i] = curr;
         }
 
-        const auto output_split = BasicString::split(input, delim);
+        auto const output_split = BasicString::split(input, delim);
         CATCH_CHECK(input_split.size() == output_split.size());
 
         for (size_type i = 0; i < s_size; ++i)
@@ -93,7 +95,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicString", "[string]", char, wchar_t, char8_t, char
 
         for (size_type i = 0; i < s_size; ++i)
         {
-            const string_type curr = BasicString::generate_random_string(10);
+            string_type const curr = BasicString::generate_random_string(10);
             input += curr + delim;
 
             if (i < s_count)
@@ -107,7 +109,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicString", "[string]", char, wchar_t, char8_t, char
             }
         }
 
-        const auto output_split = BasicString::split(input, delim, s_count);
+        auto const output_split = BasicString::split(input, delim, s_count);
         CATCH_CHECK(input_split.size() == output_split.size());
 
         for (size_type i = 0; i < s_count; ++i)
@@ -126,10 +128,10 @@ CATCH_TEMPLATE_TEST_CASE("BasicString", "[string]", char, wchar_t, char8_t, char
         string_type test6 = FLY_STR(char_type, " \n\t\r  a   c  \n\t\r ");
         string_type test7 = FLY_STR(char_type, " \n\t\r  a\n \tc  \n\t\r ");
 
-        const string_type expected1;
-        const string_type expected2 = FLY_STR(char_type, "abc");
-        const string_type expected3 = FLY_STR(char_type, "a   c");
-        const string_type expected4 = FLY_STR(char_type, "a\n \tc");
+        string_type const expected1;
+        string_type const expected2 = FLY_STR(char_type, "abc");
+        string_type const expected3 = FLY_STR(char_type, "a   c");
+        string_type const expected4 = FLY_STR(char_type, "a\n \tc");
 
         BasicString::trim(test1);
         BasicString::trim(test2);
@@ -151,8 +153,8 @@ CATCH_TEMPLATE_TEST_CASE("BasicString", "[string]", char, wchar_t, char8_t, char
     CATCH_SECTION("Replace all instances of a substring in a string with a character")
     {
         string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
-        const string_type search = FLY_STR(char_type, "Be Replaced");
-        const char_type replace('x');
+        string_type const search = FLY_STR(char_type, "Be Replaced");
+        char_type const replace('x');
 
         BasicString::replace_all(source, search, replace);
         CATCH_CHECK(source == FLY_STR(char_type, "To x! To x!"));
@@ -161,8 +163,8 @@ CATCH_TEMPLATE_TEST_CASE("BasicString", "[string]", char, wchar_t, char8_t, char
     CATCH_SECTION("Replace all instances of a substring in a string with another string")
     {
         string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
-        const string_type search = FLY_STR(char_type, "Be Replaced");
-        const string_type replace = FLY_STR(char_type, "new value");
+        string_type const search = FLY_STR(char_type, "Be Replaced");
+        string_type const replace = FLY_STR(char_type, "new value");
 
         BasicString::replace_all(source, search, replace);
         CATCH_CHECK(source == FLY_STR(char_type, "To new value! To new value!"));
@@ -171,7 +173,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicString", "[string]", char, wchar_t, char8_t, char
     CATCH_SECTION("Replace all instances of a substring in a string with an empty string")
     {
         string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
-        const string_type replace = FLY_STR(char_type, "new value");
+        string_type const replace = FLY_STR(char_type, "new value");
 
         BasicString::replace_all(source, string_type(), replace);
         CATCH_CHECK(source == FLY_STR(char_type, "To Be Replaced! To Be Replaced!"));
@@ -180,7 +182,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicString", "[string]", char, wchar_t, char8_t, char
     CATCH_SECTION("Remove all instances of a substring in a string")
     {
         string_type source = FLY_STR(char_type, "To Be Replaced! To Be Replaced!");
-        const string_type search = FLY_STR(char_type, "Be Rep");
+        string_type const search = FLY_STR(char_type, "Be Rep");
 
         BasicString::remove_all(source, search);
         CATCH_CHECK(source == FLY_STR(char_type, "To laced! To laced!"));
@@ -283,18 +285,18 @@ CATCH_TEMPLATE_TEST_CASE("BasicString", "[string]", char, wchar_t, char8_t, char
     {
         static constexpr size_type s_size = (1 << 10);
 
-        const auto random = BasicString::generate_random_string(s_size);
+        auto const random = BasicString::generate_random_string(s_size);
         CATCH_CHECK(s_size == random.size());
     }
 
     CATCH_SECTION("Join generic types by a delimeter")
     {
         string_type str = FLY_STR(char_type, "a");
-        const char_type *ctr = FLY_STR(char_type, "b");
-        const char_type arr[] = {'c', '\0'};
-        const char_type chr = 'd';
+        char_type const *ctr = FLY_STR(char_type, "b");
+        char_type const arr[] = {'c', '\0'};
+        char_type const chr = 'd';
 
-        const UserDefinedType<char_type> obj(FLY_STR(char_type, "hi"), 0xbeef);
+        UserDefinedType<char_type> const obj(FLY_STR(char_type, "hi"), 0xbeef);
 
         CATCH_CHECK(FLY_STR(char_type, "a") == BasicString::join('.', str));
         CATCH_CHECK(FLY_STR(char_type, "b") == BasicString::join('.', ctr));

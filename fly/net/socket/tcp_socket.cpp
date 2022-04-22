@@ -26,7 +26,7 @@ TcpSocket<EndpointType>::TcpSocket(std::shared_ptr<NetworkConfig> config, IOMode
 //==================================================================================================
 template <IPEndpoint EndpointType>
 TcpSocket<EndpointType>::TcpSocket(
-    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<SocketService> const &service,
     std::shared_ptr<NetworkConfig> config) noexcept :
     BaseSocket(service, std::move(config), detail::socket<EndpointType, TcpSocket<EndpointType>>())
 {
@@ -46,7 +46,7 @@ TcpSocket<EndpointType>::TcpSocket(
 //==================================================================================================
 template <IPEndpoint EndpointType>
 TcpSocket<EndpointType>::TcpSocket(
-    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<SocketService> const &service,
     std::shared_ptr<NetworkConfig> config,
     socket_type socket_handle) noexcept :
     BaseSocket(service, std::move(config), socket_handle),
@@ -65,7 +65,7 @@ TcpSocket<EndpointType>::TcpSocket(TcpSocket &&socket) noexcept :
 //==================================================================================================
 template <IPEndpoint EndpointType>
 auto TcpSocket<EndpointType>::create_socket(
-    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<SocketService> const &service,
     std::shared_ptr<NetworkConfig> config) -> std::shared_ptr<TcpSocket>
 {
     // TcpSocket's constructor for socket-service-based sockets is private, thus cannot be used with
@@ -73,7 +73,7 @@ auto TcpSocket<EndpointType>::create_socket(
     struct TcpSocketImpl final : public TcpSocket
     {
         TcpSocketImpl(
-            const std::shared_ptr<SocketService> &service,
+            std::shared_ptr<SocketService> const &service,
             std::shared_ptr<NetworkConfig> config) noexcept :
             TcpSocket(service, std::move(config))
         {
@@ -86,7 +86,7 @@ auto TcpSocket<EndpointType>::create_socket(
 //==================================================================================================
 template <IPEndpoint EndpointType>
 auto TcpSocket<EndpointType>::create_socket(
-    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<SocketService> const &service,
     std::shared_ptr<NetworkConfig> config,
     socket_type socket_handle) -> std::shared_ptr<TcpSocket>
 {
@@ -95,7 +95,7 @@ auto TcpSocket<EndpointType>::create_socket(
     struct TcpSocketImpl final : public TcpSocket
     {
         TcpSocketImpl(
-            const std::shared_ptr<SocketService> &service,
+            std::shared_ptr<SocketService> const &service,
             std::shared_ptr<NetworkConfig> config,
             socket_type socket_handle) noexcept :
             TcpSocket(service, std::move(config), socket_handle)
@@ -124,9 +124,9 @@ std::optional<EndpointType> TcpSocket<EndpointType>::remote_endpoint() const
 
 //==================================================================================================
 template <IPEndpoint EndpointType>
-ConnectedState TcpSocket<EndpointType>::connect(const EndpointType &endpoint)
+ConnectedState TcpSocket<EndpointType>::connect(EndpointType const &endpoint)
 {
-    const auto state = detail::connect(handle(), endpoint);
+    auto const state = detail::connect(handle(), endpoint);
 
     switch (state)
     {
@@ -163,11 +163,11 @@ ConnectedState TcpSocket<EndpointType>::connect(std::string_view hostname, port_
 //==================================================================================================
 template <IPEndpoint EndpointType>
 ConnectedState
-TcpSocket<EndpointType>::connect_async(const EndpointType &endpoint, ConnectCompletion &&callback)
+TcpSocket<EndpointType>::connect_async(EndpointType const &endpoint, ConnectCompletion &&callback)
 {
     if (auto service = socket_service(); service && callback)
     {
-        const auto state = connect(endpoint);
+        auto const state = connect(endpoint);
 
         if (state == ConnectedState::Connecting)
         {
@@ -277,7 +277,7 @@ template <IPEndpoint EndpointType>
 std::string TcpSocket<EndpointType>::receive()
 {
     bool would_block = false;
-    const std::string received = detail::recv(handle(), packet_size(), would_block);
+    std::string const received = detail::recv(handle(), packet_size(), would_block);
 
     if (received.size() == 0)
     {
@@ -320,7 +320,7 @@ void TcpSocket<EndpointType>::ready_to_send(
 {
     bool would_block = false;
 
-    const std::size_t current_sent = detail::send(handle(), message, would_block);
+    std::size_t const current_sent = detail::send(handle(), message, would_block);
     bytes_sent += current_sent;
 
     if (current_sent == message.size())
@@ -355,7 +355,7 @@ void TcpSocket<EndpointType>::ready_to_receive(ReceiveCompletion &&callback, std
 {
     bool would_block = false;
 
-    const std::string current_received = detail::recv(handle(), packet_size(), would_block);
+    std::string const current_received = detail::recv(handle(), packet_size(), would_block);
     received += current_received;
 
     if (!current_received.empty())

@@ -7,23 +7,23 @@ namespace fly::parser {
 
 namespace {
 
-    constexpr const std::istream::char_type *s_utf8_byte_order_mark = "\xef\xbb\xbf";
-    constexpr const std::size_t s_utf8_byte_order_mark_size = 3;
+    constexpr std::istream::char_type const *s_utf8_byte_order_mark = "\xef\xbb\xbf";
+    constexpr std::size_t s_utf8_byte_order_mark_size = 3;
 
-    constexpr const std::istream::char_type *s_utf16_be_byte_order_mark = "\xfe\xff";
-    constexpr const std::size_t s_utf16_be_byte_order_mark_size = 2;
+    constexpr std::istream::char_type const *s_utf16_be_byte_order_mark = "\xfe\xff";
+    constexpr std::size_t s_utf16_be_byte_order_mark_size = 2;
 
-    constexpr const std::istream::char_type *s_utf16_le_byte_order_mark = "\xff\xfe";
-    constexpr const std::size_t s_utf16_le_byte_order_mark_size = 2;
+    constexpr std::istream::char_type const *s_utf16_le_byte_order_mark = "\xff\xfe";
+    constexpr std::size_t s_utf16_le_byte_order_mark_size = 2;
 
-    constexpr const std::istream::char_type *s_utf32_be_byte_order_mark = "\x00\x00\xfe\xff";
-    constexpr const std::size_t s_utf32_be_byte_order_mark_size = 4;
+    constexpr std::istream::char_type const *s_utf32_be_byte_order_mark = "\x00\x00\xfe\xff";
+    constexpr std::size_t s_utf32_be_byte_order_mark_size = 4;
 
-    constexpr const std::istream::char_type *s_utf32_le_byte_order_mark = "\xff\xfe\x00\x00";
-    constexpr const std::size_t s_utf32_le_byte_order_mark_size = 4;
+    constexpr std::istream::char_type const *s_utf32_le_byte_order_mark = "\xff\xfe\x00\x00";
+    constexpr std::size_t s_utf32_le_byte_order_mark_size = 4;
 
     template <std::size_t Size>
-    bool check_bom(std::istream &stream, const std::istream::char_type *bom)
+    bool check_bom(std::istream &stream, std::istream::char_type const *bom)
     {
         if (static_cast<std::istream::char_type>(stream.peek()) == bom[0])
         {
@@ -45,7 +45,7 @@ namespace {
 } // namespace
 
 //==================================================================================================
-std::optional<fly::Json> Parser::parse_file(const std::filesystem::path &path)
+std::optional<fly::Json> Parser::parse_file(std::filesystem::path const &path)
 {
     std::ifstream stream(path);
 

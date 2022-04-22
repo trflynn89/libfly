@@ -59,7 +59,7 @@ protected:
     void poll(std::chrono::milliseconds timeout) override;
 
     std::unique_ptr<PathMonitor::PathInfo>
-    create_path_info(const std::filesystem::path &path) const override;
+    create_path_info(std::filesystem::path const &path) const override;
 
 private:
     /**
@@ -69,8 +69,8 @@ private:
     struct PathInfoImpl : PathMonitor::PathInfo
     {
         PathInfoImpl(
-            const PathMonitorImpl *path_monitor,
-            const std::filesystem::path &path) noexcept;
+            PathMonitorImpl const *path_monitor,
+            std::filesystem::path const &path) noexcept;
         ~PathInfoImpl() override;
 
         /**
@@ -120,8 +120,8 @@ private:
         void *info,
         std::size_t event_size,
         void *event_paths,
-        const FSEventStreamEventFlags event_flags[],
-        const FSEventStreamEventId event_ids[]);
+        FSEventStreamEventFlags const event_flags[],
+        FSEventStreamEventId const event_ids[]);
 
     /**
      * Convert an FSEventStreamEventFlags event mask to a PathEvent list.
@@ -130,7 +130,7 @@ private:
      *
      * @return A PathEvent list that matches the FSEventStreamEventFlags mask.
      */
-    static std::vector<PathEvent> convert_to_events(const FSEventStreamEventFlags &flags);
+    static std::vector<PathEvent> convert_to_events(FSEventStreamEventFlags const &flags);
 
     /**
      * Handle a single path event received in the FSEventStreamCallback. Find a monitored path that

@@ -6,7 +6,7 @@ namespace fly::system::detail {
 
 namespace {
 
-    bool check_kernel_status(const char *caller, const kern_return_t &status)
+    bool check_kernel_status(char const *caller, kern_return_t const &status)
     {
         if (status != KERN_SUCCESS)
         {

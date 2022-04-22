@@ -65,8 +65,8 @@ struct HuffmanNode
     HuffmanNode *m_right;
 
 private:
-    HuffmanNode(const HuffmanNode &) = delete;
-    HuffmanNode &operator=(const HuffmanNode &) = delete;
+    HuffmanNode(HuffmanNode const &) = delete;
+    HuffmanNode &operator=(HuffmanNode const &) = delete;
 };
 
 /**
@@ -78,7 +78,7 @@ private:
  */
 struct HuffmanNodeComparator
 {
-    bool operator()(const HuffmanNode *left, const HuffmanNode *right);
+    bool operator()(HuffmanNode const *left, HuffmanNode const *right);
 };
 
 /**
@@ -127,15 +127,15 @@ struct HuffmanCode
      *
      * @return True if the first Huffman code is less than the second.
      */
-    friend bool operator<(const HuffmanCode &left, const HuffmanCode &right);
+    friend bool operator<(HuffmanCode const &left, HuffmanCode const &right);
 
     symbol_type m_symbol;
     code_type m_code;
     length_type m_length;
 
 private:
-    HuffmanCode(const HuffmanCode &) = delete;
-    HuffmanCode &operator=(const HuffmanCode &) = delete;
+    HuffmanCode(HuffmanCode const &) = delete;
+    HuffmanCode &operator=(HuffmanCode const &) = delete;
 };
 
 } // namespace fly::coders

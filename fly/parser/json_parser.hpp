@@ -80,7 +80,7 @@ public:
      *
      * @param features The extra features to allow.
      */
-    explicit JsonParser(const Features features) noexcept;
+    explicit JsonParser(Features features) noexcept;
 
 protected:
     /**
@@ -212,7 +212,7 @@ private:
      *
      * @return The interpreted JSON value type.
      */
-    NumberType validate_number(const fly::json_string_type &value) const;
+    NumberType validate_number(fly::json_string_type const &value) const;
 
     /**
      * Check if a symbol is a whitespace symbol.
@@ -223,9 +223,9 @@ private:
      */
     bool is_whitespace(Token token) const;
 
-    const bool m_allow_comments {false};
-    const bool m_allow_trailing_comma {false};
-    const bool m_allow_any_type {false};
+    bool const m_allow_comments {false};
+    bool const m_allow_trailing_comma {false};
+    bool const m_allow_any_type {false};
 };
 
 /**

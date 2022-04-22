@@ -33,8 +33,8 @@ public:
      */
     template <std::size_t N>
     constexpr explicit BasicFormatParseContext(
-        const CharType (&format)[N],
-        const ParameterType *parameters,
+        CharType const (&format)[N],
+        ParameterType const *parameters,
         std::size_t parameters_size) noexcept;
 
     /**
@@ -78,7 +78,7 @@ public:
      *
      * @param error A message describing the error that was encountered.
      */
-    void on_error(const char *error);
+    void on_error(char const *error);
 
     /**
      * If an error was stored from a non-constant-evaluated context, returns whether an error was
@@ -100,12 +100,12 @@ private:
     BasicFormatParseContext(BasicFormatParseContext &&) = delete;
     BasicFormatParseContext &operator=(BasicFormatParseContext &&) = delete;
 
-    BasicFormatParseContext(const BasicFormatParseContext &) = delete;
-    BasicFormatParseContext &operator=(const BasicFormatParseContext &) = delete;
+    BasicFormatParseContext(BasicFormatParseContext const &) = delete;
+    BasicFormatParseContext &operator=(BasicFormatParseContext const &) = delete;
 
     fly::BasicLexer<CharType> m_lexer;
 
-    const ParameterType *m_parameters;
+    ParameterType const *m_parameters;
     std::size_t m_parameters_size;
 
     std::size_t m_next_position {0};
@@ -119,8 +119,8 @@ private:
 template <fly::StandardCharacter CharType>
 template <std::size_t N>
 constexpr BasicFormatParseContext<CharType>::BasicFormatParseContext(
-    const CharType (&format)[N],
-    const ParameterType *parameters,
+    CharType const (&format)[N],
+    ParameterType const *parameters,
     std::size_t parameters_size) noexcept :
     m_lexer(format),
     m_parameters(parameters),
@@ -183,7 +183,7 @@ constexpr auto BasicFormatParseContext<CharType>::view() const -> view_type
 
 //==================================================================================================
 template <fly::StandardCharacter CharType>
-void BasicFormatParseContext<CharType>::on_error(const char *error)
+void BasicFormatParseContext<CharType>::on_error(char const *error)
 {
     m_error = error;
 }

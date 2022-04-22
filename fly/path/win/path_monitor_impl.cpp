@@ -12,16 +12,16 @@ namespace fly::path {
 
 namespace {
 
-    constexpr const DWORD s_access_flags = FILE_LIST_DIRECTORY;
+    constexpr DWORD s_access_flags = FILE_LIST_DIRECTORY;
 
-    constexpr const DWORD s_share_flags = FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE;
+    constexpr DWORD s_share_flags = FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE;
 
-    constexpr const DWORD s_disposition_flags = OPEN_EXISTING;
+    constexpr DWORD s_disposition_flags = OPEN_EXISTING;
 
-    constexpr const DWORD s_attribute_flags = FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED;
+    constexpr DWORD s_attribute_flags = FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED;
 
-    constexpr const DWORD s_change_flags = FILE_NOTIFY_CHANGE_FILE_NAME |
-        FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_CREATION;
+    constexpr DWORD s_change_flags = FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME |
+        FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_CREATION;
 
 } // namespace
 
@@ -47,7 +47,7 @@ void PathMonitorImpl::poll(std::chrono::milliseconds timeout)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        for (const PathInfoMap::value_type &value : m_path_info)
+        for (PathInfoMap::value_type const &value : m_path_info)
         {
             auto *info = static_cast<PathInfoImpl *>(value.second.get());
             DWORD bytes = 0;
@@ -64,7 +64,7 @@ void PathMonitorImpl::poll(std::chrono::milliseconds timeout)
         }
     }
 
-    for (const auto &path_to_remove : paths_to_remove)
+    for (auto const &path_to_remove : paths_to_remove)
     {
         remove_path(path_to_remove);
     }
@@ -74,16 +74,16 @@ void PathMonitorImpl::poll(std::chrono::milliseconds timeout)
 
 //==================================================================================================
 std::unique_ptr<PathMonitor::PathInfo>
-PathMonitorImpl::create_path_info(const std::filesystem::path &path) const
+PathMonitorImpl::create_path_info(std::filesystem::path const &path) const
 {
     return std::make_unique<PathInfoImpl>(path);
 }
 
 //==================================================================================================
-void PathMonitorImpl::handle_events(const PathInfoImpl *info, const std::filesystem::path &path)
+void PathMonitorImpl::handle_events(PathInfoImpl const *info, std::filesystem::path const &path)
     const
 {
-    const FILE_NOTIFY_INFORMATION *file_info = info->m_file_info.data();
+    FILE_NOTIFY_INFORMATION const *file_info = info->m_file_info.data();
 
     while (file_info != nullptr)
     {
@@ -91,11 +91,11 @@ void PathMonitorImpl::handle_events(const PathInfoImpl *info, const std::filesys
 
         if (path_event != PathEvent::None)
         {
-            const std::wstring wide_file(
+            std::wstring const wide_file(
                 file_info->FileName,
                 file_info->FileNameLength / sizeof(wchar_t));
 
-            const std::filesystem::path file(wide_file);
+            std::filesystem::path const file(wide_file);
 
             auto it = info->m_file_handlers.find(file);
             PathEventCallback callback = nullptr;
@@ -124,8 +124,8 @@ void PathMonitorImpl::handle_events(const PathInfoImpl *info, const std::filesys
         }
         else
         {
-            file_info = reinterpret_cast<const FILE_NOTIFY_INFORMATION *>(
-                reinterpret_cast<const BYTE *>(file_info) + file_info->NextEntryOffset);
+            file_info = reinterpret_cast<FILE_NOTIFY_INFORMATION const *>(
+                reinterpret_cast<BYTE const *>(file_info) + file_info->NextEntryOffset);
         }
     }
 }
@@ -159,7 +159,7 @@ PathEvent PathMonitorImpl::convert_to_event(DWORD action) const
 }
 
 //==================================================================================================
-PathMonitorImpl::PathInfoImpl::PathInfoImpl(const std::filesystem::path &path) noexcept
+PathMonitorImpl::PathInfoImpl::PathInfoImpl(std::filesystem::path const &path) noexcept
 {
     m_handle = ::CreateFileW(
         path.wstring().c_str(),
@@ -197,9 +197,9 @@ bool PathMonitorImpl::PathInfoImpl::is_valid() const
 }
 
 //==================================================================================================
-bool PathMonitorImpl::PathInfoImpl::refresh(const std::filesystem::path &path)
+bool PathMonitorImpl::PathInfoImpl::refresh(std::filesystem::path const &path)
 {
-    static const auto s_file_info_size =
+    static auto const s_file_info_size =
         static_cast<DWORD>(m_file_info.size() * sizeof(FILE_NOTIFY_INFORMATION));
 
     BOOL success = ::ReadDirectoryChangesW(

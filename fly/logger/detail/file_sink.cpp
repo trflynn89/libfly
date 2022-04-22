@@ -69,7 +69,7 @@ bool FileSink::create_log_file()
         }
     }
 
-    const std::string random = fly::String::generate_random_string(10);
+    std::string const random = fly::String::generate_random_string(10);
     std::string time = fly::system::local_time();
 
     fly::String::replace_all(time, ":", '-');

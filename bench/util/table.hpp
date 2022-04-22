@@ -86,7 +86,7 @@ public:
      *
      * @return The same stream object.
      */
-    friend std::ostream &operator<<(std::ostream &stream, const Table &table)
+    friend std::ostream &operator<<(std::ostream &stream, Table const &table)
     {
         table.print_table(stream);
         return stream;
@@ -129,7 +129,7 @@ private:
      * @param stream The stream to print the values into.
      * @param row The values to print.
      */
-    void print_row(std::ostream &stream, const Row &row) const;
+    void print_row(std::ostream &stream, Row const &row) const;
 
     /**
      * Print a horizontal row separator of the given width and with the given style onto a stream.
@@ -167,7 +167,7 @@ private:
      *
      * @return An array holding the sizes.
      */
-    RowSizedArray<std::size_t> column_widths_for_row(const Row &row);
+    RowSizedArray<std::size_t> column_widths_for_row(Row const &row);
 
     /**
      * Helper to determine if a numeric value is zero (if integral), or close enough to zero (if
@@ -182,22 +182,22 @@ private:
     template <typename T>
     static bool is_zero(T value);
 
-    static constexpr const fly::logger::Color s_border_color {fly::logger::Color::Cyan};
-    static constexpr const fly::logger::Style s_border_style {fly::logger::Style::Bold};
+    static constexpr fly::logger::Color s_border_color {fly::logger::Color::Cyan};
+    static constexpr fly::logger::Style s_border_style {fly::logger::Style::Bold};
 
-    static constexpr const fly::logger::Color s_title_color {fly::logger::Color::Green};
-    static constexpr const fly::logger::Style s_title_style {fly::logger::Style::Bold};
+    static constexpr fly::logger::Color s_title_color {fly::logger::Color::Green};
+    static constexpr fly::logger::Style s_title_style {fly::logger::Style::Bold};
 
-    static constexpr const fly::logger::Color s_header_color {fly::logger::Color::Red};
-    static constexpr const fly::logger::Style s_header_style {fly::logger::Style::Italic};
+    static constexpr fly::logger::Color s_header_color {fly::logger::Color::Red};
+    static constexpr fly::logger::Style s_header_style {fly::logger::Style::Italic};
 
-    static constexpr const fly::logger::Color s_data_color {fly::logger::Color::Yellow};
-    static constexpr const fly::logger::Style s_data_style {fly::logger::Style::Default};
+    static constexpr fly::logger::Color s_data_color {fly::logger::Color::Yellow};
+    static constexpr fly::logger::Style s_data_style {fly::logger::Style::Default};
 
-    static constexpr const std::size_t s_precision = 3;
+    static constexpr std::size_t s_precision = 3;
 
-    const std::string m_title;
-    const RowSizedArray<std::string> m_headers;
+    std::string const m_title;
+    RowSizedArray<std::string> const m_headers;
     std::vector<Row> m_data;
     RowSizedArray<std::size_t> m_column_widths;
 };
@@ -221,7 +221,7 @@ void Table<Args...>::append_row(Args... args)
     m_data.emplace_back(std::make_tuple(std::forward<Args>(args)...));
 
     // Potentially resize each column's width based on the widths of the new row.
-    const RowSizedArray<std::size_t> widths = column_widths_for_row(m_data.back());
+    RowSizedArray<std::size_t> const widths = column_widths_for_row(m_data.back());
 
     for (std::size_t i = 0; i < widths.size(); ++i)
     {
@@ -238,7 +238,7 @@ void Table<Args...>::print_table(std::ostream &stream) const
 
     // Compute the entire width of the table. There are 1 + the number of columns vertical
     // separators ('|'), plus the width of each column (with 2 padding spacers each).
-    const std::size_t table_width = (m_column_widths.size() + 1) +
+    std::size_t const table_width = (m_column_widths.size() + 1) +
         std::accumulate(m_column_widths.begin(), m_column_widths.end(), 0_zu) +
         (2 * m_column_widths.size());
 
@@ -257,14 +257,14 @@ void Table<Args...>::print_table(std::ostream &stream) const
 template <class... Args>
 void Table<Args...>::print_title(std::ostream &stream, std::size_t table_width) const
 {
-    const auto style = fly::logger::Styler(s_title_style, s_title_color);
+    auto const style = fly::logger::Styler(s_title_style, s_title_color);
 
     print_row_separator(stream, table_width, s_border_style);
     print_column_separator(stream, s_border_style);
 
     // Compute the width available for the title. The title can consume the same width of the table,
     // except for the 2 vertical separators (and their padding) for the table's outside borders.
-    const std::size_t title_width = table_width - 4;
+    std::size_t const title_width = table_width - 4;
 
     auto title = std::string_view(m_title).substr(0, title_width);
     stream << style << fly::String::format(" {:^{}} ", title, title_width);
@@ -281,7 +281,7 @@ void Table<Args...>::print_headers(std::ostream &stream, std::size_t table_width
     {
         print_column_separator(stream, index == 0 ? s_border_style : fly::logger::Style::Default);
 
-        const auto style = fly::logger::Styler(s_header_style, s_header_color);
+        auto const style = fly::logger::Styler(s_header_style, s_header_color);
         stream << style;
 
         stream << fly::String::format(" {:^{}} ", m_headers[index], m_column_widths[index]);
@@ -293,14 +293,14 @@ void Table<Args...>::print_headers(std::ostream &stream, std::size_t table_width
 
 //==================================================================================================
 template <class... Args>
-void Table<Args...>::print_row(std::ostream &stream, const Row &row) const
+void Table<Args...>::print_row(std::ostream &stream, Row const &row) const
 {
     std::size_t index = 0;
 
-    auto print_value = [this, &stream, &index](const auto &value) {
+    auto print_value = [this, &stream, &index](auto const &value) {
         print_column_separator(stream, index == 0 ? s_border_style : fly::logger::Style::Default);
 
-        const auto style = fly::logger::Styler(s_data_style, s_data_color);
+        auto const style = fly::logger::Styler(s_data_style, s_data_color);
         stream << style;
 
         if constexpr (std::is_floating_point_v<std::remove_cvref_t<decltype(value)>>)
@@ -316,7 +316,7 @@ void Table<Args...>::print_row(std::ostream &stream, const Row &row) const
         ++index;
     };
 
-    std::apply([&print_value](const auto &...e) { (print_value(e), ...); }, row);
+    std::apply([&print_value](auto const &...e) { (print_value(e), ...); }, row);
     print_column_separator(stream, s_border_style) << '\n';
 }
 
@@ -343,12 +343,12 @@ Table<Args...>::print_column_separator(std::ostream &stream, fly::logger::Style 
 
 //==================================================================================================
 template <class... Args>
-auto Table<Args...>::column_widths_for_row(const Row &row) -> RowSizedArray<std::size_t>
+auto Table<Args...>::column_widths_for_row(Row const &row) -> RowSizedArray<std::size_t>
 {
     RowSizedArray<std::size_t> widths;
     std::size_t index = 0;
 
-    auto size_of_value = [&widths, &index](const auto &value) {
+    auto size_of_value = [&widths, &index](auto const &value) {
         using T = std::decay_t<decltype(value)>;
 
         if constexpr (fly::StandardStringLike<T>)
@@ -364,11 +364,11 @@ auto Table<Args...>::column_widths_for_row(const Row &row) -> RowSizedArray<std:
             }
             else
             {
-                const std::size_t negative = value < 0 ? 1 : 0;
-                const std::size_t digits = static_cast<std::size_t>(
+                std::size_t const negative = value < 0 ? 1 : 0;
+                std::size_t const digits = static_cast<std::size_t>(
                     std::abs(static_cast<std::int64_t>(std::log10(std::abs(value)))) + 1);
-                const std::size_t commas = (digits - 1) / 3;
-                const std::size_t decimal = std::is_floating_point_v<T> ? s_precision + 1 : 0;
+                std::size_t const commas = (digits - 1) / 3;
+                std::size_t const decimal = std::is_floating_point_v<T> ? s_precision + 1 : 0;
 
                 widths[index] = negative + digits + commas + decimal;
             }
@@ -381,7 +381,7 @@ auto Table<Args...>::column_widths_for_row(const Row &row) -> RowSizedArray<std:
         ++index;
     };
 
-    std::apply([&size_of_value](const auto &...e) { (size_of_value(e), ...); }, row);
+    std::apply([&size_of_value](auto const &...e) { (size_of_value(e), ...); }, row);
     return widths;
 }
 

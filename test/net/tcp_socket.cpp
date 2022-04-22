@@ -27,8 +27,8 @@
 
 namespace {
 
-constexpr const char *s_localhost = "localhost";
-constexpr const fly::net::port_type s_port = 12389;
+constexpr char const *s_localhost = "localhost";
+constexpr fly::net::port_type s_port = 12389;
 
 } // namespace
 
@@ -41,8 +41,8 @@ CATCH_TEMPLATE_TEST_CASE("TcpSocket", "[net]", fly::net::IPv4Address, fly::net::
 
     fly::test::ScopedSocketServiceSetup::create();
 
-    const std::string message(fly::String::generate_random_string(1 << 10));
-    constexpr const auto in_addr_loopback = IPAddressType::in_addr_loopback();
+    std::string const message(fly::String::generate_random_string(1 << 10));
+    constexpr auto in_addr_loopback = IPAddressType::in_addr_loopback();
 
     CATCH_SECTION("Moving a socket marks the moved-from socket as invalid")
     {
@@ -329,7 +329,7 @@ CATCH_TEMPLATE_TEST_CASE("AsyncTcpSocket", "[net]", fly::net::IPv4Address, fly::
         fly::task::SequencedTaskRunner::create(fly::test::task_manager()),
         std::make_shared<fly::net::NetworkConfig>());
 
-    const std::string message(fly::String::generate_random_string(1 << 10));
+    std::string const message(fly::String::generate_random_string(1 << 10));
     fly::test::Signal signal;
 
     CATCH_SECTION("Sockets created without socket service may not connect asynchronously")

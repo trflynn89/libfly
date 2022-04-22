@@ -20,7 +20,7 @@ CATCH_TEST_CASE("Config", "[config]")
 
     CATCH_SECTION("Values that can't convert to the desired type fallback to provided default")
     {
-        const fly::Json values = {{"name", "John Doe"}, {"address", "USA"}};
+        fly::Json const values = {{"name", "John Doe"}, {"address", "USA"}};
 
         config.update(values);
 
@@ -30,7 +30,7 @@ CATCH_TEST_CASE("Config", "[config]")
 
     CATCH_SECTION("Mixed conversion of value types")
     {
-        const fly::Json values =
+        fly::Json const values =
             {{"name", "John Doe"}, {"address", "123"}, {"employed", "1"}, {"age", "26.2"}};
 
         config.update(values);

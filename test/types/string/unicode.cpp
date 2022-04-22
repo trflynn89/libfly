@@ -36,7 +36,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
         CATCH_CAPTURE(line);
 
         auto begin = test.cbegin();
-        const auto end = test.cend();
+        auto const end = test.cend();
 
         CATCH_CHECK_FALSE(BasicString::validate(test));
         CATCH_CHECK_FALSE(BasicString::escape_codepoint(begin, end));
@@ -53,7 +53,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
         CATCH_CAPTURE(line);
 
         auto begin = test.cbegin();
-        const auto end = test.cend();
+        auto const end = test.cend();
 
         CATCH_CHECK_FALSE(BasicString::unescape_codepoint(begin, end));
 
@@ -69,7 +69,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
         std::optional<string_type> actual;
 
         auto begin = test.cbegin();
-        const auto end = test.cend();
+        auto const end = test.cend();
 
         CATCH_CHECK(BasicString::validate(test));
         CATCH_CHECK_FALSE(BasicString::decode_codepoint(begin, end));
@@ -92,7 +92,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
         string_type test;
 
         auto begin = test.cend();
-        const auto end = test.cend();
+        auto const end = test.cend();
 
         CATCH_CHECK_FALSE(BasicString::decode_codepoint(begin, end));
         CATCH_CHECK_FALSE(BasicString::escape_codepoint(begin, end));
@@ -122,7 +122,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
             // UTF-32 encoding really only fails if there is no data.
             string_type test;
             auto begin = test.cend();
-            const auto end = test.cend();
+            auto const end = test.cend();
 
             CATCH_CHECK_FALSE(BasicString::escape_codepoint(begin, end));
         }
@@ -159,7 +159,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
                 string_type test = make_string({0xff});
 
                 auto begin = test.cbegin();
-                const auto end = test.cend();
+                auto const end = test.cend();
 
                 CATCH_CHECK_FALSE(BasicString::validate(test));
                 CATCH_CHECK_FALSE(BasicString::escape_codepoint(begin, end));
@@ -295,7 +295,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
         auto encoded_to = [&](codepoint_type ch, string_type &&expected) {
             CATCH_CAPTURE(ch);
 
-            const string_type test = make_string({ch});
+            string_type const test = make_string({ch});
             std::optional<string_type> actual;
 
             CATCH_CHECK(BasicString::validate(test));
@@ -305,7 +305,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
 
             {
                 auto begin = test.cbegin();
-                const auto end = test.cend();
+                auto const end = test.cend();
 
                 actual = BasicString::template escape_codepoint<'u'>(begin, end);
                 CATCH_CHECK(actual == expected);
@@ -315,7 +315,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
             }
             {
                 auto begin = test.cbegin();
-                const auto end = test.cend();
+                auto const end = test.cend();
 
                 actual = BasicString::template escape_codepoint<'U'>(begin, end);
                 CATCH_CHECK(actual == expected);
@@ -356,7 +356,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
                 CATCH_CHECK(BasicString::validate(expected));
 
                 auto begin = test.cbegin();
-                const auto end = test.cend();
+                auto const end = test.cend();
                 CATCH_CAPTURE(std::distance(begin, end));
 
                 std::optional<string_type> actual;
@@ -481,7 +481,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
             CATCH_CHECK(BasicString::validate(expected));
 
             auto begin = test.cbegin();
-            const auto end = test.cend();
+            auto const end = test.cend();
 
             std::optional<string_type> actual;
 
@@ -564,7 +564,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
                     CATCH_CHECK(BasicString::validate(test));
 
                     auto it = test.cbegin();
-                    const auto end = test.cend();
+                    auto const end = test.cend();
 
                     std::optional<codepoint_type> actual = BasicString::decode_codepoint(it, end);
                     CATCH_CHECK(actual == expected);
@@ -581,7 +581,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
                 std::size_t index = 0;
 
                 auto it = test.cbegin();
-                const auto end = test.cend();
+                auto const end = test.cend();
 
                 for (; (it != end) && (index < expected.size()); ++index)
                 {
@@ -600,7 +600,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
 
                     CATCH_CHECK_FALSE(BasicString::validate(test));
 
-                    const auto end = test.cend();
+                    auto const end = test.cend();
                     std::size_t actual = 0;
 
                     for (auto it = test.cbegin(); it != end;)

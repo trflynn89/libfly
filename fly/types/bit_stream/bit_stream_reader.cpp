@@ -13,7 +13,7 @@ BitStreamReader::BitStreamReader(std::istream &stream) noexcept :
     byte_type magic = 0;
 
     // Cannot use read_byte because the remainder bits are not known yet.
-    const byte_type bytes_read = fill(m_header, detail::s_byte_type_size);
+    byte_type const bytes_read = fill(m_header, detail::s_byte_type_size);
 
     if (bytes_read == 1_u8)
     {
@@ -59,14 +59,14 @@ byte_type BitStreamReader::header() const
 //==================================================================================================
 void BitStreamReader::refill_buffer()
 {
-    const byte_type bits_to_fill = detail::s_most_significant_bit_position - m_position;
+    byte_type const bits_to_fill = detail::s_most_significant_bit_position - m_position;
     buffer_type buffer = 0;
 
-    const byte_type bytes_read = fill(buffer, bits_to_fill / detail::s_bits_per_byte);
+    byte_type const bytes_read = fill(buffer, bits_to_fill / detail::s_bits_per_byte);
 
     if (bytes_read > 0)
     {
-        const byte_type bits_read = bytes_read * detail::s_bits_per_byte;
+        byte_type const bits_read = bytes_read * detail::s_bits_per_byte;
         m_position += bits_read;
 
         // It is undefined behavior to bit-shift by the size of the value being shifted, i.e. when

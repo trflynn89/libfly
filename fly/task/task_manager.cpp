@@ -8,7 +8,7 @@ namespace fly::task {
 
 namespace {
 
-    const std::chrono::milliseconds s_delay(10);
+    constexpr std::chrono::milliseconds s_delay(10);
 
 } // namespace
 
@@ -19,7 +19,8 @@ std::shared_ptr<TaskManager> TaskManager::create(std::uint32_t thread_count)
     // is used to expose the private constructor locally.
     struct TaskManagerImpl final : public TaskManager
     {
-        explicit TaskManagerImpl(std::uint32_t thread_count) noexcept : TaskManager(thread_count)
+        explicit TaskManagerImpl(std::uint32_t thread_count) noexcept :
+            TaskManager(thread_count)
         {
         }
     };

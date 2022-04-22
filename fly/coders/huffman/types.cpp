@@ -3,7 +3,11 @@
 namespace fly::coders {
 
 //==================================================================================================
-HuffmanNode::HuffmanNode() noexcept : m_symbol(0), m_frequency(0), m_left(nullptr), m_right(nullptr)
+HuffmanNode::HuffmanNode() noexcept :
+    m_symbol(0),
+    m_frequency(0),
+    m_left(nullptr),
+    m_right(nullptr)
 {
 }
 
@@ -40,13 +44,16 @@ void HuffmanNode::become_intermediate(HuffmanNode *left, HuffmanNode *right)
 }
 
 //==================================================================================================
-bool HuffmanNodeComparator::operator()(const HuffmanNode *left, const HuffmanNode *right)
+bool HuffmanNodeComparator::operator()(HuffmanNode const *left, HuffmanNode const *right)
 {
     return left->m_frequency > right->m_frequency;
 }
 
 //==================================================================================================
-HuffmanCode::HuffmanCode() noexcept : m_symbol(0), m_code(0), m_length(0)
+HuffmanCode::HuffmanCode() noexcept :
+    m_symbol(0),
+    m_code(0),
+    m_length(0)
 {
 }
 
@@ -77,7 +84,7 @@ HuffmanCode &HuffmanCode::operator=(HuffmanCode &&code) noexcept
 }
 
 //==================================================================================================
-bool operator<(const HuffmanCode &left, const HuffmanCode &right)
+bool operator<(HuffmanCode const &left, HuffmanCode const &right)
 {
     if (left.m_length == right.m_length)
     {

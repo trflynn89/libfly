@@ -58,7 +58,7 @@ protected:
      * @return The created mask.
      */
     template <detail::BitStreamInteger DataType>
-    DataType bit_mask(const DataType bits);
+    DataType bit_mask(DataType const bits);
 
     std::streambuf *m_stream_buffer;
 
@@ -68,7 +68,7 @@ protected:
 
 //==================================================================================================
 template <detail::BitStreamInteger DataType>
-inline DataType BitStream::bit_mask(const DataType bits)
+inline DataType BitStream::bit_mask(DataType const bits)
 {
     static constexpr auto s_filled = std::numeric_limits<DataType>::max();
     static constexpr auto s_digits = std::numeric_limits<DataType>::digits;

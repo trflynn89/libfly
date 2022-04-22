@@ -76,22 +76,22 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Concepts for string-like JSON types")
     {
-        CATCH_CHECK(fly::JsonString<const string_type>);
+        CATCH_CHECK(fly::JsonString<string_type const>);
         CATCH_CHECK(fly::JsonString<string_type>);
-        CATCH_CHECK_FALSE(fly::JsonString<const char_type *>);
+        CATCH_CHECK_FALSE(fly::JsonString<char_type const *>);
         CATCH_CHECK_FALSE(fly::JsonString<char_type *>);
-        CATCH_CHECK_FALSE(fly::JsonString<const char_type[]>);
+        CATCH_CHECK_FALSE(fly::JsonString<char_type const[]>);
         CATCH_CHECK_FALSE(fly::JsonString<char_type[]>);
-        CATCH_CHECK_FALSE(fly::JsonString<const view_type>);
+        CATCH_CHECK_FALSE(fly::JsonString<view_type const>);
         CATCH_CHECK_FALSE(fly::JsonString<view_type>);
 
-        CATCH_CHECK(fly::JsonStringLike<const string_type>);
+        CATCH_CHECK(fly::JsonStringLike<string_type const>);
         CATCH_CHECK(fly::JsonStringLike<string_type>);
-        CATCH_CHECK(fly::JsonStringLike<const char_type *>);
+        CATCH_CHECK(fly::JsonStringLike<char_type const *>);
         CATCH_CHECK(fly::JsonStringLike<char_type *>);
-        CATCH_CHECK(fly::JsonStringLike<const char_type[]>);
+        CATCH_CHECK(fly::JsonStringLike<char_type const[]>);
         CATCH_CHECK(fly::JsonStringLike<char_type[]>);
-        CATCH_CHECK(fly::JsonStringLike<const view_type>);
+        CATCH_CHECK(fly::JsonStringLike<view_type const>);
         CATCH_CHECK(fly::JsonStringLike<view_type>);
 
         CATCH_CHECK_FALSE(fly::JsonString<array_type>);
@@ -127,7 +127,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(fly::JsonString<boolean_type>);
         CATCH_CHECK_FALSE(fly::JsonString<float_type>);
         CATCH_CHECK_FALSE(fly::JsonString<double_type>);
-        CATCH_CHECK_FALSE(fly::JsonString<const char_type>);
+        CATCH_CHECK_FALSE(fly::JsonString<char_type const>);
         CATCH_CHECK_FALSE(fly::JsonString<char_type>);
 
         CATCH_CHECK_FALSE(fly::JsonStringLike<null_type>);
@@ -135,7 +135,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(fly::JsonStringLike<boolean_type>);
         CATCH_CHECK_FALSE(fly::JsonStringLike<float_type>);
         CATCH_CHECK_FALSE(fly::JsonStringLike<double_type>);
-        CATCH_CHECK_FALSE(fly::JsonStringLike<const char_type>);
+        CATCH_CHECK_FALSE(fly::JsonStringLike<char_type const>);
         CATCH_CHECK_FALSE(fly::JsonStringLike<char_type>);
     }
 

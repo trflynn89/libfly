@@ -29,7 +29,8 @@ void standalone_task(bool &task_was_called)
 class TaskClass
 {
 public:
-    explicit TaskClass(bool &task_was_called) : m_task_was_called(task_was_called)
+    explicit TaskClass(bool &task_was_called) :
+        m_task_was_called(task_was_called)
     {
     }
 
@@ -53,7 +54,8 @@ private:
 class CountTask
 {
 public:
-    CountTask() noexcept : m_count(0)
+    CountTask() noexcept :
+        m_count(0)
     {
     }
 
@@ -77,7 +79,8 @@ private:
 class MarkerTask
 {
 public:
-    MarkerTask(fly::ConcurrentQueue<int> *ordering) noexcept : m_ordering(ordering)
+    MarkerTask(fly::ConcurrentQueue<int> *ordering) noexcept :
+        m_ordering(ordering)
     {
     }
 
@@ -96,7 +99,8 @@ private:
 class TimerTask
 {
 public:
-    TimerTask() noexcept : m_start_time(std::chrono::steady_clock::now())
+    TimerTask() noexcept :
+        m_start_time(std::chrono::steady_clock::now())
     {
     }
 
@@ -248,7 +252,7 @@ CATCH_TEST_CASE("Task", "[task]")
             fly::test::WaitableSequencedTaskRunner::create(fly::test::task_manager());
 
         TimerTask task;
-        const std::chrono::milliseconds delay(10);
+        std::chrono::milliseconds const delay(10);
 
         CATCH_REQUIRE(
             task_runner->post_task_with_delay(FROM_HERE, delay, std::bind(&TimerTask::run, &task)));

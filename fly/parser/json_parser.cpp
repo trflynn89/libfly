@@ -19,7 +19,7 @@ namespace {
 } // namespace
 
 //==================================================================================================
-JsonParser::JsonParser(const Features features) noexcept :
+JsonParser::JsonParser(Features features) noexcept :
     Parser(),
     m_allow_comments(is_feature_enabled(features, Features::AllowComments)),
     m_allow_trailing_comma(is_feature_enabled(features, Features::AllowTrailingComma)),
@@ -36,7 +36,7 @@ std::optional<fly::Json> JsonParser::parse_internal()
     {
         json = parse_json();
     }
-    catch (const JsonException &ex)
+    catch (JsonException const &ex)
     {
         JLOG("{}", ex.what());
         return std::nullopt;
@@ -95,7 +95,7 @@ std::optional<fly::Json> JsonParser::parse_json()
 //==================================================================================================
 std::optional<fly::Json> JsonParser::parse_object()
 {
-    static constexpr const Token s_end_token = Token::CloseBrace;
+    static constexpr Token const s_end_token = Token::CloseBrace;
 
     fly::Json object = fly::json_object_type();
     ParseState state;
@@ -133,7 +133,7 @@ std::optional<fly::Json> JsonParser::parse_object()
 //==================================================================================================
 std::optional<fly::Json> JsonParser::parse_array()
 {
-    static constexpr const Token s_end_token = Token::CloseBracket;
+    static constexpr Token const s_end_token = Token::CloseBracket;
 
     fly::Json array = fly::json_array_type();
     ParseState state;
@@ -170,7 +170,7 @@ JsonParser::ParseState JsonParser::state_for_object_or_array(Token end_token)
         return ParseState::Invalid;
     }
 
-    const Token token = peek<Token>();
+    Token const token = peek<Token>();
 
     if (token == end_token)
     {
@@ -219,7 +219,7 @@ std::optional<fly::json_string_type> JsonParser::parse_quoted_string()
 //==================================================================================================
 std::optional<fly::Json> JsonParser::parse_value()
 {
-    const fly::json_string_type value = consume_value();
+    fly::json_string_type const value = consume_value();
 
     if (value == FLY_JSON_STR("true"))
     {
@@ -271,7 +271,7 @@ JsonParser::ParseState JsonParser::consume_token(Token token)
 {
     consume_whitespace();
 
-    if (const Token parsed = get<Token>(); parsed != token)
+    if (Token const parsed = get<Token>(); parsed != token)
     {
         JLOG("Unexpected character {}, was expecting {}", parsed, token);
         return ParseState::Invalid;
@@ -413,19 +413,19 @@ JsonParser::ParseState JsonParser::consume_comment()
 }
 
 //==================================================================================================
-JsonParser::NumberType JsonParser::validate_number(const fly::json_string_type &value) const
+JsonParser::NumberType JsonParser::validate_number(fly::json_string_type const &value) const
 {
-    const fly::JsonStringType::view_type value_view = value;
+    fly::JsonStringType::view_type const value_view = value;
 
-    const bool is_signed = !value_view.empty() && (value_view[0] == '-');
-    const auto signless = value_view.substr(is_signed ? 1 : 0);
+    bool const is_signed = !value_view.empty() && (value_view[0] == '-');
+    auto const signless = value_view.substr(is_signed ? 1 : 0);
 
     if (signless.empty())
     {
         return NumberType::Invalid;
     }
 
-    const bool is_octal =
+    bool const is_octal =
         (signless.size() > 1) && (signless[0] == '0') && fly::JsonStringType::is_digit(signless[1]);
 
     if (!fly::JsonStringType::is_digit(signless[0]) || is_octal)
@@ -433,9 +433,9 @@ JsonParser::NumberType JsonParser::validate_number(const fly::json_string_type &
         return NumberType::Invalid;
     }
 
-    const fly::json_string_type::size_type d = signless.find('.');
-    const fly::json_string_type::size_type e1 = signless.find('e');
-    const fly::json_string_type::size_type e2 = signless.find('E');
+    fly::json_string_type::size_type const d = signless.find('.');
+    fly::json_string_type::size_type const e1 = signless.find('e');
+    fly::json_string_type::size_type const e2 = signless.find('E');
 
     if (d != fly::json_string_type::npos)
     {

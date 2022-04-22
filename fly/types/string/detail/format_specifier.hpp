@@ -126,10 +126,10 @@ struct BasicFormatSpecifier
      */
     explicit constexpr BasicFormatSpecifier(FormatParseContext &context);
 
-    BasicFormatSpecifier(const BasicFormatSpecifier &) = default;
+    BasicFormatSpecifier(BasicFormatSpecifier const &) = default;
     BasicFormatSpecifier(BasicFormatSpecifier &&) = default;
 
-    BasicFormatSpecifier &operator=(const BasicFormatSpecifier &) = default;
+    BasicFormatSpecifier &operator=(BasicFormatSpecifier const &) = default;
     BasicFormatSpecifier &operator=(BasicFormatSpecifier &&) = default;
 
     enum class Alignment : std::uint8_t
@@ -253,8 +253,8 @@ struct BasicFormatSpecifier
      */
     template <typename T>
     friend bool operator==(
-        const BasicFormatSpecifier<T> &specifier1,
-        const BasicFormatSpecifier<T> &specifier2);
+        BasicFormatSpecifier<T> const &specifier1,
+        BasicFormatSpecifier<T> const &specifier2);
 
     std::size_t m_position {0};
 
@@ -451,18 +451,18 @@ private:
         {FLY_CHR(CharType, 'G'), Type::General},
     }};
 
-    static constexpr const auto s_left_brace = FLY_CHR(CharType, '{');
-    static constexpr const auto s_right_brace = FLY_CHR(CharType, '}');
-    static constexpr const auto s_less_than_sign = FLY_CHR(CharType, '<');
-    static constexpr const auto s_greater_than_sign = FLY_CHR(CharType, '>');
-    static constexpr const auto s_caret = FLY_CHR(CharType, '^');
-    static constexpr const auto s_plus_sign = FLY_CHR(CharType, '+');
-    static constexpr const auto s_minus_sign = FLY_CHR(CharType, '-');
-    static constexpr const auto s_space = FLY_CHR(CharType, ' ');
-    static constexpr const auto s_number_sign = FLY_CHR(CharType, '#');
-    static constexpr const auto s_zero = FLY_CHR(CharType, '0');
-    static constexpr const auto s_letter_l = FLY_CHR(CharType, 'L');
-    static constexpr const auto s_decimal = FLY_CHR(CharType, '.');
+    static constexpr auto const s_left_brace = FLY_CHR(CharType, '{');
+    static constexpr auto const s_right_brace = FLY_CHR(CharType, '}');
+    static constexpr auto const s_less_than_sign = FLY_CHR(CharType, '<');
+    static constexpr auto const s_greater_than_sign = FLY_CHR(CharType, '>');
+    static constexpr auto const s_caret = FLY_CHR(CharType, '^');
+    static constexpr auto const s_plus_sign = FLY_CHR(CharType, '+');
+    static constexpr auto const s_minus_sign = FLY_CHR(CharType, '-');
+    static constexpr auto const s_space = FLY_CHR(CharType, ' ');
+    static constexpr auto const s_number_sign = FLY_CHR(CharType, '#');
+    static constexpr auto const s_zero = FLY_CHR(CharType, '0');
+    static constexpr auto const s_letter_l = FLY_CHR(CharType, 'L');
+    static constexpr auto const s_decimal = FLY_CHR(CharType, '.');
 };
 
 /**
@@ -493,7 +493,8 @@ private:
         m_parameter_type = parameter_type;                                                         \
     }                                                                                              \
                                                                                                    \
-    explicit Formatter(FormatSpecifier specifier) noexcept : FormatSpecifier(std::move(specifier)) \
+    explicit Formatter(FormatSpecifier specifier) noexcept :                                       \
+        FormatSpecifier(std::move(specifier))                                                      \
     {                                                                                              \
     }
 
@@ -635,7 +636,7 @@ constexpr auto BasicFormatSpecifier<CharType>::parse_nested_specifier(FormatPars
     -> std::optional<BasicFormatSpecifier>
 {
     // The opening { will have already been consumed, so the starting position is one less.
-    const auto starting_position = context.lexer().position() - 1;
+    auto const starting_position = context.lexer().position() - 1;
 
     BasicFormatSpecifier specifier {};
     specifier.m_position = context.next_position();
@@ -924,7 +925,7 @@ BasicFormatSpecifier<CharType>::resolve_parameter_type(FormatParseContext &conte
 template <fly::StandardCharacter CharType>
 constexpr auto BasicFormatSpecifier<CharType>::type_of(CharType ch) -> std::optional<Type>
 {
-    auto it = std::find_if(s_type_map.begin(), s_type_map.end(), [&ch](const auto &item) {
+    auto it = std::find_if(s_type_map.begin(), s_type_map.end(), [&ch](auto const &item) {
         return item.first == ch;
     });
 
@@ -960,8 +961,8 @@ constexpr bool BasicFormatSpecifier<CharType>::is_numeric() const
 //==================================================================================================
 template <typename T>
 bool operator==(
-    const BasicFormatSpecifier<T> &specifier1,
-    const BasicFormatSpecifier<T> &specifier2)
+    BasicFormatSpecifier<T> const &specifier1,
+    BasicFormatSpecifier<T> const &specifier2)
 {
     return (specifier1.m_position == specifier2.m_position) &&
         (specifier1.m_fill == specifier2.m_fill) &&

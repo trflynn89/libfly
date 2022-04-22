@@ -5,7 +5,7 @@
 namespace fly::config {
 
 //==================================================================================================
-void Config::update(const Json &values)
+void Config::update(Json const &values)
 {
     std::unique_lock<std::shared_timed_mutex> lock(m_values_mutex);
     m_values = values;

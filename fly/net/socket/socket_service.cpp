@@ -48,7 +48,7 @@ SocketService::~SocketService() noexcept
 void SocketService::remove_socket(socket_type handle)
 {
     auto task = [handle](std::shared_ptr<SocketService> self) {
-        auto compare_handles = [handle](const Request &request) {
+        auto compare_handles = [handle](Request const &request) {
             return handle == request.m_handle;
         };
 
@@ -100,22 +100,22 @@ void SocketService::poll()
     std::set<socket_type> writable;
     std::set<socket_type> readable;
 
-    for (const auto &request : m_write_requests)
+    for (auto const &request : m_write_requests)
     {
         writable.insert(request.m_handle);
     }
-    for (const auto &request : m_read_requests)
+    for (auto const &request : m_read_requests)
     {
         readable.insert(request.m_handle);
     }
 
     detail::select(m_config->socket_io_wait_time(), writable, readable);
 
-    auto invoke = [](const std::set<socket_type> &ready, std::vector<Request> &pending) {
+    auto invoke = [](std::set<socket_type> const &ready, std::vector<Request> &pending) {
         for (socket_type handle : ready)
         {
             auto it =
-                std::find_if(pending.begin(), pending.end(), [handle](const Request &request) {
+                std::find_if(pending.begin(), pending.end(), [handle](Request const &request) {
                     return handle == request.m_handle;
                 });
 

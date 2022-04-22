@@ -39,12 +39,12 @@ protected:
      * @return The converted value or the default value.
      */
     template <typename T>
-    T get_value(const std::string &name, T def) const;
+    T get_value(std::string const &name, T def) const;
 
     /**
      * Update this configuration with a new set of parsed values.
      */
-    void update(const Json &);
+    void update(Json const &);
 
 private:
     mutable std::shared_timed_mutex m_values_mutex;
@@ -53,7 +53,7 @@ private:
 
 //==================================================================================================
 template <typename T>
-T Config::get_value(const std::string &name, T def) const
+T Config::get_value(std::string const &name, T def) const
 {
     std::shared_lock<std::shared_timed_mutex> lock(m_values_mutex);
 
@@ -61,7 +61,7 @@ T Config::get_value(const std::string &name, T def) const
     {
         return T(m_values[name]);
     }
-    catch (const JsonException &)
+    catch (JsonException const &)
     {
     }
 

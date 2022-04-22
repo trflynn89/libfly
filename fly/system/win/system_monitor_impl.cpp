@@ -12,7 +12,7 @@ namespace fly::system {
 
 namespace {
 
-    const LPCWSTR s_cpu_path = L"\\Processor(_Total)\\% Processor Time";
+    LPCWSTR const s_cpu_path = L"\\Processor(_Total)\\% Processor Time";
 
 } // namespace
 
@@ -109,9 +109,9 @@ void SystemMonitorImpl::update_process_cpu_usage()
         ::memcpy(&system, &fsystem, sizeof(FILETIME));
         ::memcpy(&user, &fuser, sizeof(FILETIME));
 
-        const ULONGLONG cpu = (system.QuadPart - m_prev_process_system_time) +
+        ULONGLONG const cpu = (system.QuadPart - m_prev_process_system_time) +
             (user.QuadPart - m_prev_process_user_time);
-        const ULONGLONG time = now.QuadPart - m_prev_time;
+        ULONGLONG const time = now.QuadPart - m_prev_time;
 
         m_process_cpu_usage.store(100.0 * cpu / time / m_system_cpu_count.load());
 

@@ -15,7 +15,7 @@ CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::I
 
     CATCH_SECTION("Endpoints may be default constructed")
     {
-        const EndpointType endpoint;
+        EndpointType const endpoint;
 
         CATCH_CHECK(endpoint.address() == IPAddressType());
         CATCH_CHECK(endpoint.port() == 0);
@@ -26,14 +26,14 @@ CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::I
 
     CATCH_SECTION("Endpoints may be constructed from existing IP addresses")
     {
-        const auto address1 = IPAddressType::in_addr_loopback();
-        const EndpointType endpoint1(address1, 1);
+        auto const address1 = IPAddressType::in_addr_loopback();
+        EndpointType const endpoint1(address1, 1);
 
         CATCH_CHECK(endpoint1.address() == address1);
         CATCH_CHECK(endpoint1.port() == 1);
 
         auto address2 = IPAddressType::in_addr_loopback();
-        const EndpointType endpoint2(std::move(address2), 2);
+        EndpointType const endpoint2(std::move(address2), 2);
 
         CATCH_CHECK(endpoint2.address() == address1);
         CATCH_CHECK(endpoint2.port() == 2);
@@ -41,8 +41,8 @@ CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::I
 
     CATCH_SECTION("Endpoints may be copied")
     {
-        const auto endpoint1 = EndpointType(IPAddressType::in_addr_loopback(), 1);
-        const auto endpoint2 = endpoint1;
+        auto const endpoint1 = EndpointType(IPAddressType::in_addr_loopback(), 1);
+        auto const endpoint2 = endpoint1;
 
         CATCH_CHECK(endpoint1 == endpoint2);
     }
@@ -50,7 +50,7 @@ CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::I
     CATCH_SECTION("Endpoints may be moved")
     {
         auto endpoint1 = EndpointType(IPAddressType::in_addr_loopback(), 1);
-        const auto endpoint2 = std::move(endpoint1);
+        auto const endpoint2 = std::move(endpoint1);
 
         CATCH_CHECK(endpoint2.address() == IPAddressType::in_addr_loopback());
         CATCH_CHECK(endpoint2.port() == 1);
@@ -58,9 +58,9 @@ CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::I
 
     CATCH_SECTION("Endpoints may be compared")
     {
-        const auto endpoint1 = EndpointType(IPAddressType::in_addr_loopback(), 1);
-        const auto endpoint2 = EndpointType(IPAddressType::in_addr_loopback(), 2);
-        const auto endpoint3 = EndpointType(IPAddressType::in_addr_loopback(), 3);
+        auto const endpoint1 = EndpointType(IPAddressType::in_addr_loopback(), 1);
+        auto const endpoint2 = EndpointType(IPAddressType::in_addr_loopback(), 2);
+        auto const endpoint3 = EndpointType(IPAddressType::in_addr_loopback(), 3);
 
         CATCH_CHECK(endpoint2 == endpoint2);
         CATCH_CHECK(endpoint1 != endpoint2);
@@ -92,13 +92,13 @@ CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::I
     {
         CATCH_SECTION("Endpoints may be converted to a string")
         {
-            const auto endpoint = EndpointType(IPAddressType::in_addr_loopback(), 1);
+            auto const endpoint = EndpointType(IPAddressType::in_addr_loopback(), 1);
             CATCH_CHECK(fly::String::format("{}", endpoint) == "127.0.0.1:1");
         }
 
         CATCH_SECTION("Endpoints may be created from a string")
         {
-            const auto endpoint = EndpointType::from_string("127.0.0.1:123");
+            auto const endpoint = EndpointType::from_string("127.0.0.1:123");
             CATCH_REQUIRE(endpoint);
 
             CATCH_CHECK(endpoint->address() == IPAddressType::in_addr_loopback());
@@ -142,13 +142,13 @@ CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::I
     {
         CATCH_SECTION("Endpoints may be converted to a string")
         {
-            const auto endpoint = EndpointType(IPAddressType::in_addr_loopback(), 1);
+            auto const endpoint = EndpointType(IPAddressType::in_addr_loopback(), 1);
             CATCH_CHECK(fly::String::format("{}", endpoint) == "[::1]:1");
         }
 
         CATCH_SECTION("Endpoints may be created from a string")
         {
-            const auto endpoint = EndpointType::from_string("[::1]:123");
+            auto const endpoint = EndpointType::from_string("[::1]:123");
             CATCH_REQUIRE(endpoint);
 
             CATCH_CHECK(endpoint->address() == IPAddressType::in_addr_loopback());

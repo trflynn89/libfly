@@ -31,7 +31,7 @@ namespace fly {
  * following member template function:
  *
  *     template <typename FormatContext>
- *     void format(const T &value, FormatContext &context);
+ *     void format(T const &value, FormatContext &context);
  *
  * Where the FormatContext is a structure holding the formatting state.
  *
@@ -56,16 +56,16 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
      * @param context The context holding the formatting state.
      */
     template <typename FormatContext>
-    void format(const T &value, FormatContext &context)
+    void format(T const &value, FormatContext &context)
     {
-        const std::size_t min_width = FormatSpecifier::width(context, 0);
-        const std::size_t max_width = FormatSpecifier::precision(context, string_type::npos);
+        std::size_t const min_width = FormatSpecifier::width(context, 0);
+        std::size_t const max_width = FormatSpecifier::precision(context, string_type::npos);
 
-        const std::size_t actual_size = detail::BasicClassifier<CharType>::size(value);
-        const std::size_t value_size = std::min(max_width, actual_size);
+        std::size_t const actual_size = detail::BasicClassifier<CharType>::size(value);
+        std::size_t const value_size = std::min(max_width, actual_size);
 
-        const std::size_t padding_size = std::max(value_size, min_width) - value_size;
-        const auto padding_char = m_fill.value_or(s_space);
+        std::size_t const padding_size = std::max(value_size, min_width) - value_size;
+        auto const padding_char = m_fill.value_or(s_space);
 
         auto append_padding = [&context, padding_char](std::size_t count) {
             for (std::size_t i = 0; i < count; ++i)
@@ -89,8 +89,8 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 
             case FormatSpecifier::Alignment::Center:
             {
-                const std::size_t left_padding = padding_size / 2;
-                const std::size_t right_padding =
+                std::size_t const left_padding = padding_size / 2;
+                std::size_t const right_padding =
                     (padding_size % 2 == 0) ? left_padding : left_padding + 1;
 
                 append_padding(left_padding);
@@ -115,7 +115,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
      * @param context The context holding the formatting state.
      */
     template <typename FormatContext>
-    static void append_string(const T &value, std::size_t value_size, FormatContext &context)
+    static void append_string(T const &value, std::size_t value_size, FormatContext &context)
     {
         using standard_character_type = StandardCharacterType<T>;
         using standard_view_type = std::basic_string_view<standard_character_type>;
@@ -133,7 +133,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 
         if constexpr (fly::SameAs<CharType, standard_character_type>)
         {
-            for (const auto &ch : view)
+            for (auto const &ch : view)
             {
                 *context.out()++ = ch;
             }
@@ -144,7 +144,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 
             if (auto converted = unicode::template convert_encoding<string_type>(view); converted)
             {
-                for (const auto &ch : *converted)
+                for (auto const &ch : *converted)
                 {
                     *context.out()++ = ch;
                 }
@@ -155,7 +155,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 private:
     using string_type = std::basic_string<CharType>;
 
-    static constexpr const auto s_space = FLY_CHR(CharType, ' ');
+    static constexpr auto const s_space = FLY_CHR(CharType, ' ');
 };
 
 //==================================================================================================
@@ -180,7 +180,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 
         Formatter<std::uintptr_t, CharType> formatter(*this);
         formatter.format(
-            reinterpret_cast<std::uintptr_t>(static_cast<const void *>(value)),
+            reinterpret_cast<std::uintptr_t>(static_cast<void const *>(value)),
             context);
     }
 };
@@ -209,8 +209,8 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
             // Compute the absolute value of the integer. Benchmarks showed this is exactly as fast
             // as std::abs, but this also tracks whether the original value was negative without
             // branches.
-            const T sign = value >> std::numeric_limits<T>::digits;
-            const U unsigned_value = static_cast<U>(static_cast<U>(value ^ sign) + (sign & 1));
+            T const sign = value >> std::numeric_limits<T>::digits;
+            U const unsigned_value = static_cast<U>(static_cast<U>(value ^ sign) + (sign & 1));
 
             format(unsigned_value, static_cast<bool>(sign), context);
         }
@@ -259,12 +259,12 @@ private:
             }
         }
 
-        const int base = static_cast<int>(m_type);
-        const std::size_t value_size = count_digits(value, base) + prefix_size;
+        int const base = static_cast<int>(m_type);
+        std::size_t const value_size = count_digits(value, base) + prefix_size;
 
-        const std::size_t width = FormatSpecifier::width(context, 0);
-        const std::size_t padding_size = std::max(value_size, width) - value_size;
-        const auto padding_char = m_fill.value_or(s_space);
+        std::size_t const width = FormatSpecifier::width(context, 0);
+        std::size_t const padding_size = std::max(value_size, width) - value_size;
+        auto const padding_char = m_fill.value_or(s_space);
 
         auto append_prefix = [this, is_negative, &context]() {
             if (is_negative)
@@ -282,7 +282,7 @@ private:
 
             if (m_alternate_form)
             {
-                const bool is_upper_case = m_case == FormatSpecifier::Case::Upper;
+                bool const is_upper_case = m_case == FormatSpecifier::Case::Upper;
                 *context.out()++ = s_zero;
 
                 if (m_type == FormatSpecifier::Type::Binary)
@@ -319,8 +319,8 @@ private:
 
             case FormatSpecifier::Alignment::Center:
             {
-                const std::size_t left_padding = padding_size / 2;
-                const std::size_t right_padding =
+                std::size_t const left_padding = padding_size / 2;
+                std::size_t const right_padding =
                     (padding_size % 2 == 0) ? left_padding : left_padding + 1;
 
                 append_padding(left_padding, padding_char);
@@ -368,9 +368,9 @@ private:
             return;
         }
 
-        const std::size_t width = FormatSpecifier::width(context, 0);
-        const std::size_t padding_size = width > 1 ? width - 1 : 0;
-        const auto padding_char = m_fill.value_or(s_space);
+        std::size_t const width = FormatSpecifier::width(context, 0);
+        std::size_t const padding_size = width > 1 ? width - 1 : 0;
+        auto const padding_char = m_fill.value_or(s_space);
 
         auto append_padding = [&context, padding_char](std::size_t count) {
             for (std::size_t i = 0; i < count; ++i)
@@ -393,8 +393,8 @@ private:
 
             case FormatSpecifier::Alignment::Center:
             {
-                const std::size_t left_padding = padding_size / 2;
-                const std::size_t right_padding =
+                std::size_t const left_padding = padding_size / 2;
+                std::size_t const right_padding =
                     (padding_size % 2 == 0) ? left_padding : left_padding + 1;
 
                 append_padding(left_padding);
@@ -435,7 +435,7 @@ private:
         char *begin = s_buffer.data();
         char *end = begin + s_buffer.size();
 
-        const auto result = std::to_chars(begin, end, value, base);
+        auto const result = std::to_chars(begin, end, value, base);
 
         if ((m_type == FormatSpecifier::Type::Hex) && (m_case == FormatSpecifier::Case::Upper))
         {
@@ -447,7 +447,7 @@ private:
 
         if constexpr (fly::SameAs<string_type, std::string>)
         {
-            for (const char *it = begin; it != result.ptr; ++it)
+            for (char const *it = begin; it != result.ptr; ++it)
             {
                 *context.out()++ = *it;
             }
@@ -487,14 +487,14 @@ private:
         return digits;
     }
 
-    static constexpr const auto s_plus_sign = FLY_CHR(CharType, '+');
-    static constexpr const auto s_minus_sign = FLY_CHR(CharType, '-');
-    static constexpr const auto s_space = FLY_CHR(CharType, ' ');
-    static constexpr const auto s_zero = FLY_CHR(CharType, '0');
-    static constexpr const auto s_lower_b = FLY_CHR(CharType, 'b');
-    static constexpr const auto s_upper_b = FLY_CHR(CharType, 'B');
-    static constexpr const auto s_lower_x = FLY_CHR(CharType, 'x');
-    static constexpr const auto s_upper_x = FLY_CHR(CharType, 'X');
+    static constexpr auto const s_plus_sign = FLY_CHR(CharType, '+');
+    static constexpr auto const s_minus_sign = FLY_CHR(CharType, '-');
+    static constexpr auto const s_space = FLY_CHR(CharType, ' ');
+    static constexpr auto const s_zero = FLY_CHR(CharType, '0');
+    static constexpr auto const s_lower_b = FLY_CHR(CharType, 'b');
+    static constexpr auto const s_upper_b = FLY_CHR(CharType, 'B');
+    static constexpr auto const s_lower_x = FLY_CHR(CharType, 'x');
+    static constexpr auto const s_upper_x = FLY_CHR(CharType, 'X');
 };
 
 //==================================================================================================
@@ -521,7 +521,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
     template <typename FormatContext>
     void format(T value, FormatContext &context)
     {
-        const bool is_negative = std::signbit(value);
+        bool const is_negative = std::signbit(value);
         value = std::abs(value);
 
         std::size_t prefix_size = 0;
@@ -532,8 +532,8 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
             ++prefix_size;
         }
 
-        const int precision = static_cast<int>(FormatSpecifier::precision(context, 6));
-        const FloatConversionResult result = convert_value(value, precision);
+        int const precision = static_cast<int>(FormatSpecifier::precision(context, 6));
+        FloatConversionResult const result = convert_value(value, precision);
 
         auto append_prefix = [this, &is_negative, &context]() {
             if (is_negative)
@@ -600,12 +600,12 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
             }
         };
 
-        const std::size_t value_size = prefix_size + result.m_digits.size() +
+        std::size_t const value_size = prefix_size + result.m_digits.size() +
             result.m_exponent.size() + static_cast<std::size_t>(result.m_append_decimal) +
             result.m_zeroes_to_append;
-        const std::size_t width = FormatSpecifier::width(context, 0);
-        const std::size_t padding_size = std::max(value_size, width) - value_size;
-        const auto padding_char = m_fill.value_or(s_space);
+        std::size_t const width = FormatSpecifier::width(context, 0);
+        std::size_t const padding_size = std::max(value_size, width) - value_size;
+        auto const padding_char = m_fill.value_or(s_space);
 
         switch (m_alignment)
         {
@@ -623,8 +623,8 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
 
             case FormatSpecifier::Alignment::Center:
             {
-                const std::size_t left_padding = padding_size / 2;
-                const std::size_t right_padding =
+                std::size_t const left_padding = padding_size / 2;
+                std::size_t const right_padding =
                     (padding_size % 2 == 0) ? left_padding : left_padding + 1;
 
                 append_padding(left_padding, padding_char);
@@ -798,7 +798,7 @@ private:
                 break;
         }
 
-        const auto to_chars_result = std::to_chars(begin, end, value, fmt, precision);
+        auto const to_chars_result = std::to_chars(begin, end, value, fmt, precision);
 
         FloatConversionResult conversion_result;
         conversion_result.m_digits =
@@ -808,7 +808,7 @@ private:
         {
             conversion_result.m_append_decimal = true;
 
-            for (const char *it = begin; it != to_chars_result.ptr; ++it)
+            for (char const *it = begin; it != to_chars_result.ptr; ++it)
             {
                 if (*it == '.')
                 {
@@ -816,7 +816,7 @@ private:
                 }
                 else if (*it == exponent)
                 {
-                    const auto position = static_cast<std::size_t>(it - begin);
+                    auto const position = static_cast<std::size_t>(it - begin);
 
                     conversion_result.m_exponent = conversion_result.m_digits.substr(position);
                     conversion_result.m_digits = conversion_result.m_digits.substr(0, position);
@@ -825,7 +825,7 @@ private:
 
             if (m_type == FormatSpecifier::Type::General)
             {
-                const auto digits = conversion_result.m_digits.size() -
+                auto const digits = conversion_result.m_digits.size() -
                     static_cast<std::size_t>(!conversion_result.m_append_decimal);
 
                 if (static_cast<std::size_t>(precision) > digits)
@@ -849,10 +849,10 @@ private:
 
 #endif // FLY_COMPILER_SUPPORTS_FP_CHARCONV
 
-    static constexpr const auto s_plus_sign = FLY_CHR(CharType, '+');
-    static constexpr const auto s_minus_sign = FLY_CHR(CharType, '-');
-    static constexpr const auto s_space = FLY_CHR(CharType, ' ');
-    static constexpr const auto s_zero = FLY_CHR(CharType, '0');
+    static constexpr auto const s_plus_sign = FLY_CHR(CharType, '+');
+    static constexpr auto const s_minus_sign = FLY_CHR(CharType, '-');
+    static constexpr auto const s_space = FLY_CHR(CharType, ' ');
+    static constexpr auto const s_zero = FLY_CHR(CharType, '0');
 };
 
 //==================================================================================================
@@ -885,8 +885,8 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
     }
 
 private:
-    static constexpr const CharType *s_true = FLY_STR(CharType, "true");
-    static constexpr const CharType *s_false = FLY_STR(CharType, "false");
+    static constexpr CharType const *s_true = FLY_STR(CharType, "true");
+    static constexpr CharType const *s_false = FLY_STR(CharType, "false");
 };
 
 } // namespace fly

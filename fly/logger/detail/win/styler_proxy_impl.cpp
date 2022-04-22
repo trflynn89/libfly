@@ -55,7 +55,7 @@ StylerProxyImpl::~StylerProxyImpl()
 template <>
 void StylerProxyImpl::apply_value<WORD, fly::logger::Style>(
     WORD &attributes,
-    const fly::logger::Style &modifier)
+    fly::logger::Style const &modifier)
 {
     // https://docs.microsoft.com/en-us/windows/console/console-screen-buffers#character-attributes
     switch (modifier)
@@ -75,7 +75,7 @@ void StylerProxyImpl::apply_value<WORD, fly::logger::Style>(
 template <>
 void StylerProxyImpl::apply_value<WORD, fly::logger::Color>(
     WORD &attributes,
-    const fly::logger::Color &modifier)
+    fly::logger::Color const &modifier)
 {
     // https://docs.microsoft.com/en-us/windows/console/console-screen-buffers#character-attributes
     auto apply_color = [&attributes, &modifier](bool red, bool green, bool blue) {
@@ -126,9 +126,9 @@ void StylerProxyImpl::apply_value<WORD, fly::logger::Color>(
 template <>
 void StylerProxyImpl::apply_value<COORD, fly::logger::Cursor>(
     COORD &attributes,
-    const fly::logger::Cursor &modifier)
+    fly::logger::Cursor const &modifier)
 {
-    const std::uint8_t &distance = modifier.m_distance;
+    std::uint8_t const &distance = modifier.m_distance;
 
     switch (modifier.m_direction)
     {
@@ -149,7 +149,7 @@ void StylerProxyImpl::apply_value<COORD, fly::logger::Cursor>(
 
 //==================================================================================================
 void StylerProxyImpl::apply_styles_and_colors(
-    const CONSOLE_SCREEN_BUFFER_INFO &console_info,
+    CONSOLE_SCREEN_BUFFER_INFO const &console_info,
     std::stack<fly::logger::Style> &&styles,
     std::stack<fly::logger::Color> &&colors)
 {
@@ -171,7 +171,7 @@ void StylerProxyImpl::apply_styles_and_colors(
 
 //==================================================================================================
 void StylerProxyImpl::apply_cursors(
-    const CONSOLE_SCREEN_BUFFER_INFO &console_info,
+    CONSOLE_SCREEN_BUFFER_INFO const &console_info,
     std::stack<fly::logger::Cursor> &&cursors)
 {
     COORD cursor_position = console_info.dwCursorPosition;

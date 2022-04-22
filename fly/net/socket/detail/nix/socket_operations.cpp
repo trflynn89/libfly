@@ -36,17 +36,17 @@ namespace {
     using IPv4Endpoint = fly::net::Endpoint<fly::net::IPv4Address>;
     using IPv6Endpoint = fly::net::Endpoint<fly::net::IPv6Address>;
 
-    fly::net::IPv4Address create_address(const sockaddr_in &socket_address)
+    fly::net::IPv4Address create_address(sockaddr_in const &socket_address)
     {
         return fly::net::IPv4Address(socket_address.sin_addr.s_addr);
     }
 
-    fly::net::IPv6Address create_address(const sockaddr_in6 &socket_address)
+    fly::net::IPv6Address create_address(sockaddr_in6 const &socket_address)
     {
         return fly::net::IPv6Address(socket_address.sin6_addr.s6_addr);
     }
 
-    sockaddr_in endpoint_to_address(const fly::net::Endpoint<fly::net::IPv4Address> &endpoint)
+    sockaddr_in endpoint_to_address(fly::net::Endpoint<fly::net::IPv4Address> const &endpoint)
     {
         sockaddr_in socket_address {};
 
@@ -57,7 +57,7 @@ namespace {
         return socket_address;
     }
 
-    sockaddr_in6 endpoint_to_address(const fly::net::Endpoint<fly::net::IPv6Address> &endpoint)
+    sockaddr_in6 endpoint_to_address(fly::net::Endpoint<fly::net::IPv6Address> const &endpoint)
     {
         sockaddr_in6 socket_address {};
 
@@ -68,7 +68,7 @@ namespace {
         return socket_address;
     }
 
-    fly::net::Endpoint<fly::net::IPv4Address> address_to_endpoint(const sockaddr_in &socket_address)
+    fly::net::Endpoint<fly::net::IPv4Address> address_to_endpoint(sockaddr_in const &socket_address)
     {
         fly::net::IPv4Address address = create_address(socket_address);
         fly::net::port_type port = ntohs(socket_address.sin_port);
@@ -77,7 +77,7 @@ namespace {
     }
 
     fly::net::Endpoint<fly::net::IPv6Address>
-    address_to_endpoint(const sockaddr_in6 &socket_address)
+    address_to_endpoint(sockaddr_in6 const &socket_address)
     {
         fly::net::IPv6Address address = create_address(socket_address);
         fly::net::port_type port = ntohs(socket_address.sin6_port);
@@ -92,9 +92,9 @@ namespace {
     }
 
     template <typename SocketAddressType>
-    const sockaddr *base(const SocketAddressType &address)
+    sockaddr const *base(SocketAddressType const &address)
     {
-        return reinterpret_cast<const sockaddr *>(&address);
+        return reinterpret_cast<sockaddr const *>(&address);
     }
 
 } // namespace
@@ -129,7 +129,7 @@ std::optional<IPAddressType> hostname_to_address(std::string_view hostname)
     hints.ai_protocol = IPPROTO_TCP;
 
     // Copying to a string is required because the hostname might not be null terminated.
-    const std::string hostname_copy(hostname.data(), hostname.size());
+    std::string const hostname_copy(hostname.data(), hostname.size());
 
     if (int error = ::getaddrinfo(hostname_copy.c_str(), nullptr, &hints, &results); error != 0)
     {
@@ -138,7 +138,7 @@ std::optional<IPAddressType> hostname_to_address(std::string_view hostname)
     }
 
     auto *address = reinterpret_cast<socket_address_type<EndpointType> *>(results->ai_addr);
-    const auto ip_address = create_address(*address);
+    auto const ip_address = create_address(*address);
     ::freeaddrinfo(results);
 
     return ip_address;
@@ -257,10 +257,10 @@ template std::optional<IPv6Endpoint> remote_endpoint(fly::net::socket_type handl
 
 //==================================================================================================
 template <fly::net::IPEndpoint EndpointType>
-bool bind(fly::net::socket_type handle, const EndpointType &endpoint, fly::net::BindMode mode)
+bool bind(fly::net::socket_type handle, EndpointType const &endpoint, fly::net::BindMode mode)
 {
-    static constexpr const int s_bind_reuse = 1;
-    static constexpr const socklen_t s_bind_reuse_size = sizeof(s_bind_reuse);
+    static constexpr int const s_bind_reuse = 1;
+    static constexpr socklen_t const s_bind_reuse_size = sizeof(s_bind_reuse);
 
     if (mode == fly::net::BindMode::AllowReuse)
     {
@@ -271,7 +271,7 @@ bool bind(fly::net::socket_type handle, const EndpointType &endpoint, fly::net::
         }
     }
 
-    const auto address = endpoint_to_address(endpoint);
+    auto const address = endpoint_to_address(endpoint);
 
     if (::bind(handle, base(address), sizeof(address)) == -1)
     {
@@ -283,10 +283,10 @@ bool bind(fly::net::socket_type handle, const EndpointType &endpoint, fly::net::
 }
 
 template bool
-bind(fly::net::socket_type handle, const IPv4Endpoint &endpoint, fly::net::BindMode mode);
+bind(fly::net::socket_type handle, IPv4Endpoint const &endpoint, fly::net::BindMode mode);
 
 template bool
-bind(fly::net::socket_type handle, const IPv6Endpoint &endpoint, fly::net::BindMode mode);
+bind(fly::net::socket_type handle, IPv6Endpoint const &endpoint, fly::net::BindMode mode);
 
 //==================================================================================================
 bool listen(fly::net::socket_type handle)
@@ -308,7 +308,7 @@ accept(fly::net::socket_type handle, EndpointType &endpoint, bool &would_block)
     socket_address_type<EndpointType> address;
     socklen_t address_size = sizeof(address);
 
-    const fly::net::socket_type client = ::accept(handle, base(address), &address_size);
+    fly::net::socket_type const client = ::accept(handle, base(address), &address_size);
     would_block = false;
 
     if (client == invalid_socket())
@@ -331,13 +331,13 @@ accept(fly::net::socket_type handle, IPv6Endpoint &endpoint, bool &would_block);
 
 //==================================================================================================
 template <fly::net::IPEndpoint EndpointType>
-fly::net::ConnectedState connect(fly::net::socket_type handle, const EndpointType &endpoint)
+fly::net::ConnectedState connect(fly::net::socket_type handle, EndpointType const &endpoint)
 {
-    const auto address = endpoint_to_address(endpoint);
+    auto const address = endpoint_to_address(endpoint);
 
     if (::connect(handle, base(address), sizeof(address)) == -1)
     {
-        const int error = fly::system::get_error_code();
+        int const error = fly::system::get_error_code();
         SLOGS(handle, "Error connecting");
 
         if ((error == EINTR) || (error == EINPROGRESS))
@@ -352,10 +352,10 @@ fly::net::ConnectedState connect(fly::net::socket_type handle, const EndpointTyp
 }
 
 template fly::net::ConnectedState
-connect(fly::net::socket_type handle, const IPv4Endpoint &endpoint);
+connect(fly::net::socket_type handle, IPv4Endpoint const &endpoint);
 
 template fly::net::ConnectedState
-connect(fly::net::socket_type handle, const IPv6Endpoint &endpoint);
+connect(fly::net::socket_type handle, IPv6Endpoint const &endpoint);
 
 //==================================================================================================
 std::size_t send(fly::net::socket_type handle, std::string_view message, bool &would_block)
@@ -367,11 +367,11 @@ std::size_t send(fly::net::socket_type handle, std::string_view message, bool &w
 
     while (keep_sending)
     {
-        const ssize_t status = ::send(handle, message.data(), message.size(), MSG_NOSIGNAL);
+        ssize_t const status = ::send(handle, message.data(), message.size(), MSG_NOSIGNAL);
 
         if (status > 0)
         {
-            const auto bytes = static_cast<std::size_t>(status);
+            auto const bytes = static_cast<std::size_t>(status);
             bytes_sent += bytes;
 
             message = message.substr(bytes, std::string::npos);
@@ -396,7 +396,7 @@ std::size_t send(fly::net::socket_type handle, std::string_view message, bool &w
 template <fly::net::IPEndpoint EndpointType>
 std::size_t send_to(
     fly::net::socket_type handle,
-    const EndpointType &endpoint,
+    EndpointType const &endpoint,
     std::string_view message,
     std::size_t packet_size,
     bool &would_block)
@@ -404,19 +404,19 @@ std::size_t send_to(
     std::size_t bytes_sent = 0;
     would_block = false;
 
-    const auto address = endpoint_to_address(endpoint);
+    auto const address = endpoint_to_address(endpoint);
     bool keep_sending = !message.empty();
 
     while (keep_sending)
     {
-        const auto size = std::min(packet_size, message.size());
+        auto const size = std::min(packet_size, message.size());
 
-        const ssize_t status =
+        ssize_t const status =
             ::sendto(handle, message.data(), size, 0, base(address), sizeof(address));
 
         if (status > 0)
         {
-            const auto bytes = static_cast<std::size_t>(status);
+            auto const bytes = static_cast<std::size_t>(status);
             bytes_sent += bytes;
 
             message = message.substr(bytes, std::string::npos);
@@ -439,14 +439,14 @@ std::size_t send_to(
 
 template std::size_t send_to(
     fly::net::socket_type handle,
-    const IPv4Endpoint &endpoint,
+    IPv4Endpoint const &endpoint,
     std::string_view message,
     std::size_t packet_size,
     bool &would_block);
 
 template std::size_t send_to(
     fly::net::socket_type handle,
-    const IPv6Endpoint &endpoint,
+    IPv6Endpoint const &endpoint,
     std::string_view message,
     std::size_t packet_size,
     bool &would_block);
@@ -457,7 +457,7 @@ std::string recv(fly::net::socket_type handle, std::size_t packet_size, bool &wo
     std::string result(packet_size, 0);
     would_block = false;
 
-    const ssize_t status = ::recv(handle, result.data(), result.size(), 0);
+    ssize_t const status = ::recv(handle, result.data(), result.size(), 0);
 
     if (status > 0)
     {
@@ -491,7 +491,7 @@ std::string recv_from(
     socket_address_type<EndpointType> address;
     socklen_t address_size = sizeof(address);
 
-    const ssize_t status =
+    ssize_t const status =
         ::recvfrom(handle, result.data(), result.size(), 0, base(address), &address_size);
 
     if (status > 0)
@@ -544,14 +544,14 @@ void select(
         FD_SET(handle, &read_set);
     }
 
-    const socket_type max_handle = std::max(
+    socket_type const max_handle = std::max(
         writing_handles.empty() ? invalid_socket() : *writing_handles.rbegin(),
         reading_handles.empty() ? invalid_socket() : *reading_handles.rbegin());
 
-    const suseconds_t usec = static_cast<suseconds_t>(timeout.count());
+    suseconds_t const usec = static_cast<suseconds_t>(timeout.count());
     timeval tv {0, usec};
 
-    const int status = ::select(max_handle + 1, &read_set, &write_set, nullptr, &tv);
+    int const status = ::select(max_handle + 1, &read_set, &write_set, nullptr, &tv);
 
     if (status > 0)
     {

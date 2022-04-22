@@ -68,7 +68,7 @@ private:
      * @return If successful, the parsed name/value pair. Otherwise, an uninitialized value.
      */
     std::optional<std::pair<std::string, std::string>>
-    on_name_value_pair(const std::string &name_value);
+    on_name_value_pair(std::string const &name_value);
 
     /**
      * If the given string begins and ends with the given character, remove that character from each

@@ -11,33 +11,33 @@ JsonException::JsonException(std::string &&message) noexcept :
 }
 
 //==================================================================================================
-JsonException::JsonException(const Json &json, std::string &&message) noexcept :
+JsonException::JsonException(Json const &json, std::string &&message) noexcept :
     m_message(String::format("JsonException: {}: ({})", message, json))
 {
 }
 
 //==================================================================================================
-JsonException::JsonException(const char *class_name, std::string &&message) noexcept :
+JsonException::JsonException(char const *class_name, std::string &&message) noexcept :
     m_message(String::format("{}: {}", class_name, message))
 {
 }
 
 //==================================================================================================
-const char *JsonException::what() const noexcept
+char const *JsonException::what() const noexcept
 {
     return m_message.c_str();
 }
 
 //==================================================================================================
-JsonIteratorException::JsonIteratorException(const Json &json, std::string &&message) noexcept :
+JsonIteratorException::JsonIteratorException(Json const &json, std::string &&message) noexcept :
     JsonException("JsonIteratorException", String::format("{}: ({})", message, json))
 {
 }
 
 //==================================================================================================
 BadJsonComparisonException::BadJsonComparisonException(
-    const Json &json1,
-    const Json &json2) noexcept :
+    Json const &json1,
+    Json const &json2) noexcept :
     JsonException(
         "BadJsonComparisonException",
         String::format(
@@ -48,7 +48,7 @@ BadJsonComparisonException::BadJsonComparisonException(
 }
 
 //==================================================================================================
-NullJsonException::NullJsonException(const Json &json) noexcept :
+NullJsonException::NullJsonException(Json const &json) noexcept :
     JsonException(
         "NullJsonException",
         String::format("Cannot dereference an empty or past-the-end iterator: ({})", json))
@@ -64,7 +64,7 @@ NullJsonException::NullJsonException() noexcept :
 }
 
 //==================================================================================================
-OutOfRangeJsonException::OutOfRangeJsonException(const Json &json, std::ptrdiff_t offset) noexcept :
+OutOfRangeJsonException::OutOfRangeJsonException(Json const &json, std::ptrdiff_t offset) noexcept :
     JsonException(
         "OutOfRangeJsonException",
         String::format("Offset {} is out-of-range: ({})", offset, json)),

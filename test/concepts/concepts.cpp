@@ -25,9 +25,9 @@ CATCH_TEST_CASE("Concepts", "[concepts]")
     CATCH_SECTION("Concept: SameAs")
     {
         CATCH_CHECK(fly::SameAs<int, int>);
-        CATCH_CHECK(fly::SameAs<int, const int>);
-        CATCH_CHECK(fly::SameAs<const int, int>);
-        CATCH_CHECK(fly::SameAs<const int, const int>);
+        CATCH_CHECK(fly::SameAs<int, int const>);
+        CATCH_CHECK(fly::SameAs<int const, int>);
+        CATCH_CHECK(fly::SameAs<int const, int const>);
 
         CATCH_CHECK(fly::SameAs<int, int>);
         CATCH_CHECK(fly::SameAs<int, int &>);
@@ -35,9 +35,9 @@ CATCH_TEST_CASE("Concepts", "[concepts]")
         CATCH_CHECK(fly::SameAs<int &, int &>);
 
         CATCH_CHECK(fly::SameAs<int, int>);
-        CATCH_CHECK(fly::SameAs<int, const int &>);
-        CATCH_CHECK(fly::SameAs<const int &, int>);
-        CATCH_CHECK(fly::SameAs<const int &, const int &>);
+        CATCH_CHECK(fly::SameAs<int, int const &>);
+        CATCH_CHECK(fly::SameAs<int const &, int>);
+        CATCH_CHECK(fly::SameAs<int const &, int const &>);
 
         CATCH_CHECK_FALSE(fly::SameAs<int, char>);
         CATCH_CHECK_FALSE(fly::SameAs<int *, int>);
@@ -48,9 +48,9 @@ CATCH_TEST_CASE("Concepts", "[concepts]")
     CATCH_SECTION("Concept: SameAsAny")
     {
         CATCH_CHECK(fly::SameAsAny<int, int>);
-        CATCH_CHECK(fly::SameAsAny<int, const int>);
-        CATCH_CHECK(fly::SameAsAny<const int, int>);
-        CATCH_CHECK(fly::SameAsAny<const int, const int>);
+        CATCH_CHECK(fly::SameAsAny<int, int const>);
+        CATCH_CHECK(fly::SameAsAny<int const, int>);
+        CATCH_CHECK(fly::SameAsAny<int const, int const>);
 
         CATCH_CHECK(fly::SameAsAny<int, int>);
         CATCH_CHECK(fly::SameAsAny<int, int &>);
@@ -58,19 +58,19 @@ CATCH_TEST_CASE("Concepts", "[concepts]")
         CATCH_CHECK(fly::SameAsAny<int &, int &>);
 
         CATCH_CHECK(fly::SameAsAny<int, int>);
-        CATCH_CHECK(fly::SameAsAny<int, const int &>);
-        CATCH_CHECK(fly::SameAsAny<const int &, int>);
-        CATCH_CHECK(fly::SameAsAny<const int &, const int &>);
+        CATCH_CHECK(fly::SameAsAny<int, int const &>);
+        CATCH_CHECK(fly::SameAsAny<int const &, int>);
+        CATCH_CHECK(fly::SameAsAny<int const &, int const &>);
 
         CATCH_CHECK(fly::SameAsAny<int, int, int>);
-        CATCH_CHECK(fly::SameAsAny<int, int, const int>);
-        CATCH_CHECK(fly::SameAsAny<int, const int, int>);
-        CATCH_CHECK(fly::SameAsAny<int, const int, const int>);
+        CATCH_CHECK(fly::SameAsAny<int, int, int const>);
+        CATCH_CHECK(fly::SameAsAny<int, int const, int>);
+        CATCH_CHECK(fly::SameAsAny<int, int const, int const>);
 
-        CATCH_CHECK(fly::SameAsAny<const int, int, int>);
-        CATCH_CHECK(fly::SameAsAny<const int, int, const int>);
-        CATCH_CHECK(fly::SameAsAny<const int, const int, int>);
-        CATCH_CHECK(fly::SameAsAny<const int, const int, const int>);
+        CATCH_CHECK(fly::SameAsAny<int const, int, int>);
+        CATCH_CHECK(fly::SameAsAny<int const, int, int const>);
+        CATCH_CHECK(fly::SameAsAny<int const, int const, int>);
+        CATCH_CHECK(fly::SameAsAny<int const, int const, int const>);
 
         CATCH_CHECK(fly::SameAsAny<bool, bool, bool>);
         CATCH_CHECK(fly::SameAsAny<float, float, float, float>);
@@ -89,9 +89,9 @@ CATCH_TEST_CASE("Concepts", "[concepts]")
     CATCH_SECTION("Concept: SameAsAll")
     {
         CATCH_CHECK(fly::SameAsAll<int, int>);
-        CATCH_CHECK(fly::SameAsAll<int, const int>);
-        CATCH_CHECK(fly::SameAsAll<const int, int>);
-        CATCH_CHECK(fly::SameAsAll<const int, const int>);
+        CATCH_CHECK(fly::SameAsAll<int, int const>);
+        CATCH_CHECK(fly::SameAsAll<int const, int>);
+        CATCH_CHECK(fly::SameAsAll<int const, int const>);
 
         CATCH_CHECK(fly::SameAsAll<int, int>);
         CATCH_CHECK(fly::SameAsAll<int, int &>);
@@ -99,19 +99,19 @@ CATCH_TEST_CASE("Concepts", "[concepts]")
         CATCH_CHECK(fly::SameAsAll<int &, int &>);
 
         CATCH_CHECK(fly::SameAsAll<int, int>);
-        CATCH_CHECK(fly::SameAsAll<int, const int &>);
-        CATCH_CHECK(fly::SameAsAll<const int &, int>);
-        CATCH_CHECK(fly::SameAsAll<const int &, const int &>);
+        CATCH_CHECK(fly::SameAsAll<int, int const &>);
+        CATCH_CHECK(fly::SameAsAll<int const &, int>);
+        CATCH_CHECK(fly::SameAsAll<int const &, int const &>);
 
         CATCH_CHECK(fly::SameAsAll<int, int, int>);
-        CATCH_CHECK(fly::SameAsAll<int, int, const int>);
-        CATCH_CHECK(fly::SameAsAll<int, const int, int>);
-        CATCH_CHECK(fly::SameAsAll<int, const int, const int>);
+        CATCH_CHECK(fly::SameAsAll<int, int, int const>);
+        CATCH_CHECK(fly::SameAsAll<int, int const, int>);
+        CATCH_CHECK(fly::SameAsAll<int, int const, int const>);
 
-        CATCH_CHECK(fly::SameAsAll<const int, int, int>);
-        CATCH_CHECK(fly::SameAsAll<const int, int, const int>);
-        CATCH_CHECK(fly::SameAsAll<const int, const int, int>);
-        CATCH_CHECK(fly::SameAsAll<const int, const int, const int>);
+        CATCH_CHECK(fly::SameAsAll<int const, int, int>);
+        CATCH_CHECK(fly::SameAsAll<int const, int, int const>);
+        CATCH_CHECK(fly::SameAsAll<int const, int const, int>);
+        CATCH_CHECK(fly::SameAsAll<int const, int const, int const>);
 
         CATCH_CHECK(fly::SameAsAll<bool, bool, bool>);
         CATCH_CHECK(fly::SameAsAll<float, float, float, float>);
@@ -206,18 +206,18 @@ CATCH_TEST_CASE("Concepts", "[concepts]")
         CATCH_CHECK(fly::DerivedFrom<BazClass, BazClass>);
 
         CATCH_CHECK(fly::DerivedFrom<BazClass, FooClass>);
-        CATCH_CHECK(fly::DerivedFrom<BazClass, const FooClass &>);
+        CATCH_CHECK(fly::DerivedFrom<BazClass, FooClass const &>);
         CATCH_CHECK(fly::DerivedFrom<BazClass, FooClass &&>);
 
         CATCH_CHECK(fly::DerivedFrom<BazClass, FooClass>);
-        CATCH_CHECK(fly::DerivedFrom<const BazClass &, FooClass>);
+        CATCH_CHECK(fly::DerivedFrom<BazClass const &, FooClass>);
         CATCH_CHECK(fly::DerivedFrom<BazClass &&, FooClass>);
 
-        CATCH_CHECK(fly::DerivedFrom<const BazClass &, const FooClass &>);
+        CATCH_CHECK(fly::DerivedFrom<BazClass const &, FooClass const &>);
         CATCH_CHECK(fly::DerivedFrom<BazClass &&, FooClass &&>);
 
-        CATCH_CHECK(fly::DerivedFrom<const BazClass &, FooClass &&>);
-        CATCH_CHECK(fly::DerivedFrom<BazClass &&, const FooClass &>);
+        CATCH_CHECK(fly::DerivedFrom<BazClass const &, FooClass &&>);
+        CATCH_CHECK(fly::DerivedFrom<BazClass &&, FooClass const &>);
 
         CATCH_CHECK_FALSE(fly::DerivedFrom<BazClass, BarClass>);
         CATCH_CHECK_FALSE(fly::DerivedFrom<BarClass, FooClass>);
