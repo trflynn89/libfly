@@ -22,14 +22,14 @@ stages:
 
       - script: |
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main" | sudo tee -a /etc/apt/sources.list.d/llvm.list
+          echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main" | sudo tee -a /etc/apt/sources.list.d/llvm.list
 
           sudo apt-get update
-          sudo apt-get install -y clang-format-13
+          sudo apt-get install -y clang-format-14
         displayName: 'Dependencies'
 
       - script: |
-          make style formatter=clang-format-13 check=1
+          make style formatter=clang-format-14 check=1
         displayName: 'Style'
 
   - stage: Linux

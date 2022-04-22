@@ -62,7 +62,8 @@ int s_sendto_call_count = 0;
 } // namespace
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 //==============================================================================================
