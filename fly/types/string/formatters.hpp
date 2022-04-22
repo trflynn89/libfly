@@ -557,7 +557,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
             }
         };
 
-        auto append_number = [this, &context, &result]() {
+        auto append_number = [&context, &result]() {
             if constexpr (fly::SameAs<string_type, std::string>)
             {
                 for (auto ch : result.m_digits)
