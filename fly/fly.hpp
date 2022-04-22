@@ -1,5 +1,7 @@
 #pragma once
 
+#include <version>
+
 // Determine operating system.
 #if defined(__linux__)
 #    define FLY_LINUX
@@ -26,7 +28,7 @@
 #if defined(FLY_COMPILER_DISABLE_CONSTEVAL)
 #    undef FLY_COMPILER_SUPPORTS_CONSTEVAL
 #    define FLY_CONSTEVAL constexpr
-#elif defined(FLY_COMPILER_GCC)
+#elif defined(__cpp_consteval) && !defined(FLY_COMPILER_MSVC)
 #    define FLY_COMPILER_SUPPORTS_CONSTEVAL
 #    define FLY_CONSTEVAL consteval
 #else
@@ -34,7 +36,7 @@
 #    define FLY_CONSTEVAL constexpr
 #endif
 
-#if defined(FLY_COMPILER_GCC) || defined(FLY_COMPILER_MSVC)
+#if defined(__cpp_lib_to_chars)
 #    define FLY_COMPILER_SUPPORTS_FP_CHARCONV
 #else
 #    undef FLY_COMPILER_SUPPORTS_FP_CHARCONV
