@@ -105,7 +105,7 @@ std::optional<EndpointType> remote_endpoint(fly::net::socket_type handle);
  * @return True if the operation was successful.
  */
 template <fly::net::IPEndpoint EndpointType>
-bool bind(fly::net::socket_type handle, const EndpointType &endpoint, fly::net::BindMode mode);
+bool bind(fly::net::socket_type handle, EndpointType const &endpoint, fly::net::BindMode mode);
 
 /**
  * Configure a socket to be used to accept incoming connections.
@@ -139,7 +139,7 @@ accept(fly::net::socket_type handle, EndpointType &endpoint, bool &would_block);
  * @return The connection state (disconnected, connecting, or connected).
  */
 template <fly::net::IPEndpoint EndpointType>
-fly::net::ConnectedState connect(fly::net::socket_type handle, const EndpointType &endpoint);
+fly::net::ConnectedState connect(fly::net::socket_type handle, EndpointType const &endpoint);
 
 /**
  * Transmit a message to a connected remote socket.
@@ -166,7 +166,7 @@ std::size_t send(fly::net::socket_type handle, std::string_view message, bool &w
 template <fly::net::IPEndpoint EndpointType>
 std::size_t send_to(
     fly::net::socket_type handle,
-    const EndpointType &endpoint,
+    EndpointType const &endpoint,
     std::string_view message,
     std::size_t packet_size,
     bool &would_block);

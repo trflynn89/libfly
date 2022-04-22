@@ -8,14 +8,14 @@ CATCH_TEST_CASE("Fly", "[fly]")
 {
     CATCH_SECTION("Stringize helper")
     {
-        const std::string s = FLY_STRINGIZE(libfly);
+        std::string const s = FLY_STRINGIZE(libfly);
         CATCH_CHECK(s == "libfly");
     }
 
     CATCH_SECTION("Operating system-dependent headers")
     {
         static_assert(fly::is_linux() || fly::is_macos() || fly::is_windows());
-        const std::string header = FLY_OS_IMPL_PATH(libfly, fly);
+        std::string const header = FLY_OS_IMPL_PATH(libfly, fly);
 
         if constexpr (fly::is_linux())
         {

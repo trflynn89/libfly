@@ -46,7 +46,7 @@ public:
      * @return True if the string is Unicode compliant.
      */
     template <typename IteratorType>
-    static bool validate_encoding(IteratorType &it, const IteratorType &end);
+    static bool validate_encoding(IteratorType &it, IteratorType const &end);
 
     /**
      * Convert the Unicode encoding of a string to another encoding.
@@ -91,7 +91,7 @@ public:
      */
     template <typename IteratorType>
     static std::optional<codepoint_type>
-    decode_codepoint(IteratorType &it, const IteratorType &end);
+    decode_codepoint(IteratorType &it, IteratorType const &end);
 
     /**
      * Encode a single Unicode codepoint.
@@ -133,7 +133,7 @@ public:
      */
     template <char UnicodePrefix = 'U', typename IteratorType>
     requires fly::UnicodePrefixCharacter<UnicodePrefix>
-    static std::optional<string_type> escape_codepoint(IteratorType &it, const IteratorType &end);
+    static std::optional<string_type> escape_codepoint(IteratorType &it, IteratorType const &end);
 
     /**
      * Unescape a single Unicode codepoint, starting at the character pointed to by provided
@@ -155,7 +155,7 @@ public:
      *         uninitialized value.
      */
     template <typename IteratorType>
-    static std::optional<string_type> unescape_codepoint(IteratorType &it, const IteratorType &end);
+    static std::optional<string_type> unescape_codepoint(IteratorType &it, IteratorType const &end);
 
 private:
     friend BasicUnicode<char>;
@@ -192,7 +192,7 @@ private:
      */
     template <char UnicodePrefix, typename IteratorType>
     requires fly::UnicodePrefixCharacter<UnicodePrefix>
-    static codepoint_type unescape_codepoint(IteratorType &it, const IteratorType &end);
+    static codepoint_type unescape_codepoint(IteratorType &it, IteratorType const &end);
 
     /**
      * Decode a Unicode codepoint from a UTF-8 string.
@@ -206,7 +206,7 @@ private:
      */
     template <typename IteratorType>
     requires fly::SizeOfTypeIs<CharType, 1>
-    static codepoint_type codepoint_from_string(IteratorType &it, const IteratorType &end);
+    static codepoint_type codepoint_from_string(IteratorType &it, IteratorType const &end);
 
     /**
      * Decode a Unicode codepoint from a UTF-16 string.
@@ -220,7 +220,7 @@ private:
      */
     template <typename IteratorType>
     requires fly::SizeOfTypeIs<CharType, 2>
-    static codepoint_type codepoint_from_string(IteratorType &it, const IteratorType &end);
+    static codepoint_type codepoint_from_string(IteratorType &it, IteratorType const &end);
 
     /**
      * Decode a Unicode codepoint from a UTF-32 string.
@@ -234,7 +234,7 @@ private:
      */
     template <typename IteratorType>
     requires fly::SizeOfTypeIs<CharType, 4>
-    static codepoint_type codepoint_from_string(IteratorType &it, const IteratorType &end);
+    static codepoint_type codepoint_from_string(IteratorType &it, IteratorType const &end);
 
     /**
      * Encode a Unicode codepoint into a UTF-8 string.
@@ -307,7 +307,7 @@ private:
      * @return The next byte of the encoded Unicode codepoint.
      */
     template <typename IteratorType>
-    static codepoint_type next_encoded_byte(IteratorType &it, const IteratorType &end);
+    static codepoint_type next_encoded_byte(IteratorType &it, IteratorType const &end);
 
     /**
      * Structure to hold static data required for decoding UTF-8 encoded Unicode codepoints.
@@ -315,19 +315,19 @@ private:
     struct Utf8Data
     {
         // The value of the UTF-8 encoded leading byte.
-        const codepoint_type m_leading_byte;
+        codepoint_type const m_leading_byte;
 
         // A bit-mask of the bits in the UTF-8 encoded leading byte reserved for encoding.
-        const codepoint_type m_encoding_mask;
+        codepoint_type const m_encoding_mask;
 
         // A bit-mask of the bits in the UTF-8 encoded leading byte reserved for codepoint data.
-        const codepoint_type m_codepoint_mask;
+        codepoint_type const m_codepoint_mask;
 
         // The number of bytes required to decode the codepoint.
-        const codepoint_type m_codepoint_size;
+        codepoint_type const m_codepoint_size;
     };
 
-    static constexpr const std::array<Utf8Data, 4> s_utf8_leading_bytes = {{
+    static constexpr std::array<Utf8Data, 4> const s_utf8_leading_bytes = {{
         // Codepoint length 1, range [U+0000, U+007f], leading byte 0b0xxx'xxxx.
         {0b0000'0000, 0b1000'0000, 0b0111'1111, 1},
 
@@ -341,30 +341,30 @@ private:
         {0b1111'0000, 0b1111'1000, 0b0000'0111, 4},
     }};
 
-    static constexpr const Utf8Data s_utf8_continuation_byte =
+    static constexpr Utf8Data const s_utf8_continuation_byte =
         {0b1000'0000, 0b1100'0000, 0b0011'1111, 6};
 
-    static constexpr const codepoint_type s_high_surrogate_min = 0xd800;
-    static constexpr const codepoint_type s_high_surrogate_max = 0xdbff;
-    static constexpr const codepoint_type s_low_surrogate_min = 0xdc00;
-    static constexpr const codepoint_type s_low_surrogate_max = 0xdfff;
-    static constexpr const codepoint_type s_max_codepoint = 0x10ffff;
-    static constexpr const codepoint_type s_invalid_codepoint = 0xffffffff;
+    static constexpr codepoint_type const s_high_surrogate_min = 0xd800;
+    static constexpr codepoint_type const s_high_surrogate_max = 0xdbff;
+    static constexpr codepoint_type const s_low_surrogate_min = 0xdc00;
+    static constexpr codepoint_type const s_low_surrogate_max = 0xdfff;
+    static constexpr codepoint_type const s_max_codepoint = 0x10ffff;
+    static constexpr codepoint_type const s_invalid_codepoint = 0xffffffff;
 
-    static constexpr const auto s_zero = FLY_CHR(CharType, '0');
-    static constexpr const auto s_nine = FLY_CHR(CharType, '9');
-    static constexpr const auto s_lower_a = FLY_CHR(CharType, 'a');
-    static constexpr const auto s_upper_a = FLY_CHR(CharType, 'A');
-    static constexpr const auto s_lower_f = FLY_CHR(CharType, 'f');
-    static constexpr const auto s_upper_f = FLY_CHR(CharType, 'F');
-    static constexpr const auto s_lower_u = FLY_CHR(CharType, 'u');
-    static constexpr const auto s_upper_u = FLY_CHR(CharType, 'U');
+    static constexpr auto const s_zero = FLY_CHR(CharType, '0');
+    static constexpr auto const s_nine = FLY_CHR(CharType, '9');
+    static constexpr auto const s_lower_a = FLY_CHR(CharType, 'a');
+    static constexpr auto const s_upper_a = FLY_CHR(CharType, 'A');
+    static constexpr auto const s_lower_f = FLY_CHR(CharType, 'f');
+    static constexpr auto const s_upper_f = FLY_CHR(CharType, 'F');
+    static constexpr auto const s_lower_u = FLY_CHR(CharType, 'u');
+    static constexpr auto const s_upper_u = FLY_CHR(CharType, 'U');
 };
 
 //==================================================================================================
 template <fly::StandardCharacter CharType>
 template <typename IteratorType>
-bool BasicUnicode<CharType>::validate_encoding(IteratorType &it, const IteratorType &end)
+bool BasicUnicode<CharType>::validate_encoding(IteratorType &it, IteratorType const &end)
 {
     while (it != end)
     {
@@ -401,7 +401,7 @@ bool BasicUnicode<CharType>::convert_encoding_into(view_type value, OutputIterat
     using DesiredUnicodeType = BasicUnicode<typename DesiredStringType::value_type>;
 
     auto it = value.cbegin();
-    const auto end = value.cend();
+    auto const end = value.cend();
 
     while (it != end)
     {
@@ -420,10 +420,10 @@ bool BasicUnicode<CharType>::convert_encoding_into(view_type value, OutputIterat
 //==================================================================================================
 template <fly::StandardCharacter CharType>
 template <typename IteratorType>
-auto BasicUnicode<CharType>::decode_codepoint(IteratorType &it, const IteratorType &end)
+auto BasicUnicode<CharType>::decode_codepoint(IteratorType &it, IteratorType const &end)
     -> std::optional<codepoint_type>
 {
-    const codepoint_type codepoint = codepoint_from_string(it, end);
+    codepoint_type const codepoint = codepoint_from_string(it, end);
 
     if (validate_codepoint(codepoint))
     {
@@ -453,7 +453,7 @@ auto BasicUnicode<CharType>::encode_codepoint(codepoint_type codepoint)
 template <fly::StandardCharacter CharType>
 template <char UnicodePrefix, typename IteratorType>
 requires fly::UnicodePrefixCharacter<UnicodePrefix>
-auto BasicUnicode<CharType>::escape_codepoint(IteratorType &it, const IteratorType &end)
+auto BasicUnicode<CharType>::escape_codepoint(IteratorType &it, IteratorType const &end)
     -> std::optional<string_type>
 {
     if (auto codepoint = decode_codepoint(it, end); codepoint)
@@ -467,10 +467,10 @@ auto BasicUnicode<CharType>::escape_codepoint(IteratorType &it, const IteratorTy
 //==================================================================================================
 template <fly::StandardCharacter CharType>
 template <typename IteratorType>
-auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
+auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, IteratorType const &end)
     -> std::optional<string_type>
 {
-    auto escaped_with = [&it, &end](const CharType ch) -> bool {
+    auto escaped_with = [&it, &end](CharType const ch) -> bool {
         if ((it == end) || ((it + 1) == end))
         {
             return false;
@@ -507,7 +507,7 @@ auto BasicUnicode<CharType>::escape_codepoint(codepoint_type codepoint) -> strin
 
     // TODO: Replace this with BasicString::format without actually including formatters.hpp.
     auto to_hex = [&codepoint](std::size_t length) -> string_type {
-        static const auto *s_digits = FLY_STR(CharType, "0123456789abcdef");
+        static auto const *s_digits = FLY_STR(CharType, "0123456789abcdef");
         string_type hex(length, FLY_CHR(CharType, '0'));
 
         for (std::size_t i = 0, j = (length - 1) * 4; i < length; ++i, j -= 4)
@@ -530,8 +530,8 @@ auto BasicUnicode<CharType>::escape_codepoint(codepoint_type codepoint) -> strin
         {
             if constexpr (UnicodePrefix == 'u')
             {
-                const codepoint_type high_surrogate = 0xd7c0 + (codepoint >> 10);
-                const codepoint_type low_surrogate = 0xdc00 + (codepoint & 0x3ff);
+                codepoint_type const high_surrogate = 0xd7c0 + (codepoint >> 10);
+                codepoint_type const low_surrogate = 0xdc00 + (codepoint & 0x3ff);
 
                 result += escape_codepoint<UnicodePrefix>(high_surrogate);
                 result += escape_codepoint<UnicodePrefix>(low_surrogate);
@@ -556,7 +556,7 @@ auto BasicUnicode<CharType>::escape_codepoint(codepoint_type codepoint) -> strin
 template <fly::StandardCharacter CharType>
 template <char UnicodePrefix, typename IteratorType>
 requires fly::UnicodePrefixCharacter<UnicodePrefix>
-auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
+auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, IteratorType const &end)
     -> codepoint_type
 {
     if ((it == end) || (*it != '\\') || (++it == end) || (*it != UnicodePrefix))
@@ -567,12 +567,12 @@ auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const Iterator
     codepoint_type codepoint = 0;
     ++it;
 
-    static constexpr const codepoint_type s_expected_digits = (UnicodePrefix == 'u') ? 4 : 8;
+    static constexpr codepoint_type const s_expected_digits = (UnicodePrefix == 'u') ? 4 : 8;
     codepoint_type i = 0;
 
     for (i = 0; (i < s_expected_digits) && (it != end); ++i, ++it)
     {
-        const codepoint_type shift = (4 * (s_expected_digits - i - 1));
+        codepoint_type const shift = (4 * (s_expected_digits - i - 1));
 
         if ((*it >= s_zero) && (*it <= s_nine))
         {
@@ -599,16 +599,16 @@ auto BasicUnicode<CharType>::unescape_codepoint(IteratorType &it, const Iterator
 template <fly::StandardCharacter CharType>
 template <typename IteratorType>
 requires fly::SizeOfTypeIs<CharType, 1>
-auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
+auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, IteratorType const &end)
     -> codepoint_type
 {
-    const codepoint_type leading_byte = next_encoded_byte(it, end);
+    codepoint_type const leading_byte = next_encoded_byte(it, end);
 
     // First find the codepoint length by finding which leading byte matches the first encoded byte.
     auto utf8_it = std::find_if(
         s_utf8_leading_bytes.begin(),
         s_utf8_leading_bytes.end(),
-        [&leading_byte](const auto &candidate) {
+        [&leading_byte](auto const &candidate) {
             return (leading_byte & candidate.m_encoding_mask) == candidate.m_leading_byte;
         });
 
@@ -617,7 +617,7 @@ auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const Itera
         return s_invalid_codepoint;
     }
 
-    const std::size_t bytes = utf8_it->m_codepoint_size;
+    std::size_t const bytes = utf8_it->m_codepoint_size;
     std::size_t shift = s_utf8_continuation_byte.m_codepoint_size * (bytes - 1);
 
     // Then decode the encoded bytes using the leading and continuation byte masks.
@@ -625,7 +625,7 @@ auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const Itera
 
     for (std::size_t i = 1; i < bytes; ++i)
     {
-        const codepoint_type continuation_byte = next_encoded_byte(it, end);
+        codepoint_type const continuation_byte = next_encoded_byte(it, end);
 
         if ((continuation_byte & s_utf8_continuation_byte.m_encoding_mask) !=
             s_utf8_continuation_byte.m_leading_byte)
@@ -652,7 +652,7 @@ auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const Itera
 template <fly::StandardCharacter CharType>
 template <typename IteratorType>
 requires fly::SizeOfTypeIs<CharType, 2>
-auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
+auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, IteratorType const &end)
     -> codepoint_type
 {
     auto next_codepoint = [&it, &end]() -> codepoint_type {
@@ -666,7 +666,7 @@ auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const Itera
 template <fly::StandardCharacter CharType>
 template <typename IteratorType>
 requires fly::SizeOfTypeIs<CharType, 4>
-auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, const IteratorType &end)
+auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, IteratorType const &end)
     -> codepoint_type
 {
     return next_encoded_byte(it, end);
@@ -745,7 +745,7 @@ auto BasicUnicode<CharType>::create_codepoint_from_surrogates(
 
     if (is_high_surrogate(codepoint))
     {
-        const codepoint_type low_surrogate = next_codepoint();
+        codepoint_type const low_surrogate = next_codepoint();
 
         if (is_low_surrogate(low_surrogate))
         {
@@ -790,7 +790,7 @@ bool BasicUnicode<CharType>::validate_codepoint(codepoint_type codepoint)
 //==================================================================================================
 template <fly::StandardCharacter CharType>
 template <typename IteratorType>
-inline auto BasicUnicode<CharType>::next_encoded_byte(IteratorType &it, const IteratorType &end)
+inline auto BasicUnicode<CharType>::next_encoded_byte(IteratorType &it, IteratorType const &end)
     -> codepoint_type
 {
     return (it == end) ? s_invalid_codepoint : static_cast<codepoint_type>(*(it++));

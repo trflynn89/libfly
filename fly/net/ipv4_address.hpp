@@ -37,7 +37,7 @@ public:
      *
      * @param address The 4-part array of octets to initialize the IPv4 address from.
      */
-    explicit constexpr IPv4Address(const address_type &address) noexcept;
+    explicit constexpr IPv4Address(address_type const &address) noexcept;
 
     /**
      * Constructor. Create an IPv4 address from a network-order 32-bit value.
@@ -46,10 +46,10 @@ public:
      */
     explicit constexpr IPv4Address(int_type address) noexcept;
 
-    IPv4Address(const IPv4Address &) = default;
+    IPv4Address(IPv4Address const &) = default;
     IPv4Address(IPv4Address &&) = default;
 
-    IPv4Address &operator=(const IPv4Address &) = default;
+    IPv4Address &operator=(IPv4Address const &) = default;
     IPv4Address &operator=(IPv4Address &&) = default;
 
     /**
@@ -95,14 +95,14 @@ public:
      * Three-way-comparison operator. Defaulted to perform the comparison on the network-order IPv4
      * address.
      */
-    auto operator<=>(const IPv4Address &) const = default;
+    auto operator<=>(IPv4Address const &) const = default;
 
 private:
     int_type m_address {0};
 };
 
 //==================================================================================================
-constexpr IPv4Address::IPv4Address(const address_type &address) noexcept
+constexpr IPv4Address::IPv4Address(address_type const &address) noexcept
 {
     m_address |= static_cast<int_type>(address[0]);
     m_address |= static_cast<int_type>(address[1] << 8);
@@ -111,7 +111,8 @@ constexpr IPv4Address::IPv4Address(const address_type &address) noexcept
 }
 
 //==================================================================================================
-constexpr IPv4Address::IPv4Address(int_type address) noexcept : m_address(address)
+constexpr IPv4Address::IPv4Address(int_type address) noexcept :
+    m_address(address)
 {
 }
 
@@ -136,8 +137,8 @@ constexpr IPv4Address IPv4Address::in_addr_loopback()
 //==================================================================================================
 constexpr std::optional<IPv4Address> IPv4Address::from_string(std::string_view address)
 {
-    constexpr const auto s_max32 = static_cast<std::uint64_t>(std::numeric_limits<int_type>::max());
-    constexpr const auto s_decimal = '.';
+    constexpr auto const s_max32 = static_cast<std::uint64_t>(std::numeric_limits<int_type>::max());
+    constexpr auto const s_decimal = '.';
 
     fly::Lexer lexer(std::move(address));
 
@@ -146,7 +147,7 @@ constexpr std::optional<IPv4Address> IPv4Address::from_string(std::string_view a
 
     do
     {
-        if (const auto segment = lexer.consume_number(); segment && (*segment <= s_max32))
+        if (auto const segment = lexer.consume_number(); segment && (*segment <= s_max32))
         {
             parts[index++] = static_cast<int_type>(*segment);
         }
@@ -219,9 +220,9 @@ struct fly::Formatter<fly::net::IPv4Address>
      * @param context The context holding the formatting state.
      */
     template <typename FormatContext>
-    void format(const fly::net::IPv4Address &address, FormatContext &context)
+    void format(fly::net::IPv4Address const &address, FormatContext &context)
     {
-        const auto network_order = address.network_order();
+        auto const network_order = address.network_order();
 
         fly::String::format_to(
             context.out(),

@@ -74,7 +74,7 @@ private:
     static bool s_mock_system_enabled;
     static MockCalls s_mocked_calls;
 
-    const MockCall m_mock;
+    MockCall const m_mock;
 };
 
 } // namespace fly::test

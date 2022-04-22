@@ -17,7 +17,7 @@ namespace fly::coders {
 class CoderConfig : public fly::config::Config
 {
 public:
-    static constexpr const char *identifier = "coder";
+    static constexpr char const *identifier = "coder";
 
     /**
      * @return Huffman encoder chunk size (in bytes).

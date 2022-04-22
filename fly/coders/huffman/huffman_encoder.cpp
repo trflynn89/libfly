@@ -16,12 +16,12 @@ namespace fly::coders {
 
 namespace {
 
-    constexpr const std::uint8_t s_huffman_version = 1;
+    constexpr std::uint8_t s_huffman_version = 1;
 
 } // namespace
 
 //==================================================================================================
-HuffmanEncoder::HuffmanEncoder(const std::shared_ptr<CoderConfig> &config) noexcept :
+HuffmanEncoder::HuffmanEncoder(std::shared_ptr<CoderConfig> const &config) noexcept :
     m_chunk_size(config->huffman_encoder_chunk_size()),
     m_max_code_length(config->huffman_encoder_max_code_length()),
     m_huffman_codes_size(0)
@@ -114,8 +114,8 @@ void HuffmanEncoder::create_tree(std::uint32_t chunk_size)
 //==================================================================================================
 void HuffmanEncoder::create_codes()
 {
-    std::stack<const HuffmanNode *> pending;
-    std::stack<const HuffmanNode *> path;
+    std::stack<HuffmanNode const *> pending;
+    std::stack<HuffmanNode const *> path;
 
     length_type max_code_length = 0;
     m_huffman_codes_size = 0;
@@ -123,7 +123,7 @@ void HuffmanEncoder::create_codes()
     // Symbol frequency is no longer needed. Use that field to form codes.
     m_huffman_tree[0].m_frequency = 0;
 
-    const HuffmanNode *node = nullptr;
+    HuffmanNode const *node = nullptr;
     pending.push(&m_huffman_tree[0]);
 
     while (!pending.empty())
@@ -139,8 +139,8 @@ void HuffmanEncoder::create_codes()
         {
             if ((node->m_left == nullptr) || (node->m_right == nullptr))
             {
-                const auto code = static_cast<code_type>(node->m_frequency);
-                const auto length = static_cast<length_type>(path.size());
+                auto const code = static_cast<code_type>(node->m_frequency);
+                auto const length = static_cast<length_type>(path.size());
                 max_code_length = std::max(max_code_length, length);
 
                 insert_code(HuffmanCode(node->m_symbol, code, length));
@@ -182,11 +182,11 @@ void HuffmanEncoder::insert_code(HuffmanCode &&code)
 //==================================================================================================
 void HuffmanEncoder::limit_code_lengths()
 {
-    auto compute_kraft = [this](const HuffmanCode &code) -> code_type {
+    auto compute_kraft = [this](HuffmanCode const &code) -> code_type {
         return 1_u16 << (m_max_code_length - code.m_length);
     };
 
-    const code_type max_allowed_kraft = (1_u16 << m_max_code_length) - 1;
+    code_type const max_allowed_kraft = (1_u16 << m_max_code_length) - 1;
     code_type kraft = 0;
 
     // Limit all Huffman codes to not be larger than the maximum code length. Compute the Kraft
@@ -242,7 +242,7 @@ void HuffmanEncoder::convert_to_canonical_form()
 
     for (std::uint16_t i = 1; i < m_huffman_codes_size; ++i)
     {
-        const HuffmanCode &previous = m_huffman_codes[i - 1_u16];
+        HuffmanCode const &previous = m_huffman_codes[i - 1_u16];
         HuffmanCode &code = m_huffman_codes[i];
 
         // Subsequent codes are one greater than the previous code, but also bit-shifted left enough
@@ -273,7 +273,7 @@ void HuffmanEncoder::encode_codes(fly::BitStreamWriter &encoded) const
 
     for (std::uint16_t i = 0; i < m_huffman_codes_size; ++i)
     {
-        const HuffmanCode &code = m_huffman_codes[i];
+        HuffmanCode const &code = m_huffman_codes[i];
 
         if (counts.size() <= code.m_length)
         {
@@ -287,7 +287,7 @@ void HuffmanEncoder::encode_codes(fly::BitStreamWriter &encoded) const
     encoded.write_byte(static_cast<byte_type>(counts.size()));
 
     // Encode the code length counts.
-    for (const std::uint16_t &length : counts)
+    for (std::uint16_t const &length : counts)
     {
         encoded.write_word(static_cast<word_type>(length));
     }
@@ -295,7 +295,7 @@ void HuffmanEncoder::encode_codes(fly::BitStreamWriter &encoded) const
     // Encode the symbols.
     for (std::uint16_t i = 0; i < m_huffman_codes_size; ++i)
     {
-        const HuffmanCode &code = m_huffman_codes[i];
+        HuffmanCode const &code = m_huffman_codes[i];
         encoded.write_byte(static_cast<byte_type>(code.m_symbol));
     }
 }
@@ -313,8 +313,8 @@ void HuffmanEncoder::encode_symbols(std::uint32_t chunk_size, fly::BitStreamWrit
 
     for (std::uint32_t i = 0; i < chunk_size; ++i)
     {
-        const HuffmanCode &code = symbols[m_chunk_buffer[i]];
-        const auto length = static_cast<byte_type>(code.m_length);
+        HuffmanCode const &code = symbols[m_chunk_buffer[i]];
+        auto const length = static_cast<byte_type>(code.m_length);
 
         encoded.write_bits(code.m_code, length);
     }

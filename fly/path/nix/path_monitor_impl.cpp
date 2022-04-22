@@ -14,9 +14,9 @@ namespace fly::path {
 
 namespace {
 
-    const int s_init_flags = IN_NONBLOCK;
+    constexpr int s_init_flags = IN_NONBLOCK;
 
-    const int s_change_flags = IN_CREATE | IN_DELETE | IN_MOVED_TO | IN_MOVED_FROM | IN_MODIFY;
+    constexpr int s_change_flags = IN_CREATE | IN_DELETE | IN_MOVED_TO | IN_MOVED_FROM | IN_MODIFY;
 
 } // namespace
 
@@ -75,7 +75,7 @@ void PathMonitorImpl::poll(std::chrono::milliseconds timeout)
 
 //==================================================================================================
 std::unique_ptr<PathMonitor::PathInfo>
-PathMonitorImpl::create_path_info(const std::filesystem::path &path) const
+PathMonitorImpl::create_path_info(std::filesystem::path const &path) const
 {
     return std::make_unique<PathInfoImpl>(m_monitor_descriptor, path);
 }
@@ -94,7 +94,7 @@ bool PathMonitorImpl::read_events()
     }
     else
     {
-        const inotify_event *event;
+        inotify_event const *event;
 
         for (std::uint8_t *event_data = m_event_data.data();
              event_data < (m_event_data.data() + size);
@@ -113,24 +113,24 @@ bool PathMonitorImpl::read_events()
 }
 
 //==================================================================================================
-void PathMonitorImpl::handle_event(const inotify_event *event) const
+void PathMonitorImpl::handle_event(inotify_event const *event) const
 {
     auto path_it = std::find_if(
         m_path_info.begin(),
         m_path_info.end(),
-        [&event](const PathInfoMap::value_type &value) -> bool {
-            const auto *info = static_cast<PathInfoImpl *>(value.second.get());
+        [&event](PathInfoMap::value_type const &value) -> bool {
+            auto const *info = static_cast<PathInfoImpl *>(value.second.get());
             return info->m_watch_descriptor == event->wd;
         });
 
     if (path_it != m_path_info.end())
     {
-        const auto *info = static_cast<PathInfoImpl *>(path_it->second.get());
+        auto const *info = static_cast<PathInfoImpl *>(path_it->second.get());
         PathEvent path_event = convert_to_event(event->mask);
 
         if (path_event != PathEvent::None)
         {
-            const std::filesystem::path file(event->name);
+            std::filesystem::path const file(event->name);
 
             auto file_it = info->m_file_handlers.find(file);
             PathEventCallback callback = nullptr;
@@ -179,7 +179,7 @@ PathEvent PathMonitorImpl::convert_to_event(std::uint32_t mask) const
 //==================================================================================================
 PathMonitorImpl::PathInfoImpl::PathInfoImpl(
     int monitor_descriptor,
-    const std::filesystem::path &path) noexcept :
+    std::filesystem::path const &path) noexcept :
     PathMonitorImpl::PathInfo(),
     m_monitor_descriptor(monitor_descriptor),
     m_watch_descriptor(-1)

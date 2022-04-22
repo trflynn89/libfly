@@ -150,14 +150,14 @@ byte_type BitStreamReader::read_bits(DataType &bits, byte_type size)
     if constexpr (detail::BitStreamBuffer<DataType>)
     {
         // See peek_bits for why buffer_type reads must be split.
-        const byte_type size_high = size / 2;
-        const byte_type size_low = size - size_high;
+        byte_type const size_high = size / 2;
+        byte_type const size_low = size - size_high;
         std::uint32_t bits_high, bits_low;
 
-        const byte_type bits_read_high = peek_bits(bits_high, size_high);
+        byte_type const bits_read_high = peek_bits(bits_high, size_high);
         discard_bits(bits_read_high);
 
-        const byte_type bits_read_low = peek_bits(bits_low, size_low);
+        byte_type const bits_read_low = peek_bits(bits_low, size_low);
         discard_bits(bits_read_low);
 
         bits = (static_cast<DataType>(bits_high) << size_low) | bits_low;
@@ -165,7 +165,7 @@ byte_type BitStreamReader::read_bits(DataType &bits, byte_type size)
     }
     else
     {
-        const byte_type bits_read = peek_bits(bits, size);
+        byte_type const bits_read = peek_bits(bits, size);
         discard_bits(bits_read);
 
         return bits_read;
@@ -201,7 +201,7 @@ byte_type BitStreamReader::peek_bits(DataType &bits, byte_type size)
     {
         peeked = m_position;
 
-        const DataType buffer = static_cast<DataType>(m_buffer);
+        DataType const buffer = static_cast<DataType>(m_buffer);
         lshift = size - m_position;
 
         // Fill the input bits with the remainder of byte buffer.
@@ -217,8 +217,8 @@ byte_type BitStreamReader::peek_bits(DataType &bits, byte_type size)
         lshift -= size;
     }
 
-    const byte_type rshift = m_position - peeked - size;
-    const DataType buffer = static_cast<DataType>(m_buffer >> rshift);
+    byte_type const rshift = m_position - peeked - size;
+    DataType const buffer = static_cast<DataType>(m_buffer >> rshift);
 
     bits |= (buffer & bit_mask<DataType>(size)) << lshift;
     peeked += size;
@@ -238,7 +238,7 @@ byte_type BitStreamReader::fill(DataType &buffer, byte_type bytes)
 {
     if (m_stream)
     {
-        const std::streamsize bytes_read = m_stream_buffer->sgetn(
+        std::streamsize const bytes_read = m_stream_buffer->sgetn(
             reinterpret_cast<std::ios::char_type *>(&buffer),
             static_cast<std::streamsize>(bytes));
 

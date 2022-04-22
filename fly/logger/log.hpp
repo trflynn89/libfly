@@ -71,7 +71,7 @@ struct Log
      */
     Log &operator=(Log &&log) noexcept;
 
-    friend std::ostream &operator<<(std::ostream &stream, const Log &log);
+    friend std::ostream &operator<<(std::ostream &stream, Log const &log);
 
     std::uintmax_t m_index {0};
     Level m_level {Level::NumLevels};

@@ -11,7 +11,7 @@ void WaitableTaskRunner::task_complete(fly::task::TaskLocation &&location)
 }
 
 //==================================================================================================
-void WaitableTaskRunner::wait_for_task_to_complete(const std::string &location)
+void WaitableTaskRunner::wait_for_task_to_complete(std::string const &location)
 {
     std::string completed_location;
 

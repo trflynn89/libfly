@@ -42,7 +42,7 @@ public:
      * Constructor. Parse and validate a C-string literal as a format string.
      */
     template <std::size_t N>
-    FLY_CONSTEVAL BasicFormatString(const CharType (&format)[N]) noexcept;
+    FLY_CONSTEVAL BasicFormatString(CharType const (&format)[N]) noexcept;
 
     BasicFormatString(BasicFormatString &&) = default;
     BasicFormatString &operator=(BasicFormatString &&) = default;
@@ -58,8 +58,8 @@ public:
     std::optional<FormatSpecifier> next_specifier();
 
 private:
-    BasicFormatString(const BasicFormatString &) = delete;
-    BasicFormatString &operator=(const BasicFormatString &) = delete;
+    BasicFormatString(BasicFormatString const &) = delete;
+    BasicFormatString &operator=(BasicFormatString const &) = delete;
 
     /**
      * Upon parsing an un-escaped opening brace, parse a single replacement field in the format
@@ -80,9 +80,9 @@ private:
     template <std::size_t N = 0>
     constexpr void parse_user_defined_specifier(FormatSpecifier &specifier);
 
-    static constexpr const auto s_left_brace = FLY_CHR(CharType, '{');
-    static constexpr const auto s_right_brace = FLY_CHR(CharType, '}');
-    static constexpr const auto s_colon = FLY_CHR(CharType, ':');
+    static constexpr auto const s_left_brace = FLY_CHR(CharType, '{');
+    static constexpr auto const s_right_brace = FLY_CHR(CharType, '}');
+    static constexpr auto const s_colon = FLY_CHR(CharType, ':');
 
     static constexpr std::array<ParameterType, sizeof...(ParameterTypes)> s_parameters {
         infer_parameter_type<ParameterTypes>()...};
@@ -98,7 +98,7 @@ private:
 template <fly::StandardCharacter CharType, typename... ParameterTypes>
 template <std::size_t N>
 FLY_CONSTEVAL BasicFormatString<CharType, ParameterTypes...>::BasicFormatString(
-    const CharType (&format)[N]) noexcept :
+    CharType const (&format)[N]) noexcept :
     m_context(format, s_parameters.data(), s_parameters.size())
 {
     std::optional<CharType> ch;
@@ -158,7 +158,7 @@ template <fly::StandardCharacter CharType, typename... ParameterTypes>
 constexpr auto BasicFormatString<CharType, ParameterTypes...>::parse_specifier() -> FormatSpecifier
 {
     // The opening { will have already been consumed, so the starting position is one less.
-    const auto starting_position = m_context.lexer().position() - 1;
+    auto const starting_position = m_context.lexer().position() - 1;
 
     FormatSpecifier specifier(m_context);
     specifier.m_parse_index = m_context.lexer().position();

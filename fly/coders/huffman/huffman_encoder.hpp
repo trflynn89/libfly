@@ -30,7 +30,7 @@ public:
      *
      * @param config Reference to coder configuration.
      */
-    explicit HuffmanEncoder(const std::shared_ptr<CoderConfig> &config) noexcept;
+    explicit HuffmanEncoder(std::shared_ptr<CoderConfig> const &config) noexcept;
 
 protected:
     /**
@@ -160,8 +160,8 @@ private:
     void encode_symbols(std::uint32_t chunk_size, fly::BitStreamWriter &encoded);
 
     // Configuration.
-    const std::uint32_t m_chunk_size;
-    const length_type m_max_code_length;
+    std::uint32_t const m_chunk_size;
+    length_type const m_max_code_length;
 
     std::unique_ptr<symbol_type[]> m_chunk_buffer;
 

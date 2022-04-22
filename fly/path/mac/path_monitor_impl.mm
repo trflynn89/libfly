@@ -12,15 +12,15 @@ namespace fly::path {
 
 namespace {
 
-    const FSEventStreamCreateFlags s_stream_flags = kFSEventStreamCreateFlagFileEvents |
+    FSEventStreamCreateFlags const s_stream_flags = kFSEventStreamCreateFlagFileEvents |
         kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagUseExtendedData;
 
-    const CFAbsoluteTime s_latency = 0.25;
+    CFAbsoluteTime const s_latency = 0.25;
 
     /**
      * Retreive the inode ID of the provided directory, returning 0 if an error occurs.
      */
-    ino_t get_inode_id(const std::filesystem::path &path)
+    ino_t get_inode_id(std::filesystem::path const &path)
     {
         struct stat info;
 
@@ -85,15 +85,15 @@ void PathMonitorImpl::poll(std::chrono::milliseconds timeout)
 
     while (time_remaining != std::chrono::milliseconds::zero())
     {
-        const auto start = std::chrono::steady_clock::now();
+        auto const start = std::chrono::steady_clock::now();
 
         if (m_event_queue.pop(event, time_remaining))
         {
             handle_event(std::move(event));
         }
 
-        const auto end = std::chrono::steady_clock::now();
-        const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        auto const end = std::chrono::steady_clock::now();
+        auto const duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
         if (duration >= time_remaining)
         {
@@ -108,7 +108,7 @@ void PathMonitorImpl::poll(std::chrono::milliseconds timeout)
 
 //==================================================================================================
 std::unique_ptr<PathMonitor::PathInfo>
-PathMonitorImpl::create_path_info(const std::filesystem::path &path) const
+PathMonitorImpl::create_path_info(std::filesystem::path const &path) const
 {
     return std::make_unique<PathInfoImpl>(this, path);
 }
@@ -167,8 +167,8 @@ void PathMonitorImpl::event_callback(
     void *user_data,
     std::size_t event_size,
     void *event_paths,
-    const FSEventStreamEventFlags event_flags[],
-    const FSEventStreamEventId[])
+    FSEventStreamEventFlags const event_flags[],
+    FSEventStreamEventId const[])
 {
     auto *path_monitor = reinterpret_cast<PathMonitorImpl *>(user_data);
     auto paths = reinterpret_cast<CFArrayRef>(event_paths);
@@ -185,11 +185,11 @@ void PathMonitorImpl::event_callback(
 
         if (CFStringGetFileSystemRepresentation(event_path_as_cfstring, file_path, PATH_MAX))
         {
-            const std::filesystem::path event_path(file_path);
+            std::filesystem::path const event_path(file_path);
 
             if (!std::filesystem::is_directory(event_path))
             {
-                for (const auto &path_event : convert_to_events(event_flags[i]))
+                for (auto const &path_event : convert_to_events(event_flags[i]))
                 {
                     EventInfo event {event_path, path_event};
                     path_monitor->m_event_queue.push(std::move(event));
@@ -205,7 +205,7 @@ void PathMonitorImpl::event_callback(
 }
 
 //==================================================================================================
-std::vector<PathEvent> PathMonitorImpl::convert_to_events(const FSEventStreamEventFlags &flags)
+std::vector<PathEvent> PathMonitorImpl::convert_to_events(FSEventStreamEventFlags const &flags)
 {
     std::vector<PathEvent> path_events;
 
@@ -228,20 +228,20 @@ std::vector<PathEvent> PathMonitorImpl::convert_to_events(const FSEventStreamEve
 //==================================================================================================
 void PathMonitorImpl::handle_event(EventInfo &&event) const
 {
-    const ino_t inode_id = get_inode_id(event.path.parent_path());
+    ino_t const inode_id = get_inode_id(event.path.parent_path());
     std::lock_guard<std::mutex> lock(m_mutex);
 
     auto path_it = std::find_if(
         m_path_info.begin(),
         m_path_info.end(),
-        [&inode_id](const PathInfoMap::value_type &value) -> bool {
-            const auto *info = static_cast<PathInfoImpl *>(value.second.get());
+        [&inode_id](PathInfoMap::value_type const &value) -> bool {
+            auto const *info = static_cast<PathInfoImpl *>(value.second.get());
             return info->m_inode_id == inode_id;
         });
 
     if (path_it != m_path_info.end())
     {
-        const auto *info = static_cast<PathInfoImpl *>(path_it->second.get());
+        auto const *info = static_cast<PathInfoImpl *>(path_it->second.get());
 
         auto file_it = info->m_file_handlers.find(event.path.filename());
         PathEventCallback callback = nullptr;
@@ -267,8 +267,8 @@ void PathMonitorImpl::handle_event(EventInfo &&event) const
 
 //==================================================================================================
 PathMonitorImpl::PathInfoImpl::PathInfoImpl(
-    const PathMonitorImpl *path_monitor,
-    const std::filesystem::path &path) noexcept :
+    PathMonitorImpl const *path_monitor,
+    std::filesystem::path const &path) noexcept :
     PathMonitorImpl::PathInfo(),
     m_path_monitor(const_cast<PathMonitorImpl *>(path_monitor)),
     m_path(CFStringCreateWithCString(nullptr, path.c_str(), kCFStringEncodingUTF8)),

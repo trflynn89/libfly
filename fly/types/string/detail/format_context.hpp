@@ -36,7 +36,7 @@ public:
     template <typename... Parameters>
     constexpr BasicFormatContext(
         OutputIterator out,
-        const BasicFormatParameters<BasicFormatContext, Parameters...> &parameters) noexcept;
+        BasicFormatParameters<BasicFormatContext, Parameters...> const &parameters) noexcept;
 
     /**
      * Get the object holding the format parameter at the specified index. If the index is invalid,
@@ -54,13 +54,13 @@ public:
     OutputIterator &out();
 
 private:
-    BasicFormatContext(const BasicFormatContext &) = delete;
-    BasicFormatContext &operator=(const BasicFormatContext &) = delete;
+    BasicFormatContext(BasicFormatContext const &) = delete;
+    BasicFormatContext &operator=(BasicFormatContext const &) = delete;
 
     OutputIterator m_out;
 
-    const FormatParameter *m_parameters;
-    const std::size_t m_parameters_size;
+    FormatParameter const *m_parameters;
+    std::size_t const m_parameters_size;
 };
 
 //==================================================================================================
@@ -68,7 +68,7 @@ template <typename OutputIterator, fly::StandardCharacter CharType>
 template <typename... Parameters>
 constexpr BasicFormatContext<OutputIterator, CharType>::BasicFormatContext(
     OutputIterator out,
-    const BasicFormatParameters<BasicFormatContext, Parameters...> &parameters) noexcept :
+    BasicFormatParameters<BasicFormatContext, Parameters...> const &parameters) noexcept :
     m_out(std::move(out)),
     m_parameters(parameters.m_parameters.data()),
     m_parameters_size(parameters.m_parameters.size())

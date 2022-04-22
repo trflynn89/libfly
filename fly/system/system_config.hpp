@@ -15,7 +15,7 @@ namespace fly::system {
 class SystemConfig : public fly::config::Config
 {
 public:
-    static constexpr const char *identifier = "system";
+    static constexpr char const *identifier = "system";
 
     /**
      * @return Delay between system monitor poll intervals.

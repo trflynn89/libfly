@@ -53,7 +53,7 @@ public:
      * @return If successful, the parsed values. Otherwise, an uninitialized value.
      */
     template <typename StringType>
-    std::optional<fly::Json> parse_string(const StringType &contents);
+    std::optional<fly::Json> parse_string(StringType const &contents);
 
     /**
      * Parse a file and retrieve the parsed values.
@@ -75,7 +75,7 @@ public:
      *
      * @return If successful, the parsed values. Otherwise, an uninitialized value.
      */
-    std::optional<fly::Json> parse_file(const std::filesystem::path &path);
+    std::optional<fly::Json> parse_file(std::filesystem::path const &path);
 
 protected:
     /**
@@ -181,7 +181,7 @@ private:
 
 //==================================================================================================
 template <typename StringType>
-std::optional<fly::Json> Parser::parse_string(const StringType &contents)
+std::optional<fly::Json> Parser::parse_string(StringType const &contents)
 {
     using char_type = typename StringType::value_type;
 
@@ -203,7 +203,7 @@ std::optional<std::string> Parser::ensure_utf8(std::istream &stream) const
 {
     using char_type = typename StringType::value_type;
 
-    static constexpr const std::uint8_t s_char_size = sizeof(char_type);
+    static constexpr std::uint8_t const s_char_size = sizeof(char_type);
     StringType contents;
 
     while (stream)
@@ -212,7 +212,7 @@ std::optional<std::string> Parser::ensure_utf8(std::istream &stream) const
 
         for (std::uint8_t i = 0; stream && (i < s_char_size); ++i)
         {
-            const std::uint8_t shift = 8 * (s_char_size - i - 1);
+            std::uint8_t const shift = 8 * (s_char_size - i - 1);
             character |= static_cast<char_type>(stream.get() & 0xff) << shift;
         }
 
@@ -241,9 +241,8 @@ inline SymbolType Parser::peek()
 template <typename SymbolType>
 inline SymbolType Parser::get()
 {
-    static constexpr const std::ios::int_type s_new_line = 0x0a;
-
-    const std::ios::int_type symbol = m_stream_buffer->sbumpc();
+    static constexpr std::ios::int_type const s_new_line = 0x0a;
+    std::ios::int_type const symbol = m_stream_buffer->sbumpc();
 
     if (symbol == s_new_line)
     {

@@ -35,7 +35,7 @@ public:
      *
      * @return True if the input string was successfully encoded.
      */
-    virtual bool encode_string(const std::string &decoded, std::string &encoded);
+    virtual bool encode_string(std::string const &decoded, std::string &encoded);
 
     /**
      * Encode a file.
@@ -46,7 +46,7 @@ public:
      * @return True if the input file was successfully encoded.
      */
     virtual bool
-    encode_file(const std::filesystem::path &decoded, const std::filesystem::path &encoded);
+    encode_file(std::filesystem::path const &decoded, std::filesystem::path const &encoded);
 
 protected:
     /**
@@ -106,7 +106,7 @@ public:
      *
      * @return True if the input string was successfully decoded.
      */
-    bool decode_string(const std::string &encoded, std::string &decoded);
+    bool decode_string(std::string const &encoded, std::string &decoded);
 
     /**
      * Decode a file.
@@ -116,7 +116,7 @@ public:
      *
      * @return True if the input file was successfully decoded.
      */
-    bool decode_file(const std::filesystem::path &encoded, const std::filesystem::path &decoded);
+    bool decode_file(std::filesystem::path const &encoded, std::filesystem::path const &decoded);
 
 protected:
     /**

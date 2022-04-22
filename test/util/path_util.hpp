@@ -43,8 +43,8 @@ public:
         std::filesystem::path file() const;
 
     private:
-        ScopedTempDirectory(const ScopedTempDirectory &) = delete;
-        ScopedTempDirectory &operator=(const ScopedTempDirectory &) = delete;
+        ScopedTempDirectory(ScopedTempDirectory const &) = delete;
+        ScopedTempDirectory &operator=(ScopedTempDirectory const &) = delete;
 
         std::filesystem::path m_directory;
     };
@@ -58,7 +58,7 @@ public:
      *
      * @return True if the file was correctly created.
      */
-    static bool write_file(const std::filesystem::path &path, const std::string &contents);
+    static bool write_file(std::filesystem::path const &path, std::string const &contents);
 
     /**
      * Read the contents of a file.
@@ -67,7 +67,7 @@ public:
      *
      * @return Contents of the file.
      */
-    static std::string read_file(const std::filesystem::path &path);
+    static std::string read_file(std::filesystem::path const &path);
 
     /**
      * Compare two files for equality. Two files are equal if they have the same size and the same
@@ -79,7 +79,7 @@ public:
      * @return True if the given files are equal.
      */
     static bool
-    compare_files(const std::filesystem::path &path1, const std::filesystem::path &path2);
+    compare_files(std::filesystem::path const &path1, std::filesystem::path const &path2);
 };
 
 } // namespace fly::test

@@ -8,7 +8,7 @@ namespace fly::coders {
 namespace {
 
     // The Base64 symbol table.
-    constexpr const std::array<std::ios::char_type, 64> s_base64_symbols = {
+    constexpr std::array<std::ios::char_type, 64> s_base64_symbols = {
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
         'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 
@@ -22,7 +22,7 @@ namespace {
 
     // A mapping of ASCII codes to their indices in the Base64 symbol table. Invalid values are -1,
     // and the padding symbol is -2.
-    constexpr const std::array<std::ios::char_type, 256> s_base64_codes = {
+    constexpr std::array<std::ios::char_type, 256> s_base64_codes = {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62,
         -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -2, -1, -1, -1, 0,
@@ -38,7 +38,7 @@ namespace {
     };
 
     // The Base64 padding symbol for 4-byte encoding alignment.
-    constexpr const std::ios::char_type *s_pad = "===";
+    constexpr std::ios::char_type const *s_pad = "===";
 
     /**
      * Encode a chunk of data into Base64 symbols.
@@ -46,11 +46,11 @@ namespace {
      * @param decoded Buffer holding the contents to encode.
      * @param encoded Buffer to store the encoded contents.
      */
-    void encode_chunk(const std::ios::char_type *decoded, std::ios::char_type *encoded)
+    void encode_chunk(std::ios::char_type const *decoded, std::ios::char_type *encoded)
     {
-        const auto &ch0 = decoded[0];
-        const auto &ch1 = decoded[1];
-        const auto &ch2 = decoded[2];
+        auto const &ch0 = decoded[0];
+        auto const &ch1 = decoded[1];
+        auto const &ch2 = decoded[2];
 
         // First 6 bits of the first symbol.
         encoded[0] = s_base64_symbols[static_cast<std::size_t>((ch0 & 0xfc) >> 2)];
@@ -81,12 +81,12 @@ namespace {
      */
     template <typename AllowPadding>
     std::conditional_t<AllowPadding::value, std::size_t, bool>
-    decode_chunk(const std::ios::char_type *encoded, std::ios::char_type *decoded)
+    decode_chunk(std::ios::char_type const *encoded, std::ios::char_type *decoded)
     {
-        const auto code0 = s_base64_codes[static_cast<std::size_t>(encoded[0])];
-        const auto code1 = s_base64_codes[static_cast<std::size_t>(encoded[1])];
-        const auto code2 = s_base64_codes[static_cast<std::size_t>(encoded[2])];
-        const auto code3 = s_base64_codes[static_cast<std::size_t>(encoded[3])];
+        auto const code0 = s_base64_codes[static_cast<std::size_t>(encoded[0])];
+        auto const code1 = s_base64_codes[static_cast<std::size_t>(encoded[1])];
+        auto const code2 = s_base64_codes[static_cast<std::size_t>(encoded[2])];
+        auto const code3 = s_base64_codes[static_cast<std::size_t>(encoded[3])];
 
         // All 6 bits of the first code, first 2 bits of the second code.
         decoded[0] = static_cast<std::ios::char_type>((code0 << 2) | ((code1 >> 4) & 0x03));
@@ -128,9 +128,9 @@ bool Base64Coder::encode_internal(std::istream &decoded, std::ostream &encoded)
     do
     {
         decoded.read(m_decoded.data(), static_cast<std::streamsize>(m_decoded.size()));
-        const auto bytes = static_cast<std::size_t>(decoded.gcount());
+        auto const bytes = static_cast<std::size_t>(decoded.gcount());
 
-        const std::ios::char_type *decoding = m_decoded.data();
+        std::ios::char_type const *decoding = m_decoded.data();
         std::ios::char_type *encoding = m_encoded.data();
 
         for (std::size_t i = bytes / s_decoded_chunk_size; i > 0; --i)
@@ -144,9 +144,9 @@ bool Base64Coder::encode_internal(std::istream &decoded, std::ostream &encoded)
 
         // If the input stream was not evenly split into 3-byte chunks, add padding to the remaining
         // chunk.
-        if (const auto remainder = bytes % s_decoded_chunk_size; remainder > 0)
+        if (auto const remainder = bytes % s_decoded_chunk_size; remainder > 0)
         {
-            const auto end = static_cast<std::size_t>(decoding - m_decoded.data()) + remainder;
+            auto const end = static_cast<std::size_t>(decoding - m_decoded.data()) + remainder;
             ::memset(m_decoded.data() + end, '\0', end);
 
             encode_chunk(decoding, m_encoded.data());
@@ -165,7 +165,7 @@ bool Base64Coder::decode_internal(std::istream &encoded, std::ostream &decoded)
     do
     {
         encoded.read(m_encoded.data(), static_cast<std::streamsize>(m_encoded.size()));
-        const auto bytes = static_cast<std::size_t>(encoded.gcount());
+        auto const bytes = static_cast<std::size_t>(encoded.gcount());
 
         if ((bytes % s_encoded_chunk_size) != 0)
         {
@@ -177,7 +177,7 @@ bool Base64Coder::decode_internal(std::istream &encoded, std::ostream &decoded)
             break;
         }
 
-        const std::ios::char_type *encoding = m_encoded.data();
+        std::ios::char_type const *encoding = m_encoded.data();
         std::ios::char_type *decoding = m_decoded.data();
 
         // For performance, the decoding loop is potentially broken up depending on whether this is
@@ -199,7 +199,7 @@ bool Base64Coder::decode_internal(std::istream &encoded, std::ostream &decoded)
 
         if (encoded.eof())
         {
-            const std::size_t bytes_read = decode_chunk<std::true_type>(encoding, decoding);
+            std::size_t const bytes_read = decode_chunk<std::true_type>(encoding, decoding);
             decoding += bytes_read;
 
             if (bytes_read == 0)

@@ -37,7 +37,7 @@ public:
      *
      * @param address The 16-part array of octets to initialize the IPv6 address from.
      */
-    explicit constexpr IPv6Address(const address_type &address) noexcept;
+    explicit constexpr IPv6Address(address_type const &address) noexcept;
 
     /**
      * Constructor. Create an IPv6 address from a 16-part array of octets. The array should be
@@ -53,12 +53,12 @@ public:
      *
      * @param address The 16-part array of octets to initialize the IPv6 address from.
      */
-    explicit constexpr IPv6Address(const address_type::value_type (&address)[16]) noexcept;
+    explicit constexpr IPv6Address(address_type::value_type const (&address)[16]) noexcept;
 
-    IPv6Address(const IPv6Address &) = default;
+    IPv6Address(IPv6Address const &) = default;
     IPv6Address(IPv6Address &&) = default;
 
-    IPv6Address &operator=(const IPv6Address &) = default;
+    IPv6Address &operator=(IPv6Address const &) = default;
     IPv6Address &operator=(IPv6Address &&) = default;
 
     /**
@@ -98,17 +98,17 @@ public:
      * Comparison operators. Apple's Clang does not fully support the three-way comparison operator,
      * so these must be manually defined.
      */
-    constexpr bool operator==(const IPv6Address &address) const;
-    constexpr bool operator!=(const IPv6Address &address) const;
-    constexpr bool operator<(const IPv6Address &address) const;
-    constexpr bool operator<=(const IPv6Address &address) const;
-    constexpr bool operator>(const IPv6Address &address) const;
-    constexpr bool operator>=(const IPv6Address &address) const;
+    constexpr bool operator==(IPv6Address const &address) const;
+    constexpr bool operator!=(IPv6Address const &address) const;
+    constexpr bool operator<(IPv6Address const &address) const;
+    constexpr bool operator<=(IPv6Address const &address) const;
+    constexpr bool operator>(IPv6Address const &address) const;
+    constexpr bool operator>=(IPv6Address const &address) const;
 #else
     /**
      * Three-way-comparison operator. Defaulted to perform the comparison on the IPv6 array data.
      */
-    auto operator<=>(const IPv6Address &) const = default;
+    auto operator<=>(IPv6Address const &) const = default;
 #endif
 
 private:
@@ -117,17 +117,19 @@ private:
 };
 
 //==================================================================================================
-constexpr IPv6Address::IPv6Address(const address_type &address) noexcept : m_address {address}
+constexpr IPv6Address::IPv6Address(address_type const &address) noexcept :
+    m_address {address}
 {
 }
 
 //==================================================================================================
-constexpr IPv6Address::IPv6Address(address_type &&address) noexcept : m_address {std::move(address)}
+constexpr IPv6Address::IPv6Address(address_type &&address) noexcept :
+    m_address {std::move(address)}
 {
 }
 
 //==================================================================================================
-constexpr IPv6Address::IPv6Address(const address_type::value_type (&address)[16]) noexcept
+constexpr IPv6Address::IPv6Address(address_type::value_type const (&address)[16]) noexcept
 {
     std::copy(std::begin(address), std::end(address), m_address.begin());
 }
@@ -151,9 +153,9 @@ constexpr IPv6Address IPv6Address::in_addr_loopback()
 //==================================================================================================
 constexpr std::optional<IPv6Address> IPv6Address::from_string(std::string_view address)
 {
-    constexpr const auto s_max16 =
+    constexpr auto const s_max16 =
         static_cast<std::uint64_t>(std::numeric_limits<std::uint16_t>::max());
-    constexpr const auto s_colon = ':';
+    constexpr auto const s_colon = ':';
 
     fly::Lexer lexer(std::move(address));
     address_type parts {};
@@ -175,7 +177,7 @@ constexpr std::optional<IPv6Address> IPv6Address::from_string(std::string_view a
                 index_after_short_form = index;
             }
         }
-        else if (const auto segment = lexer.consume_hex_number(); segment && (*segment <= s_max16))
+        else if (auto const segment = lexer.consume_hex_number(); segment && (*segment <= s_max16))
         {
             parts[index++] = static_cast<address_type::value_type>((*segment >> 8) & 0xff);
             parts[index++] = static_cast<address_type::value_type>(*segment & 0xff);
@@ -192,8 +194,8 @@ constexpr std::optional<IPv6Address> IPv6Address::from_string(std::string_view a
     }
     else if (index_after_short_form)
     {
-        const auto start = static_cast<std::ptrdiff_t>(s_address_size - index);
-        const auto end = static_cast<std::ptrdiff_t>(*index_after_short_form);
+        auto const start = static_cast<std::ptrdiff_t>(s_address_size - index);
+        auto const end = static_cast<std::ptrdiff_t>(*index_after_short_form);
 
         std::rotate(parts.rbegin(), parts.rbegin() + start, parts.rend() - end);
     }
@@ -210,37 +212,37 @@ constexpr void IPv6Address::copy(address_type::value_type (&address)[16]) const
 #if defined(FLY_MACOS)
 
 //==================================================================================================
-constexpr bool IPv6Address::operator==(const IPv6Address &address) const
+constexpr bool IPv6Address::operator==(IPv6Address const &address) const
 {
     return m_address == address.m_address;
 }
 
 //==================================================================================================
-constexpr bool IPv6Address::operator!=(const IPv6Address &address) const
+constexpr bool IPv6Address::operator!=(IPv6Address const &address) const
 {
     return m_address != address.m_address;
 }
 
 //==================================================================================================
-constexpr bool IPv6Address::operator<(const IPv6Address &address) const
+constexpr bool IPv6Address::operator<(IPv6Address const &address) const
 {
     return m_address < address.m_address;
 }
 
 //==================================================================================================
-constexpr bool IPv6Address::operator<=(const IPv6Address &address) const
+constexpr bool IPv6Address::operator<=(IPv6Address const &address) const
 {
     return m_address <= address.m_address;
 }
 
 //==================================================================================================
-constexpr bool IPv6Address::operator>(const IPv6Address &address) const
+constexpr bool IPv6Address::operator>(IPv6Address const &address) const
 {
     return m_address > address.m_address;
 }
 
 //==================================================================================================
-constexpr bool IPv6Address::operator>=(const IPv6Address &address) const
+constexpr bool IPv6Address::operator>=(IPv6Address const &address) const
 {
     return m_address >= address.m_address;
 }
@@ -262,7 +264,7 @@ struct fly::Formatter<fly::net::IPv6Address>
      * @param context The context holding the formatting state.
      */
     template <typename FormatContext>
-    void format(const fly::net::IPv6Address &address, FormatContext &context)
+    void format(fly::net::IPv6Address const &address, FormatContext &context)
     {
         static constexpr std::size_t s_address_size =
             std::tuple_size_v<fly::net::IPv6Address::address_type>;
@@ -278,7 +280,7 @@ struct fly::Formatter<fly::net::IPv6Address>
 
         for (std::size_t i = 0; i < s_address_size;)
         {
-            const std::uint16_t segment = join_segments(i);
+            std::uint16_t const segment = join_segments(i);
 
             if ((segment == 0) && !used_short_form)
             {

@@ -15,17 +15,17 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 {
     fly::parser::JsonParser parser;
 
-    auto validate_fail_raw = [&](const std::string &test) {
+    auto validate_fail_raw = [&](std::string const &test) {
         CATCH_CAPTURE(test);
         CATCH_CHECK_FALSE(parser.parse_string(test).has_value());
     };
 
-    auto validate_fail = [&](const std::string &test) {
+    auto validate_fail = [&](std::string const &test) {
         validate_fail_raw(fly::String::format("{{ \"a\" : {} }}", test));
     };
 
     auto validate_pass_raw =
-        [&](const std::string &test, const std::string &key, const fly::Json &expected) {
+        [&](std::string const &test, std::string const &key, fly::Json const &expected) {
             CATCH_CAPTURE(test);
 
             std::optional<fly::Json> actual = parser.parse_string(test);
@@ -46,7 +46,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             CATCH_CHECK(*actual == *repeat);
         };
 
-    auto validate_pass = [&](const std::string &test, const fly::Json &expected) {
+    auto validate_pass = [&](std::string const &test, fly::Json const &expected) {
         validate_pass_raw(fly::String::format("{{ \"a\" : {} }}", test), "a", expected);
     };
 
@@ -57,13 +57,13 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         // - fail18.json: The parser has no max-depth
 
         // Get the path to the JSON checker directory.
-        const auto here = std::filesystem::path(__FILE__);
-        const auto path = here.parent_path() / "json" / "json_checker";
+        auto const here = std::filesystem::path(__FILE__);
+        auto const path = here.parent_path() / "json" / "json_checker";
 
         // Validate each JSON file in the JSON checker directory.
-        for (const auto &it : std::filesystem::directory_iterator(path))
+        for (auto const &it : std::filesystem::directory_iterator(path))
         {
-            const auto file = it.path().filename();
+            auto const file = it.path().filename();
             CATCH_CAPTURE(file);
 
             if (file.string().starts_with("pass"))
@@ -84,8 +84,8 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
     // https://code.google.com/archive/p/json-test-suite/
     CATCH_SECTION("Google's json-test-suite")
     {
-        const auto here = std::filesystem::path(__FILE__);
-        const auto path = here.parent_path() / "json" / "google_json_test_suite";
+        auto const here = std::filesystem::path(__FILE__);
+        auto const path = here.parent_path() / "json" / "google_json_test_suite";
 
         CATCH_CHECK(parser.parse_file(path / "sample.json").has_value());
     }
@@ -109,13 +109,13 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         fly::parser::JsonParser type_parser(fly::parser::JsonParser::Features::AllowAnyType);
 
         // Get the path to the JSONTestSuite directory.
-        const auto here = std::filesystem::path(__FILE__);
-        const auto path = here.parent_path() / "json" / "nst_json_test_suite";
+        auto const here = std::filesystem::path(__FILE__);
+        auto const path = here.parent_path() / "json" / "nst_json_test_suite";
 
         // Validate each JSON file in the JSONTestSuite directory.
-        for (const auto &it : std::filesystem::directory_iterator(path))
+        for (auto const &it : std::filesystem::directory_iterator(path))
         {
-            const auto file = it.path().filename();
+            auto const file = it.path().filename();
             CATCH_CAPTURE(file);
 
             if (file.string().starts_with('y'))
@@ -147,8 +147,8 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
     // https://github.com/minimaxir/big-list-of-naughty-strings
     CATCH_SECTION("Big List of Naughty Strings")
     {
-        const auto here = std::filesystem::path(__FILE__);
-        const auto path = here.parent_path() / "json" / "big_list_of_naughty_strings";
+        auto const here = std::filesystem::path(__FILE__);
+        auto const path = here.parent_path() / "json" / "big_list_of_naughty_strings";
 
         auto parsed = parser.parse_file(path / "blns.json");
         CATCH_REQUIRE(parsed.has_value());
@@ -164,8 +164,8 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("All Unicode characters")
     {
-        const auto here = std::filesystem::path(__FILE__);
-        const auto path = here.parent_path() / "json" / "unicode";
+        auto const here = std::filesystem::path(__FILE__);
+        auto const path = here.parent_path() / "json" / "unicode";
 
         auto parsed = parser.parse_file(path / "all_unicode.json");
         CATCH_REQUIRE(parsed.has_value());
@@ -176,7 +176,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("String with UTF-8 encoding (std::string)")
     {
-        const std::string contents("{\"encoding\": \"UTF-8\"}");
+        std::string const contents("{\"encoding\": \"UTF-8\"}");
 
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
@@ -190,7 +190,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("String with UTF-8 encoding (std::u8string)")
     {
-        const std::u8string contents(u8"{\"encoding\": \"UTF-8\"}");
+        std::u8string const contents(u8"{\"encoding\": \"UTF-8\"}");
 
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
@@ -204,8 +204,8 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("File with UTF-8 byte order mark")
     {
-        const auto here = std::filesystem::path(__FILE__);
-        const auto path = here.parent_path() / "json" / "unicode";
+        auto const here = std::filesystem::path(__FILE__);
+        auto const path = here.parent_path() / "json" / "unicode";
 
         auto parsed = parser.parse_file(path / "utf_8.json");
         CATCH_REQUIRE(parsed.has_value());
@@ -219,7 +219,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("String with UTF-16 encoding")
     {
-        const std::u16string contents(u"{\"encoding\": \"UTF-16\"}");
+        std::u16string const contents(u"{\"encoding\": \"UTF-16\"}");
 
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
@@ -236,8 +236,8 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("File with UTF-16 big endian byte order mark")
     {
-        const auto here = std::filesystem::path(__FILE__);
-        const auto path = here.parent_path() / "json" / "unicode";
+        auto const here = std::filesystem::path(__FILE__);
+        auto const path = here.parent_path() / "json" / "unicode";
 
         auto parsed = parser.parse_file(path / "utf_16_big_endian.json");
         CATCH_REQUIRE(parsed.has_value());
@@ -254,8 +254,8 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("File with UTF-16 little endian byte order mark")
     {
-        const auto here = std::filesystem::path(__FILE__);
-        const auto path = here.parent_path() / "json" / "unicode";
+        auto const here = std::filesystem::path(__FILE__);
+        auto const path = here.parent_path() / "json" / "unicode";
 
         auto parsed = parser.parse_file(path / "utf_16_little_endian.json");
         CATCH_REQUIRE(parsed.has_value());
@@ -272,7 +272,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("String with UTF-32 encoding")
     {
-        const std::u32string contents(U"{\"encoding\": \"UTF-32\"}");
+        std::u32string const contents(U"{\"encoding\": \"UTF-32\"}");
 
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
@@ -289,8 +289,8 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("File with UTF-32 big endian byte order mark")
     {
-        const auto here = std::filesystem::path(__FILE__);
-        const auto path = here.parent_path() / "json" / "unicode";
+        auto const here = std::filesystem::path(__FILE__);
+        auto const path = here.parent_path() / "json" / "unicode";
 
         auto parsed = parser.parse_file(path / "utf_32_big_endian.json");
         CATCH_REQUIRE(parsed.has_value());
@@ -307,8 +307,8 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("File with UTF-32 little endian byte order mark")
     {
-        const auto here = std::filesystem::path(__FILE__);
-        const auto path = here.parent_path() / "json" / "unicode";
+        auto const here = std::filesystem::path(__FILE__);
+        auto const path = here.parent_path() / "json" / "unicode";
 
         auto parsed = parser.parse_file(path / "utf_32_little_endian.json");
         CATCH_REQUIRE(parsed.has_value());
@@ -337,7 +337,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("Empty file cannot be parsed")
     {
-        const std::string contents;
+        std::string const contents;
 
         auto parsed = parser.parse_string(contents);
         CATCH_CHECK_FALSE(parsed.has_value());
@@ -345,7 +345,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("Empty JSON object can be parsed")
     {
-        const std::string contents("{}");
+        std::string const contents("{}");
 
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
@@ -357,7 +357,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("Empty JSON array can be parsed")
     {
-        const std::string contents("[]");
+        std::string const contents("[]");
 
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
@@ -369,7 +369,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("Nested empty JSON object can be parsed")
     {
-        const std::string contents("[{}]");
+        std::string const contents("[{}]");
 
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
@@ -385,7 +385,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("Nested empty JSON array can be parsed")
     {
-        const std::string contents("[[]]");
+        std::string const contents("[[]]");
 
         auto parsed = parser.parse_string(contents);
         CATCH_REQUIRE(parsed.has_value());
@@ -402,7 +402,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
     CATCH_SECTION("Empty key/value strings can be parsed")
     {
         {
-            const std::string contents("{\"a\" : \"\" }");
+            std::string const contents("{\"a\" : \"\" }");
 
             auto parsed = parser.parse_string(contents);
             CATCH_REQUIRE(parsed.has_value());
@@ -413,7 +413,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             CATCH_CHECK(values["a"] == "");
         }
         {
-            const std::string contents("{\"\" : \"a\" }");
+            std::string const contents("{\"\" : \"a\" }");
 
             auto parsed = parser.parse_string(contents);
             CATCH_REQUIRE(parsed.has_value());
@@ -424,7 +424,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             CATCH_CHECK(values[""] == "a");
         }
         {
-            const std::string contents("{\"\" : \"\" }");
+            std::string const contents("{\"\" : \"\" }");
 
             auto parsed = parser.parse_string(contents);
             CATCH_REQUIRE(parsed.has_value());

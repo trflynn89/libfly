@@ -30,7 +30,8 @@ namespace {
 class MutableLoggerConfig : public fly::logger::LoggerConfig
 {
 public:
-    MutableLoggerConfig() noexcept : fly::logger::LoggerConfig()
+    MutableLoggerConfig() noexcept :
+        fly::logger::LoggerConfig()
     {
         m_default_max_log_file_size = 1 << 10;
     }
@@ -61,7 +62,7 @@ public:
  *
  * @return The current log file.
  */
-std::filesystem::path find_log_file(const fly::test::PathUtil::ScopedTempDirectory &path)
+std::filesystem::path find_log_file(fly::test::PathUtil::ScopedTempDirectory const &path)
 {
     std::uint32_t most_recent_log_index = 0_u32;
     std::filesystem::path most_recent_log_file;
@@ -88,7 +89,7 @@ std::filesystem::path find_log_file(const fly::test::PathUtil::ScopedTempDirecto
  *
  * @return uintmax_t Size of the log point.
  */
-std::uintmax_t log_size(const std::string &message)
+std::uintmax_t log_size(std::string const &message)
 {
     fly::logger::Log log;
 
@@ -136,7 +137,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
         logger->debug("This log will be rejected");
 
         std::filesystem::path log_file = find_log_file(path);
-        const std::string contents = fly::test::PathUtil::read_file(log_file);
+        std::string const contents = fly::test::PathUtil::read_file(log_file);
         CATCH_REQUIRE(contents.empty());
     }
 
@@ -147,7 +148,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
         logger->debug("Debug Log");
 
         std::filesystem::path log_file = find_log_file(path);
-        const std::string contents = fly::test::PathUtil::read_file(log_file);
+        std::string const contents = fly::test::PathUtil::read_file(log_file);
         CATCH_REQUIRE_FALSE(contents.empty());
 
         CATCH_CHECK(contents.find("Debug Log") != std::string::npos);
@@ -158,7 +159,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
         logger->info("Info Log");
 
         std::filesystem::path log_file = find_log_file(path);
-        const std::string contents = fly::test::PathUtil::read_file(log_file);
+        std::string const contents = fly::test::PathUtil::read_file(log_file);
         CATCH_REQUIRE_FALSE(contents.empty());
 
         CATCH_CHECK(contents.find("Info Log") != std::string::npos);
@@ -169,7 +170,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
         logger->warn("Warning Log");
 
         std::filesystem::path log_file = find_log_file(path);
-        const std::string contents = fly::test::PathUtil::read_file(log_file);
+        std::string const contents = fly::test::PathUtil::read_file(log_file);
         CATCH_REQUIRE_FALSE(contents.empty());
 
         CATCH_CHECK(contents.find("Warning Log") != std::string::npos);
@@ -180,7 +181,7 @@ CATCH_TEST_CASE("FileLogger", "[logger]")
         logger->error("Error Log");
 
         std::filesystem::path log_file = find_log_file(path);
-        const std::string contents = fly::test::PathUtil::read_file(log_file);
+        std::string const contents = fly::test::PathUtil::read_file(log_file);
         CATCH_REQUIRE_FALSE(contents.empty());
 
         CATCH_CHECK(contents.find("Error Log") != std::string::npos);

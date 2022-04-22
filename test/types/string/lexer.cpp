@@ -36,7 +36,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicLexer", "[string]", char, wchar_t, char8_t, char1
 
     CATCH_SECTION("Lexer accepts non-null-terminated string")
     {
-        constexpr const char_type str[] {
+        constexpr char_type const str[] {
             static_cast<char_type>(0x61), // a
             static_cast<char_type>(0x62), // b
         };
@@ -51,7 +51,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicLexer", "[string]", char, wchar_t, char8_t, char1
 
     CATCH_SECTION("Lexer accepts an already-existing string view")
     {
-        const char_type *str = FLY_STR(char_type, "ab");
+        char_type const *str = FLY_STR(char_type, "ab");
         auto view = std::basic_string_view<char_type>(str);
 
         Lexer lexer(view);

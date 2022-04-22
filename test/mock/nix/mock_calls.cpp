@@ -191,15 +191,15 @@ int __wrap_fcntl(int fd, int cmd, int args)
 //==============================================================================================
 // NOLINTNEXTLINE(readability-identifier-naming)
 int __real_getaddrinfo(
-    const char *node,
-    const char *service,
+    char const *node,
+    char const *service,
     const struct addrinfo *hints,
     struct addrinfo **res);
 
 // NOLINTNEXTLINE(readability-identifier-naming)
 int __wrap_getaddrinfo(
-    const char *node,
-    const char *service,
+    char const *node,
+    char const *service,
     const struct addrinfo *hints,
     struct addrinfo **res)
 {
@@ -262,10 +262,10 @@ int __wrap_getsockopt(int sockfd, int level, int optname, void *optval, socklen_
 
 //==============================================================================================
 // NOLINTNEXTLINE(readability-identifier-naming)
-int __real_inotify_add_watch(int fd, const char *pathname, uint32_t mask);
+int __real_inotify_add_watch(int fd, char const *pathname, uint32_t mask);
 
 // NOLINTNEXTLINE(readability-identifier-naming)
-int __wrap_inotify_add_watch(int fd, const char *pathname, uint32_t mask)
+int __wrap_inotify_add_watch(int fd, char const *pathname, uint32_t mask)
 {
     if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::InotifyAddWatch))
     {
@@ -328,10 +328,10 @@ int __wrap_listen(int sockfd, int backlog)
 
 //==============================================================================================
 // NOLINTNEXTLINE(readability-identifier-naming)
-struct tm *__real_localtime_r(const time_t *timep, struct tm *result);
+struct tm *__real_localtime_r(time_t const *timep, struct tm *result);
 
 // NOLINTNEXTLINE(readability-identifier-naming)
-struct tm *__wrap_localtime_r(const time_t *timep, struct tm *result)
+struct tm *__wrap_localtime_r(time_t const *timep, struct tm *result)
 {
     if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::LocalTime))
     {
@@ -475,10 +475,10 @@ int __wrap_select(
 
 //==============================================================================================
 // NOLINTNEXTLINE(readability-identifier-naming)
-ssize_t __real_send(int sockfd, const void *buf, size_t len, int flags);
+ssize_t __real_send(int sockfd, void const *buf, size_t len, int flags);
 
 // NOLINTNEXTLINE(readability-identifier-naming)
-ssize_t __wrap_send(int sockfd, const void *buf, size_t len, int flags)
+ssize_t __wrap_send(int sockfd, void const *buf, size_t len, int flags)
 {
     if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Send))
     {
@@ -510,7 +510,7 @@ ssize_t __wrap_send(int sockfd, const void *buf, size_t len, int flags)
 // NOLINTNEXTLINE(readability-identifier-naming)
 ssize_t __real_sendto(
     int sockfd,
-    const void *buf,
+    void const *buf,
     size_t len,
     int flags,
     const struct sockaddr *dest_addr,
@@ -519,7 +519,7 @@ ssize_t __real_sendto(
 // NOLINTNEXTLINE(readability-identifier-naming)
 ssize_t __wrap_sendto(
     int sockfd,
-    const void *buf,
+    void const *buf,
     size_t len,
     int flags,
     const struct sockaddr *dest_addr,
@@ -553,10 +553,10 @@ ssize_t __wrap_sendto(
 
 //==============================================================================================
 // NOLINTNEXTLINE(readability-identifier-naming)
-int __real_setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
+int __real_setsockopt(int sockfd, int level, int optname, void const *optval, socklen_t optlen);
 
 // NOLINTNEXTLINE(readability-identifier-naming)
-int __wrap_setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen)
+int __wrap_setsockopt(int sockfd, int level, int optname, void const *optval, socklen_t optlen)
 {
     if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Setsockopt))
     {
@@ -617,10 +617,10 @@ clock_t __wrap_times(struct tms *buf)
 
 //==============================================================================================
 // NOLINTNEXTLINE(readability-identifier-naming)
-ssize_t __real_write(int fd, const void *buf, size_t count);
+ssize_t __real_write(int fd, void const *buf, size_t count);
 
 // NOLINTNEXTLINE(readability-identifier-naming)
-ssize_t __wrap_write(int fd, const void *buf, size_t count)
+ssize_t __wrap_write(int fd, void const *buf, size_t count)
 {
     if (fly::test::MockSystem::mock_enabled(fly::test::MockCall::Write))
     {

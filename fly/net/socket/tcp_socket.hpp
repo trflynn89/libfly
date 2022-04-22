@@ -83,7 +83,7 @@ public:
      *
      * @return The connection state (disconnected, connecting, or connected).
      */
-    ConnectedState connect(const EndpointType &endpoint);
+    ConnectedState connect(EndpointType const &endpoint);
 
     /**
      * Connect to a remote socket. If this socket was opened in an asynchronous IO processing mode,
@@ -113,7 +113,7 @@ public:
      *
      * @return The connection state (disconnected, connecting, or connected).
      */
-    ConnectedState connect_async(const EndpointType &endpoint, ConnectCompletion &&callback);
+    ConnectedState connect_async(EndpointType const &endpoint, ConnectCompletion &&callback);
 
     /**
      * Asynchronously connect to a remote socket. May only be used if this socket was created
@@ -219,7 +219,7 @@ private:
      * @return The created socket.
      */
     static std::shared_ptr<TcpSocket> create_socket(
-        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<SocketService> const &service,
         std::shared_ptr<NetworkConfig> config);
 
     /**
@@ -233,7 +233,7 @@ private:
      * @return The created socket.
      */
     static std::shared_ptr<TcpSocket> create_socket(
-        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<SocketService> const &service,
         std::shared_ptr<NetworkConfig> config,
         socket_type handle);
 
@@ -245,7 +245,7 @@ private:
      * @param config Reference to network configuration.
      */
     TcpSocket(
-        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<SocketService> const &service,
         std::shared_ptr<NetworkConfig> config) noexcept;
 
     /**
@@ -267,12 +267,12 @@ private:
      * @param handle Native socket handle opened by the calling listening socket.
      */
     TcpSocket(
-        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<SocketService> const &service,
         std::shared_ptr<NetworkConfig> config,
         socket_type handle) noexcept;
 
-    TcpSocket(const TcpSocket &) = delete;
-    TcpSocket &operator=(const TcpSocket &) = delete;
+    TcpSocket(TcpSocket const &) = delete;
+    TcpSocket &operator=(TcpSocket const &) = delete;
 
     /**
      * When the socket service indicates the socket is available for writing, attempt to transmit

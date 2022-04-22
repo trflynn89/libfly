@@ -47,7 +47,7 @@ private:
      * @param modifier The modifier to stream.
      */
     template <typename Modifier>
-    void stream_value(const Modifier &modifier);
+    void stream_value(Modifier const &modifier);
 
     /**
      * Manipulate the stream with ANSI escape sequences of the provided styles and colors.

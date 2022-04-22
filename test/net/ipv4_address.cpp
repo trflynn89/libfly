@@ -15,32 +15,32 @@ CATCH_TEST_CASE("IPv4Address", "[net]")
 {
     CATCH_SECTION("INADDR_ANY should be equivalent to system value")
     {
-        const auto address = fly::net::IPv4Address::in_addr_any();
+        auto const address = fly::net::IPv4Address::in_addr_any();
         CATCH_CHECK(address.host_order() == INADDR_ANY);
     }
 
     CATCH_SECTION("INADDR_BROADCAST should be equivalent to system value")
     {
-        const auto address = fly::net::IPv4Address::in_addr_broadcast();
+        auto const address = fly::net::IPv4Address::in_addr_broadcast();
         CATCH_CHECK(address.host_order() == INADDR_BROADCAST);
     }
 
     CATCH_SECTION("INADDR_LOOPBACK should be equivalent to system value")
     {
-        const auto address = fly::net::IPv4Address::in_addr_loopback();
+        auto const address = fly::net::IPv4Address::in_addr_loopback();
         CATCH_CHECK(address.host_order() == INADDR_LOOPBACK);
     }
 
     CATCH_SECTION("Default constructed IPv4 addresses are initialized to 0.0.0.0")
     {
-        const fly::net::IPv4Address address;
+        fly::net::IPv4Address const address;
         CATCH_CHECK(address == fly::net::IPv4Address::in_addr_any());
     }
 
     CATCH_SECTION("Construction from an array is interpreted as host order")
     {
-        const fly::net::IPv4Address address({0x11, 0x22, 0x33, 0x44});
-        const fly::net::IPv4Address::int_type ip = 0x11'22'33'44;
+        fly::net::IPv4Address const address({0x11, 0x22, 0x33, 0x44});
+        fly::net::IPv4Address::int_type const ip = 0x11'22'33'44;
 
         CATCH_CHECK(
             address.network_order() == fly::endian_swap_if_non_native<std::endian::big>(ip));
@@ -49,8 +49,8 @@ CATCH_TEST_CASE("IPv4Address", "[net]")
 
     CATCH_SECTION("Construction from an integer is interpreted as network order")
     {
-        const fly::net::IPv4Address address(0x11'22'33'44);
-        const fly::net::IPv4Address::int_type ip = 0x11'22'33'44;
+        fly::net::IPv4Address const address(0x11'22'33'44);
+        fly::net::IPv4Address::int_type const ip = 0x11'22'33'44;
 
         CATCH_CHECK(address.network_order() == ip);
         CATCH_CHECK(address.host_order() == fly::endian_swap_if_non_native<std::endian::big>(ip));
@@ -58,24 +58,24 @@ CATCH_TEST_CASE("IPv4Address", "[net]")
 
     CATCH_SECTION("Network ordered address is big-endian")
     {
-        const fly::net::IPv4Address::int_type ip = 0x11'22'33'44;
-        const fly::net::IPv4Address address(ip);
+        fly::net::IPv4Address::int_type const ip = 0x11'22'33'44;
+        fly::net::IPv4Address const address(ip);
 
         CATCH_CHECK(address.network_order() == 0x11'22'33'44);
     }
 
     CATCH_SECTION("Host ordered address is little-endian")
     {
-        const fly::net::IPv4Address::int_type ip = 0x11'22'33'44;
-        const fly::net::IPv4Address address(ip);
+        fly::net::IPv4Address::int_type const ip = 0x11'22'33'44;
+        fly::net::IPv4Address const address(ip);
 
         CATCH_CHECK(address.host_order() == fly::endian_swap_if_non_native<std::endian::big>(ip));
     }
 
     CATCH_SECTION("IPv4 addresses may be copied")
     {
-        const auto address1 = fly::net::IPv4Address::in_addr_loopback();
-        const auto address2 = address1;
+        auto const address1 = fly::net::IPv4Address::in_addr_loopback();
+        auto const address2 = address1;
 
         CATCH_CHECK(address1 == address2);
     }
@@ -83,16 +83,16 @@ CATCH_TEST_CASE("IPv4Address", "[net]")
     CATCH_SECTION("IPv4 addresses may be moved")
     {
         auto address1 = fly::net::IPv4Address::in_addr_loopback();
-        const auto address2 = std::move(address1);
+        auto const address2 = std::move(address1);
 
         CATCH_CHECK(address2 == fly::net::IPv4Address::in_addr_loopback());
     }
 
     CATCH_SECTION("IPv4 addresses may be compared")
     {
-        const auto address1 = fly::net::IPv4Address::in_addr_any();
-        const auto address2 = fly::net::IPv4Address::in_addr_loopback();
-        const auto address3 = fly::net::IPv4Address::in_addr_broadcast();
+        auto const address1 = fly::net::IPv4Address::in_addr_any();
+        auto const address2 = fly::net::IPv4Address::in_addr_loopback();
+        auto const address3 = fly::net::IPv4Address::in_addr_broadcast();
 
         CATCH_CHECK(address2 == address2);
         CATCH_CHECK(address1 != address2);
@@ -139,60 +139,60 @@ CATCH_TEST_CASE("IPv4Address", "[net]")
 
     CATCH_SECTION("Single-part strings are parsed as 32-bit values")
     {
-        const auto address1 = fly::net::IPv4Address::from_string("0");
+        auto const address1 = fly::net::IPv4Address::from_string("0");
         CATCH_REQUIRE(address1.has_value());
         CATCH_CHECK(address1->host_order() == INADDR_ANY);
 
-        const auto address2 = fly::net::IPv4Address::from_string("2130706433");
+        auto const address2 = fly::net::IPv4Address::from_string("2130706433");
         CATCH_REQUIRE(address2.has_value());
         CATCH_CHECK(address2->host_order() == INADDR_LOOPBACK);
 
-        const auto address3 = fly::net::IPv4Address::from_string("4294967295");
+        auto const address3 = fly::net::IPv4Address::from_string("4294967295");
         CATCH_REQUIRE(address3.has_value());
         CATCH_CHECK(address3->host_order() == INADDR_BROADCAST);
     }
 
     CATCH_SECTION("Two-part strings are parsed as an octet and a 24-bit value")
     {
-        const auto address1 = fly::net::IPv4Address::from_string("0.0");
+        auto const address1 = fly::net::IPv4Address::from_string("0.0");
         CATCH_REQUIRE(address1.has_value());
         CATCH_CHECK(address1->host_order() == 0U);
 
-        const auto address2 = fly::net::IPv4Address::from_string("127.1");
+        auto const address2 = fly::net::IPv4Address::from_string("127.1");
         CATCH_REQUIRE(address2.has_value());
         CATCH_CHECK(address2->host_order() == INADDR_LOOPBACK);
 
-        const auto address3 = fly::net::IPv4Address::from_string("255.16777215");
+        auto const address3 = fly::net::IPv4Address::from_string("255.16777215");
         CATCH_REQUIRE(address3.has_value());
         CATCH_CHECK(address3->host_order() == INADDR_BROADCAST);
     }
 
     CATCH_SECTION("Three-part strings are parsed as two octet and a 16-bit value")
     {
-        const auto address1 = fly::net::IPv4Address::from_string("0.0.0");
+        auto const address1 = fly::net::IPv4Address::from_string("0.0.0");
         CATCH_REQUIRE(address1.has_value());
         CATCH_CHECK(address1->host_order() == 0U);
 
-        const auto address2 = fly::net::IPv4Address::from_string("127.0.1");
+        auto const address2 = fly::net::IPv4Address::from_string("127.0.1");
         CATCH_REQUIRE(address2.has_value());
         CATCH_CHECK(address2->host_order() == INADDR_LOOPBACK);
 
-        const auto address3 = fly::net::IPv4Address::from_string("255.255.65535");
+        auto const address3 = fly::net::IPv4Address::from_string("255.255.65535");
         CATCH_REQUIRE(address3.has_value());
         CATCH_CHECK(address3->host_order() == INADDR_BROADCAST);
     }
 
     CATCH_SECTION("Four-part strings are parsed as four octets")
     {
-        const auto address1 = fly::net::IPv4Address::from_string("0.0.0.0");
+        auto const address1 = fly::net::IPv4Address::from_string("0.0.0.0");
         CATCH_REQUIRE(address1.has_value());
         CATCH_CHECK(address1->host_order() == 0U);
 
-        const auto address2 = fly::net::IPv4Address::from_string("127.0.0.1");
+        auto const address2 = fly::net::IPv4Address::from_string("127.0.0.1");
         CATCH_REQUIRE(address2.has_value());
         CATCH_CHECK(address2->host_order() == INADDR_LOOPBACK);
 
-        const auto address3 = fly::net::IPv4Address::from_string("255.255.255.255");
+        auto const address3 = fly::net::IPv4Address::from_string("255.255.255.255");
         CATCH_REQUIRE(address3.has_value());
         CATCH_CHECK(address3->host_order() == INADDR_BROADCAST);
     }

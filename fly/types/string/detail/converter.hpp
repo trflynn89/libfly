@@ -24,10 +24,10 @@ namespace fly::detail {
 template <typename T>
 struct Converter
 {
-    static std::optional<T> convert(const std::string &value)
+    static std::optional<T> convert(std::string const &value)
     {
-        const char *begin = value.data();
-        const char *end = begin + value.size();
+        char const *begin = value.data();
+        char const *end = begin + value.size();
 
         T converted {};
         auto result = std::from_chars(begin, end, converted);
@@ -47,7 +47,7 @@ struct Converter
 template <>
 struct Converter<float>
 {
-    static std::optional<float> convert(const std::string &value)
+    static std::optional<float> convert(std::string const &value)
     {
         std::size_t index = 0;
         float result {};
@@ -74,7 +74,7 @@ struct Converter<float>
 template <>
 struct Converter<double>
 {
-    static std::optional<double> convert(const std::string &value)
+    static std::optional<double> convert(std::string const &value)
     {
         std::size_t index = 0;
         double result {};
@@ -101,7 +101,7 @@ struct Converter<double>
 template <>
 struct Converter<long double>
 {
-    static std::optional<long double> convert(const std::string &value)
+    static std::optional<long double> convert(std::string const &value)
     {
         std::size_t index = 0;
         long double result {};

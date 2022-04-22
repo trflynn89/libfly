@@ -16,7 +16,7 @@ namespace fly::logger {
 class LoggerConfig : public fly::config::Config
 {
 public:
-    static constexpr const char *identifier = "logger";
+    static constexpr char const *identifier = "logger";
 
     /**
      * @return True if log files should be compressed after reaching the max log file size.

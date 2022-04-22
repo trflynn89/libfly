@@ -34,7 +34,8 @@ public:
 class SilentReporter final : public Catch::StreamingReporterBase
 {
 public:
-    explicit SilentReporter(const Catch::ReporterConfig &config) : StreamingReporterBase(config)
+    explicit SilentReporter(Catch::ReporterConfig const &config) :
+        StreamingReporterBase(config)
     {
     }
 
@@ -45,17 +46,17 @@ public:
         return "Catch2 silent reporter for libfly benchmarking";
     }
 
-    void assertionStarting(const Catch::AssertionInfo &) override
+    void assertionStarting(Catch::AssertionInfo const &) override
     {
     }
 
-    void assertionEnded(const Catch::AssertionStats &) override
+    void assertionEnded(Catch::AssertionStats const &) override
     {
     }
 
-    void testCaseStarting(const Catch::TestCaseInfo &info) override
+    void testCaseStarting(Catch::TestCaseInfo const &info) override
     {
-        const auto style = fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Cyan);
+        auto const style = fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Cyan);
         m_stream << style << fly::String::format("[{:=>13}{}{:=<13}]\n\n", ' ', info.name, ' ');
     }
 };

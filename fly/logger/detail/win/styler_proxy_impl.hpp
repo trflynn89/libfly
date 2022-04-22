@@ -51,7 +51,7 @@ private:
      * @param modifier The modifier to apply.
      */
     template <typename Attributes, typename Modifier>
-    void apply_value(Attributes &attributes, const Modifier &modifier);
+    void apply_value(Attributes &attributes, Modifier const &modifier);
 
     /**
      * Apply the provided styles and colors to the stream.
@@ -61,7 +61,7 @@ private:
      * @param colors The list of colors to apply to the stream.
      */
     void apply_styles_and_colors(
-        const CONSOLE_SCREEN_BUFFER_INFO &console_info,
+        CONSOLE_SCREEN_BUFFER_INFO const &console_info,
         std::stack<fly::logger::Style> &&styles,
         std::stack<fly::logger::Color> &&colors);
 
@@ -72,7 +72,7 @@ private:
      * @param cursors The list of cursor positions to apply to the stream.
      */
     void apply_cursors(
-        const CONSOLE_SCREEN_BUFFER_INFO &console_info,
+        CONSOLE_SCREEN_BUFFER_INFO const &console_info,
         std::stack<fly::logger::Cursor> &&cursors);
 
     HANDLE m_handle {INVALID_HANDLE_VALUE};

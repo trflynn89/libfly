@@ -14,15 +14,15 @@ namespace fly::test {
 class TestConfig : public fly::config::Config
 {
 public:
-    static constexpr const char *identifier = "config";
+    static constexpr char const *identifier = "config";
 
     template <typename T>
-    T get_value(const std::string &name, T def) const
+    T get_value(std::string const &name, T def) const
     {
         return fly::config::Config::get_value(name, def);
     }
 
-    void update(const fly::Json &values)
+    void update(fly::Json const &values)
     {
         fly::config::Config::update(values);
     }

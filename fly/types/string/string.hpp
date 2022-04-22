@@ -275,7 +275,7 @@ public:
      */
     template <typename IteratorType>
     static std::optional<codepoint_type>
-    decode_codepoint(IteratorType &it, const IteratorType &end);
+    decode_codepoint(IteratorType &it, IteratorType const &end);
 
     /**
      * Encode a single Unicode codepoint.
@@ -345,7 +345,7 @@ public:
      */
     template <char UnicodePrefix = 'U', typename IteratorType>
     requires fly::UnicodePrefixCharacter<UnicodePrefix>
-    static std::optional<string_type> escape_codepoint(IteratorType &it, const IteratorType &end);
+    static std::optional<string_type> escape_codepoint(IteratorType &it, IteratorType const &end);
 
     /**
      * Unescape all Unicode codepoints in a string.
@@ -383,7 +383,7 @@ public:
      *         uninitialized value.
      */
     template <typename IteratorType>
-    static std::optional<string_type> unescape_codepoint(IteratorType &it, const IteratorType &end);
+    static std::optional<string_type> unescape_codepoint(IteratorType &it, IteratorType const &end);
 
     /**
      * Generate a random string of the given length.
@@ -445,7 +445,7 @@ public:
      *     struct fly::Formatter<MyType, CharType> : public fly::Formatter<int, CharType>
      *     {
      *         template <typename FormatContext>
-     *         void format(const MyType &value, FormatContext &context)
+     *         void format(MyType const &value, FormatContext &context)
      *         {
      *             fly::Formatter<int, CharType>::format(value.as_int(), context);
      *         }
@@ -472,7 +472,7 @@ public:
      *         }
      *
      *         template <typename FormatContext>
-     *         void format(const MyType &value, FormatContext &context)
+     *         void format(MyType const &value, FormatContext &context)
      *         {
      *             fly::BasicString<CharType>::format_to(context.out(), "{}", value.as_int());
      *         }
@@ -550,7 +550,7 @@ public:
      *         value.
      */
     template <typename T>
-    static std::optional<T> convert(const string_type &value);
+    static std::optional<T> convert(string_type const &value);
 
 private:
     /**
@@ -568,14 +568,14 @@ private:
     /**
      * A list of alpha-numeric characters in the range [0-9A-Za-z].
      */
-    static constexpr const char_type *s_alpha_num =
+    static constexpr char_type const *s_alpha_num =
         FLY_STR(char_type, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 
     static constexpr size_type s_alpha_num_length =
         std::char_traits<char_type>::length(s_alpha_num);
 
-    static constexpr const auto s_left_brace = FLY_CHR(char_type, '{');
-    static constexpr const auto s_right_brace = FLY_CHR(char_type, '}');
+    static constexpr auto const s_left_brace = FLY_CHR(char_type, '{');
+    static constexpr auto const s_right_brace = FLY_CHR(char_type, '}');
 };
 
 //==================================================================================================
@@ -745,7 +745,7 @@ bool BasicString<CharType>::wildcard_match(view_type source, view_type search)
     static constexpr char_type s_wildcard = '*';
     bool result = !search.empty();
 
-    const std::vector<string_type> segments = split(search, s_wildcard);
+    std::vector<string_type> const segments = split(search, s_wildcard);
     size_type index = 0;
 
     if (!segments.empty())
@@ -778,7 +778,7 @@ template <StandardCharacter CharType>
 inline bool BasicString<CharType>::validate(view_type value)
 {
     auto it = value.cbegin();
-    const auto end = value.cend();
+    auto const end = value.cend();
 
     return unicode::validate_encoding(it, end);
 }
@@ -786,7 +786,7 @@ inline bool BasicString<CharType>::validate(view_type value)
 //==================================================================================================
 template <StandardCharacter CharType>
 template <typename IteratorType>
-inline auto BasicString<CharType>::decode_codepoint(IteratorType &it, const IteratorType &end)
+inline auto BasicString<CharType>::decode_codepoint(IteratorType &it, IteratorType const &end)
     -> std::optional<codepoint_type>
 {
     return unicode::decode_codepoint(it, end);
@@ -809,7 +809,7 @@ auto BasicString<CharType>::escape_all_codepoints(view_type value) -> std::optio
     string_type result;
     result.reserve(value.size());
 
-    const auto end = value.cend();
+    auto const end = value.cend();
 
     for (auto it = value.cbegin(); it != end;)
     {
@@ -830,7 +830,7 @@ auto BasicString<CharType>::escape_all_codepoints(view_type value) -> std::optio
 template <StandardCharacter CharType>
 template <char UnicodePrefix, typename IteratorType>
 requires fly::UnicodePrefixCharacter<UnicodePrefix>
-inline auto BasicString<CharType>::escape_codepoint(IteratorType &it, const IteratorType &end)
+inline auto BasicString<CharType>::escape_codepoint(IteratorType &it, IteratorType const &end)
     -> std::optional<string_type>
 {
     return unicode::template escape_codepoint<UnicodePrefix>(it, end);
@@ -843,7 +843,7 @@ auto BasicString<CharType>::unescape_all_codepoints(view_type value) -> std::opt
     string_type result;
     result.reserve(value.size());
 
-    const auto end = value.cend();
+    auto const end = value.cend();
 
     for (auto it = value.cbegin(); it != end;)
     {
@@ -883,7 +883,7 @@ auto BasicString<CharType>::unescape_all_codepoints(view_type value) -> std::opt
 //==================================================================================================
 template <StandardCharacter CharType>
 template <typename IteratorType>
-inline auto BasicString<CharType>::unescape_codepoint(IteratorType &it, const IteratorType &end)
+inline auto BasicString<CharType>::unescape_codepoint(IteratorType &it, IteratorType const &end)
     -> std::optional<string_type>
 {
     return unicode::unescape_codepoint(it, end);
@@ -898,8 +898,8 @@ auto BasicString<CharType>::generate_random_string(size_type length) -> string_t
     constexpr auto limit = static_cast<short_distribution::result_type>(s_alpha_num_length - 1);
     static_assert(limit > 0);
 
-    static thread_local const auto s_now = std::chrono::system_clock::now().time_since_epoch();
-    static thread_local const auto s_seed = static_cast<std::mt19937::result_type>(s_now.count());
+    static thread_local auto const s_now = std::chrono::system_clock::now().time_since_epoch();
+    static thread_local auto const s_seed = static_cast<std::mt19937::result_type>(s_now.count());
 
     static thread_local std::mt19937 s_engine(s_seed);
     short_distribution distribution(0, limit);
@@ -945,7 +945,7 @@ void BasicString<CharType>::format_to(
     using FormatParseContext = detail::BasicFormatParseContext<char_type>;
 
     FormatParseContext &parse_context = fmt.context();
-    const view_type view = parse_context.view();
+    view_type const view = parse_context.view();
 
     if (parse_context.has_error())
     {
@@ -963,7 +963,7 @@ void BasicString<CharType>::format_to(
 
     for (std::size_t pos = 0; pos < view.size();)
     {
-        switch (const auto &ch = view[pos])
+        switch (auto const &ch = view[pos])
         {
             case s_left_brace:
                 if (view[pos + 1] == s_left_brace)
@@ -976,7 +976,7 @@ void BasicString<CharType>::format_to(
                     auto specifier = *std::move(fmt.next_specifier());
                     pos += specifier.m_size;
 
-                    const auto parameter = context.arg(specifier.m_position);
+                    auto const parameter = context.arg(specifier.m_position);
                     parameter.format(parse_context, context, std::move(specifier));
                 }
                 break;
@@ -1029,7 +1029,7 @@ inline void BasicString<CharType>::join_internal(string_type &result, char_type,
 //==================================================================================================
 template <StandardCharacter CharType>
 template <typename T>
-std::optional<T> BasicString<CharType>::convert(const string_type &value)
+std::optional<T> BasicString<CharType>::convert(string_type const &value)
 {
     if constexpr (StandardString<T>)
     {

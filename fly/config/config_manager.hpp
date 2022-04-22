@@ -118,7 +118,7 @@ private:
     std::unique_ptr<fly::parser::Parser> m_parser;
     fly::Json m_values;
 
-    const std::filesystem::path m_path;
+    std::filesystem::path const m_path;
 
     mutable std::mutex m_configs_mutex;
     ConfigMap m_configs;

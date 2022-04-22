@@ -57,7 +57,7 @@ CATCH_TEST_CASE("Json", "[json]")
     CATCH_SECTION("Check the iterator at the beginning of a JSON instance")
     {
         fly::Json json1 {1, 2, 3};
-        const fly::Json json2 {4, 5, 6};
+        fly::Json const json2 {4, 5, 6};
 
         auto begin1 = json1.begin();
         CATCH_CHECK(*begin1 == 1);
@@ -80,7 +80,7 @@ CATCH_TEST_CASE("Json", "[json]")
     CATCH_SECTION("Check the iterator at the end of a JSON instance")
     {
         fly::Json json1 {1, 2, 3};
-        const fly::Json json2 {4, 5, 6};
+        fly::Json const json2 {4, 5, 6};
 
         auto end1 = json1.end();
         CATCH_CHECK(*(end1 - 1) == 3);
@@ -103,7 +103,7 @@ CATCH_TEST_CASE("Json", "[json]")
     CATCH_SECTION("Check the reverse iterator at the beginning of a JSON instance")
     {
         fly::Json json1 {1, 2, 3};
-        const fly::Json json2 {4, 5, 6};
+        fly::Json const json2 {4, 5, 6};
 
         auto begin1 = json1.rbegin();
         CATCH_CHECK(*begin1 == 3);
@@ -126,7 +126,7 @@ CATCH_TEST_CASE("Json", "[json]")
     CATCH_SECTION("Check the reverse iterator at the end of a JSON instance")
     {
         fly::Json json1 {1, 2, 3};
-        const fly::Json json2 {4, 5, 6};
+        fly::Json const json2 {4, 5, 6};
 
         auto end1 = json1.rend();
         CATCH_CHECK(*(end1 - 1) == 1);
@@ -191,7 +191,7 @@ CATCH_TEST_CASE("Json", "[json]")
         {
             fly::Json::size_type size = 0;
 
-            for (const fly::Json &value : json)
+            for (fly::Json const &value : json)
             {
                 CATCH_CHECK(value == (size++ == 0 ? 1 : 2));
             }
@@ -243,7 +243,7 @@ CATCH_TEST_CASE("Json", "[json]")
         {
             fly::Json::size_type size = 0;
 
-            for (const fly::Json &value : json)
+            for (fly::Json const &value : json)
             {
                 CATCH_CHECK(value == json[size++]);
             }

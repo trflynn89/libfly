@@ -149,13 +149,13 @@ Logger *Logger::get_default_logger()
 }
 
 //==================================================================================================
-std::shared_ptr<Logger> Logger::get(const std::string &name)
+std::shared_ptr<Logger> Logger::get(std::string const &name)
 {
     return detail::Registry::instance().get_logger(name);
 }
 
 //==================================================================================================
-const std::string &Logger::name() const
+std::string const &Logger::name() const
 {
     return m_name;
 }
@@ -180,7 +180,7 @@ void Logger::log(Level level, Trace &&trace, std::string &&message)
         return;
     }
 
-    const auto now = std::chrono::steady_clock::now();
+    auto const now = std::chrono::steady_clock::now();
 
     if (m_task_runner)
     {
@@ -208,14 +208,14 @@ void Logger::log_to_sink(
     std::string &&message,
     std::chrono::steady_clock::time_point time)
 {
-    const std::chrono::duration<double, std::milli> elapsed = time - m_start_time;
+    std::chrono::duration<double, std::milli> const elapsed = time - m_start_time;
 
     Log log(std::move(trace), std::move(message), m_config->max_message_size());
     log.m_index = m_index++;
     log.m_level = level;
     log.m_time = elapsed.count();
 
-    const bool accepted = m_sink->stream(std::move(log));
+    bool const accepted = m_sink->stream(std::move(log));
     m_last_task_failed.store(!accepted);
 }
 

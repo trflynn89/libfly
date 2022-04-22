@@ -71,7 +71,7 @@ public:
      *
      * @return True if the directory could be added.
      */
-    bool add_path(const std::filesystem::path &path, PathEventCallback callback);
+    bool add_path(std::filesystem::path const &path, PathEventCallback callback);
 
     /**
      * Stop monitoring for changes to all files under a directory.
@@ -80,7 +80,7 @@ public:
      *
      * @return True if the directory was removed.
      */
-    bool remove_path(const std::filesystem::path &path);
+    bool remove_path(std::filesystem::path const &path);
 
     /**
      * Stop monitoring all paths.
@@ -96,7 +96,7 @@ public:
      *
      * @return True if the file could be added.
      */
-    bool add_file(const std::filesystem::path &file, PathEventCallback callback);
+    bool add_file(std::filesystem::path const &file, PathEventCallback callback);
 
     /**
      * Stop monitoring for changes to a single file. If there are no more files monitored in the
@@ -107,7 +107,7 @@ public:
      *
      * @return True if the file was removed.
      */
-    bool remove_file(const std::filesystem::path &file);
+    bool remove_file(std::filesystem::path const &file);
 
 protected:
     /**
@@ -154,7 +154,7 @@ protected:
      *
      * @return Up-casted pointer to the PathInfo struct.
      */
-    virtual std::unique_ptr<PathInfo> create_path_info(const std::filesystem::path &path) const = 0;
+    virtual std::unique_ptr<PathInfo> create_path_info(std::filesystem::path const &path) const = 0;
 
     /**
      * Check if the path monitor implementation is valid.
@@ -189,7 +189,7 @@ private:
      *
      * @return Shared pointer to the PathInfo struct.
      */
-    PathInfo *get_or_create_path_info(const std::filesystem::path &path);
+    PathInfo *get_or_create_path_info(std::filesystem::path const &path);
 
     /**
      * Queue a task to poll monitored paths. When the task is completed, it re-arms itself (if the
@@ -261,7 +261,7 @@ struct fly::Formatter<std::filesystem::path> : public fly::Formatter<std::string
      * @param context The context holding the formatting state.
      */
     template <typename FormatContext>
-    void format(const std::filesystem::path &path, FormatContext &context)
+    void format(std::filesystem::path const &path, FormatContext &context)
     {
         fly::Formatter<std::string>::format(path.string(), context);
     }

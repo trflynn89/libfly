@@ -26,8 +26,8 @@ using namespace fly::literals::numeric_literals;
 
 namespace {
 
-constexpr const char *s_path_monitor_file = "path_monitor.cpp";
-const std::chrono::seconds s_wait_time(5);
+constexpr char const *s_path_monitor_file = "path_monitor.cpp";
+constexpr std::chrono::seconds s_wait_time(5);
 
 /**
  * Subclass of the path config to decrease the poll interval for faster testing.
@@ -35,7 +35,8 @@ const std::chrono::seconds s_wait_time(5);
 class TestPathConfig : public fly::path::PathConfig
 {
 public:
-    TestPathConfig() noexcept : fly::path::PathConfig()
+    TestPathConfig() noexcept :
+        fly::path::PathConfig()
     {
         m_default_poll_interval = 10_i64;
     }

@@ -62,7 +62,7 @@ template <typename DataType, std::endian Desired>
 void run_test()
 {
     constexpr DataType iterations = 100;
-    const DataType step = std::numeric_limits<DataType>::max() / iterations;
+    DataType const step = std::numeric_limits<DataType>::max() / iterations;
 
     for (DataType data = 0, i = 0; i++ < iterations; data += step)
     {

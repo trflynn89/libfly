@@ -42,7 +42,7 @@ public:
      * @param literals Reference to a C-string literal of size N.
      */
     template <std::size_t N>
-    constexpr explicit BasicLexer(const CharType (&literals)[N]) noexcept;
+    constexpr explicit BasicLexer(CharType const (&literals)[N]) noexcept;
 
     /**
      * Constructor. Stores an existing view into a string.
@@ -135,14 +135,14 @@ private:
     template <typename Condition>
     constexpr std::optional<CharType> consume_if(Condition condition);
 
-    static constexpr const auto s_zero = FLY_CHR(CharType, '0');
-    static constexpr const auto s_upper_a = FLY_CHR(CharType, 'A');
-    static constexpr const auto s_upper_f = FLY_CHR(CharType, 'F');
-    static constexpr const auto s_lower_a = FLY_CHR(CharType, 'a');
-    static constexpr const auto s_lower_f = FLY_CHR(CharType, 'f');
+    static constexpr auto const s_zero = FLY_CHR(CharType, '0');
+    static constexpr auto const s_upper_a = FLY_CHR(CharType, 'A');
+    static constexpr auto const s_upper_f = FLY_CHR(CharType, 'F');
+    static constexpr auto const s_lower_a = FLY_CHR(CharType, 'a');
+    static constexpr auto const s_lower_f = FLY_CHR(CharType, 'f');
 
-    const std::size_t m_size;
-    const view_type m_view;
+    std::size_t const m_size;
+    view_type const m_view;
 
     std::size_t m_index {0};
 };
@@ -150,7 +150,7 @@ private:
 //==================================================================================================
 template <StandardCharacter CharType>
 template <std::size_t N>
-constexpr BasicLexer<CharType>::BasicLexer(const CharType (&literals)[N]) noexcept :
+constexpr BasicLexer<CharType>::BasicLexer(CharType const (&literals)[N]) noexcept :
     m_size(classifier::size(literals)),
     m_view(literals, m_size)
 {

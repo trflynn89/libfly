@@ -36,10 +36,10 @@ std::string get_error_string(int code)
 void set_signal_handler(SignalHandler handler)
 {
 #if defined(FLY_WINDOWS)
-    static constexpr const std::array<int, 6>
+    static constexpr std::array<int, 6> const
         s_signals {SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV};
 #else
-    static constexpr const std::array<int, 8>
+    static constexpr std::array<int, 8> const
         s_signals {SIGINT, SIGTERM, SIGILL, SIGFPE, SIGABRT, SIGSEGV, SIGSYS, SIGBUS};
 #endif
 

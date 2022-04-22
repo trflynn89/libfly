@@ -16,8 +16,8 @@ namespace fly::system {
 
 namespace {
 
-    const char *s_proc_stat_file = "/proc/stat";
-    const char *s_self_status_file = "/proc/self/status";
+    char const *s_proc_stat_file = "/proc/stat";
+    char const *s_self_status_file = "/proc/self/status";
 
 } // namespace
 
@@ -89,9 +89,9 @@ void SystemMonitorImpl::update_system_cpu_usage()
     if ((user >= m_prev_system_user_time) && (nice >= m_prev_system_nice_time) &&
         (system >= m_prev_system_system_time) && (idle >= m_prev_system_idle_time))
     {
-        const auto active = (user - m_prev_system_user_time) + (nice - m_prev_system_nice_time) +
+        auto const active = (user - m_prev_system_user_time) + (nice - m_prev_system_nice_time) +
             (system - m_prev_system_system_time);
-        const auto total = active + (idle - m_prev_system_idle_time);
+        auto const total = active + (idle - m_prev_system_idle_time);
 
         m_system_cpu_usage.store(100.0 * active / total);
     }
@@ -117,9 +117,9 @@ void SystemMonitorImpl::update_process_cpu_usage()
     if ((now > m_prev_time) && (sample.tms_stime >= m_prev_process_system_time) &&
         (sample.tms_utime >= m_prev_process_user_time))
     {
-        const auto cpu = (sample.tms_stime - m_prev_process_system_time) +
+        auto const cpu = (sample.tms_stime - m_prev_process_system_time) +
             (sample.tms_utime - m_prev_process_user_time);
-        const auto time = now - m_prev_time;
+        auto const time = now - m_prev_time;
 
         m_process_cpu_usage.store(100.0 * cpu / time / m_system_cpu_count.load());
     }
@@ -136,8 +136,8 @@ void SystemMonitorImpl::update_system_memory_usage()
 
     if (::sysinfo(&info) == 0)
     {
-        const auto total_memory = static_cast<std::uint64_t>(info.totalram) * info.mem_unit;
-        const auto free_memory = static_cast<std::uint64_t>(info.freeram) * info.mem_unit;
+        auto const total_memory = static_cast<std::uint64_t>(info.totalram) * info.mem_unit;
+        auto const free_memory = static_cast<std::uint64_t>(info.freeram) * info.mem_unit;
 
         m_total_system_memory.store(total_memory);
         m_system_memory_usage.store(total_memory - free_memory);

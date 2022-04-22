@@ -36,7 +36,7 @@ StylerProxyImpl::~StylerProxyImpl()
 
 //==================================================================================================
 template <>
-void StylerProxyImpl::stream_value<fly::logger::Style>(const fly::logger::Style &modifier)
+void StylerProxyImpl::stream_value<fly::logger::Style>(fly::logger::Style const &modifier)
 {
     // https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
     switch (modifier)
@@ -67,7 +67,7 @@ void StylerProxyImpl::stream_value<fly::logger::Style>(const fly::logger::Style 
 
 //==================================================================================================
 template <>
-void StylerProxyImpl::stream_value<fly::logger::Color>(const fly::logger::Color &modifier)
+void StylerProxyImpl::stream_value<fly::logger::Color>(fly::logger::Color const &modifier)
 {
     if (modifier.m_color <= fly::logger::Color::White)
     {
@@ -99,7 +99,7 @@ void StylerProxyImpl::stream_value<fly::logger::Color>(const fly::logger::Color 
 
 //==================================================================================================
 template <>
-void StylerProxyImpl::stream_value<fly::logger::Cursor>(const fly::logger::Cursor &modifier)
+void StylerProxyImpl::stream_value<fly::logger::Cursor>(fly::logger::Cursor const &modifier)
 {
     // https://en.wikipedia.org/wiki/ANSI_escape_code#Terminal_output_sequences
     m_stream << "\x1b[" << static_cast<std::uint32_t>(modifier.m_distance);

@@ -39,7 +39,7 @@ template <>
 struct BasicCharacterLiteral<char>
 {
     static constexpr auto
-    value(const char ch, const wchar_t, const char8_t, const char16_t, const char32_t)
+    value(char const ch, wchar_t const, char8_t const, char16_t const, char32_t const)
     {
         return ch;
     }
@@ -50,7 +50,7 @@ template <>
 struct BasicCharacterLiteral<wchar_t>
 {
     static constexpr auto
-    value(const char, const wchar_t ch, const char8_t, const char16_t, const char32_t)
+    value(char const, wchar_t const ch, char8_t const, char16_t const, char32_t const)
     {
         return ch;
     }
@@ -61,7 +61,7 @@ template <>
 struct BasicCharacterLiteral<char8_t>
 {
     static constexpr auto
-    value(const char, const wchar_t, const char8_t ch, const char16_t, const char32_t)
+    value(char const, wchar_t const, char8_t const ch, char16_t const, char32_t const)
     {
         return ch;
     }
@@ -72,7 +72,7 @@ template <>
 struct BasicCharacterLiteral<char16_t>
 {
     static constexpr auto
-    value(const char, const wchar_t, const char8_t, const char16_t ch, const char32_t)
+    value(char const, wchar_t const, char8_t const, char16_t const ch, char32_t const)
     {
         return ch;
     }
@@ -83,7 +83,7 @@ template <>
 struct BasicCharacterLiteral<char32_t>
 {
     static constexpr auto
-    value(const char, const wchar_t, const char8_t, const char16_t, const char32_t ch)
+    value(char const, wchar_t const, char8_t const, char16_t const, char32_t const ch)
     {
         return ch;
     }
@@ -94,7 +94,7 @@ template <>
 struct BasicStringLiteral<char>
 {
     static constexpr auto
-    value(const char *str, const wchar_t *, const char8_t *, const char16_t *, const char32_t *)
+    value(char const *str, wchar_t const *, char8_t const *, char16_t const *, char32_t const *)
     {
         return str;
     }
@@ -105,7 +105,7 @@ template <>
 struct BasicStringLiteral<wchar_t>
 {
     static constexpr auto
-    value(const char *, const wchar_t *str, const char8_t *, const char16_t *, const char32_t *)
+    value(char const *, wchar_t const *str, char8_t const *, char16_t const *, char32_t const *)
     {
         return str;
     }
@@ -116,7 +116,7 @@ template <>
 struct BasicStringLiteral<char8_t>
 {
     static constexpr auto
-    value(const char *, const wchar_t *, const char8_t *str, const char16_t *, const char32_t *)
+    value(char const *, wchar_t const *, char8_t const *str, char16_t const *, char32_t const *)
     {
         return str;
     }
@@ -127,7 +127,7 @@ template <>
 struct BasicStringLiteral<char16_t>
 {
     static constexpr auto
-    value(const char *, const wchar_t *, const char8_t *, const char16_t *str, const char32_t *)
+    value(char const *, wchar_t const *, char8_t const *, char16_t const *str, char32_t const *)
     {
         return str;
     }
@@ -138,7 +138,7 @@ template <>
 struct BasicStringLiteral<char32_t>
 {
     static constexpr auto
-    value(const char *, const wchar_t *, const char8_t *, const char16_t *, const char32_t *str)
+    value(char const *, wchar_t const *, char8_t const *, char16_t const *, char32_t const *str)
     {
         return str;
     }
@@ -150,11 +150,11 @@ struct BasicStringArray<char>
 {
     template <std::size_t N>
     static constexpr auto value(
-        const char (&arr)[N],
-        const wchar_t (&)[N],
-        const char8_t (&)[N],
-        const char16_t (&)[N],
-        const char32_t (&)[N]) -> decltype(arr)
+        char const (&arr)[N],
+        wchar_t const (&)[N],
+        char8_t const (&)[N],
+        char16_t const (&)[N],
+        char32_t const (&)[N]) -> decltype(arr)
     {
         return arr;
     }
@@ -166,11 +166,11 @@ struct BasicStringArray<wchar_t>
 {
     template <std::size_t N>
     static constexpr auto value(
-        const char (&)[N],
-        const wchar_t (&arr)[N],
-        const char8_t (&)[N],
-        const char16_t (&)[N],
-        const char32_t (&)[N]) -> decltype(arr)
+        char const (&)[N],
+        wchar_t const (&arr)[N],
+        char8_t const (&)[N],
+        char16_t const (&)[N],
+        char32_t const (&)[N]) -> decltype(arr)
     {
         return arr;
     }
@@ -182,11 +182,11 @@ struct BasicStringArray<char8_t>
 {
     template <std::size_t N>
     static constexpr auto value(
-        const char (&)[N],
-        const wchar_t (&)[N],
-        const char8_t (&arr)[N],
-        const char16_t (&)[N],
-        const char32_t (&)[N]) -> decltype(arr)
+        char const (&)[N],
+        wchar_t const (&)[N],
+        char8_t const (&arr)[N],
+        char16_t const (&)[N],
+        char32_t const (&)[N]) -> decltype(arr)
     {
         return arr;
     }
@@ -198,11 +198,11 @@ struct BasicStringArray<char16_t>
 {
     template <std::size_t N>
     static constexpr auto value(
-        const char (&)[N],
-        const wchar_t (&)[N],
-        const char8_t (&)[N],
-        const char16_t (&arr)[N],
-        const char32_t (&)[N]) -> decltype(arr)
+        char const (&)[N],
+        wchar_t const (&)[N],
+        char8_t const (&)[N],
+        char16_t const (&arr)[N],
+        char32_t const (&)[N]) -> decltype(arr)
     {
         return arr;
     }
@@ -214,11 +214,11 @@ struct BasicStringArray<char32_t>
 {
     template <std::size_t N>
     static constexpr auto value(
-        const char (&)[N],
-        const wchar_t (&)[N],
-        const char8_t (&)[N],
-        const char16_t (&)[N],
-        const char32_t (&arr)[N]) -> decltype(arr)
+        char const (&)[N],
+        wchar_t const (&)[N],
+        char8_t const (&)[N],
+        char16_t const (&)[N],
+        char32_t const (&arr)[N]) -> decltype(arr)
     {
         return arr;
     }

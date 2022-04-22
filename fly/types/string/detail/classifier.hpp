@@ -44,7 +44,7 @@ public:
      * @return The length of the character array.
      */
     template <std::size_t N>
-    static constexpr size_type size(const CharType (&value)[N]);
+    static constexpr size_type size(CharType const (&value)[N]);
 
     /**
      * Checks if the given character is an alphabetic character as classified by the default C
@@ -167,22 +167,22 @@ private:
      */
     static constexpr CharType unify_az_characters(CharType ch);
 
-    static constexpr const auto s_null_terminator = FLY_CHR(CharType, '\0');
-    static constexpr const auto s_zero = FLY_CHR(CharType, '0');
-    static constexpr const auto s_upper_a = FLY_CHR(CharType, 'A');
-    static constexpr const auto s_upper_z = FLY_CHR(CharType, 'Z');
-    static constexpr const auto s_upper_f = FLY_CHR(CharType, 'F');
-    static constexpr const auto s_lower_a = FLY_CHR(CharType, 'a');
-    static constexpr const auto s_lower_z = FLY_CHR(CharType, 'z');
-    static constexpr const auto s_space = FLY_CHR(CharType, ' ');
-    static constexpr const auto s_form_feed = FLY_CHR(CharType, '\f');
-    static constexpr const auto s_line_feed = FLY_CHR(CharType, '\n');
-    static constexpr const auto s_carriage_return = FLY_CHR(CharType, '\r');
-    static constexpr const auto s_horizontal_tab = FLY_CHR(CharType, '\t');
-    static constexpr const auto s_vertical_tab = FLY_CHR(CharType, '\v');
+    static constexpr auto const s_null_terminator = FLY_CHR(CharType, '\0');
+    static constexpr auto const s_zero = FLY_CHR(CharType, '0');
+    static constexpr auto const s_upper_a = FLY_CHR(CharType, 'A');
+    static constexpr auto const s_upper_z = FLY_CHR(CharType, 'Z');
+    static constexpr auto const s_upper_f = FLY_CHR(CharType, 'F');
+    static constexpr auto const s_lower_a = FLY_CHR(CharType, 'a');
+    static constexpr auto const s_lower_z = FLY_CHR(CharType, 'z');
+    static constexpr auto const s_space = FLY_CHR(CharType, ' ');
+    static constexpr auto const s_form_feed = FLY_CHR(CharType, '\f');
+    static constexpr auto const s_line_feed = FLY_CHR(CharType, '\n');
+    static constexpr auto const s_carriage_return = FLY_CHR(CharType, '\r');
+    static constexpr auto const s_horizontal_tab = FLY_CHR(CharType, '\t');
+    static constexpr auto const s_vertical_tab = FLY_CHR(CharType, '\v');
 
-    static constexpr const auto s_case_bit = static_cast<int_type>(0x20);
-    static constexpr const auto s_case_mask = static_cast<int_type>(~s_case_bit);
+    static constexpr auto const s_case_bit = static_cast<int_type>(0x20);
+    static constexpr auto const s_case_mask = static_cast<int_type>(~s_case_bit);
 };
 
 //==================================================================================================
@@ -205,7 +205,7 @@ constexpr auto BasicClassifier<CharType>::size(T &&value) -> size_type
 //==================================================================================================
 template <fly::StandardCharacter CharType>
 template <std::size_t N>
-constexpr auto BasicClassifier<CharType>::size(const CharType (&value)[N]) -> size_type
+constexpr auto BasicClassifier<CharType>::size(CharType const (&value)[N]) -> size_type
 {
     static_assert(N > 0, "Character arrays must have non-zero size");
     return N - ((value[N - 1] == s_null_terminator) ? 1 : 0);
@@ -267,7 +267,7 @@ constexpr bool BasicClassifier<CharType>::is_digit(CharType ch)
 template <fly::StandardCharacter CharType>
 constexpr bool BasicClassifier<CharType>::is_x_digit(CharType ch)
 {
-    const auto alpha = unify_az_characters(ch);
+    auto const alpha = unify_az_characters(ch);
     return is_digit(ch) || ((alpha >= s_upper_a) && (alpha <= s_upper_f));
 }
 

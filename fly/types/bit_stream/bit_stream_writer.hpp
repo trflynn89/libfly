@@ -91,7 +91,7 @@ private:
      * @param bytes The number of bytes to flush.
      */
     template <detail::BitStreamInteger DataType>
-    void flush(const DataType &buffer, byte_type bytes);
+    void flush(DataType const &buffer, byte_type bytes);
 
     std::ostream &m_stream;
 };
@@ -104,7 +104,7 @@ void BitStreamWriter::write_bits(DataType bits, byte_type size)
     // two chunks.
     if (size > m_position)
     {
-        const byte_type rshift = size - m_position;
+        byte_type const rshift = size - m_position;
 
         // Fill the remainder of the byte buffer with as many bits as are available, and flush it
         // onto the stream.
@@ -116,7 +116,7 @@ void BitStreamWriter::write_bits(DataType bits, byte_type size)
         size = rshift;
     }
 
-    const byte_type lshift = m_position - size;
+    byte_type const lshift = m_position - size;
 
     m_buffer |= static_cast<buffer_type>(bits) << lshift;
     m_position = lshift;
@@ -124,14 +124,14 @@ void BitStreamWriter::write_bits(DataType bits, byte_type size)
 
 //==================================================================================================
 template <detail::BitStreamInteger DataType>
-void BitStreamWriter::flush(const DataType &buffer, byte_type bytes)
+void BitStreamWriter::flush(DataType const &buffer, byte_type bytes)
 {
     if (m_stream)
     {
-        const DataType data = endian_swap_if_non_native<std::endian::big>(buffer);
+        DataType const data = endian_swap_if_non_native<std::endian::big>(buffer);
 
         m_stream_buffer->sputn(
-            reinterpret_cast<const std::ios::char_type *>(&data),
+            reinterpret_cast<std::ios::char_type const *>(&data),
             static_cast<std::streamsize>(bytes));
     }
 }

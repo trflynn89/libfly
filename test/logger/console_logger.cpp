@@ -19,7 +19,7 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
         fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
         logger->debug("Debug Log");
 
-        const std::string contents = capture();
+        std::string const contents = capture();
         CATCH_REQUIRE_FALSE(contents.empty());
 
         CATCH_CHECK(contents.find("Debug Log") != std::string::npos);
@@ -30,7 +30,7 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
         fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
         logger->info("Info Log");
 
-        const std::string contents = capture();
+        std::string const contents = capture();
         CATCH_REQUIRE_FALSE(contents.empty());
 
         CATCH_CHECK(contents.find("Info Log") != std::string::npos);
@@ -41,7 +41,7 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
         fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
         logger->warn("Warning Log");
 
-        const std::string contents = capture();
+        std::string const contents = capture();
         CATCH_REQUIRE_FALSE(contents.empty());
 
         CATCH_CHECK(contents.find("Warning Log") != std::string::npos);
@@ -52,7 +52,7 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
         fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
         logger->error("Error Log");
 
-        const std::string contents = capture();
+        std::string const contents = capture();
         CATCH_REQUIRE_FALSE(contents.empty());
 
         CATCH_CHECK(contents.find("Error Log") != std::string::npos);
@@ -62,7 +62,7 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
     CATCH_SECTION("Validate style of console logs")
     {
         // Get the substring of a log point that should be styled.
-        auto styled_contents = [](const std::string &contents, std::string &&log) {
+        auto styled_contents = [](std::string const &contents, std::string &&log) {
             auto pos = contents.find(": " + log);
             CATCH_REQUIRE(pos != std::string::npos);
 
@@ -74,10 +74,10 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
             fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
             logger->debug("Debug Log");
 
-            const std::string contents = capture();
+            std::string const contents = capture();
             CATCH_REQUIRE_FALSE(contents.empty());
 
-            const std::string styled = styled_contents(contents, "Debug Log");
+            std::string const styled = styled_contents(contents, "Debug Log");
             CATCH_CHECK(styled.starts_with("\x1b[0m"));
             CATCH_CHECK(styled.ends_with("\x1b[0m"));
         }
@@ -87,10 +87,10 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
             fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stdout);
             logger->info("Info Log");
 
-            const std::string contents = capture();
+            std::string const contents = capture();
             CATCH_REQUIRE_FALSE(contents.empty());
 
-            const std::string styled = styled_contents(contents, "Info Log");
+            std::string const styled = styled_contents(contents, "Info Log");
             CATCH_CHECK(styled.starts_with("\x1b[0;32m"));
             CATCH_CHECK(styled.ends_with("\x1b[0m"));
         }
@@ -100,10 +100,10 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
             fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
             logger->warn("Warning Log");
 
-            const std::string contents = capture();
+            std::string const contents = capture();
             CATCH_REQUIRE_FALSE(contents.empty());
 
-            const std::string styled = styled_contents(contents, "Warning Log");
+            std::string const styled = styled_contents(contents, "Warning Log");
             CATCH_CHECK(styled.starts_with("\x1b[0;33m"));
             CATCH_CHECK(styled.ends_with("\x1b[0m"));
         }
@@ -113,10 +113,10 @@ CATCH_TEST_CASE("ConsoleLogger", "[logger]")
             fly::test::CaptureStream capture(fly::test::CaptureStream::Stream::Stderr);
             logger->error("Error Log");
 
-            const std::string contents = capture();
+            std::string const contents = capture();
             CATCH_REQUIRE_FALSE(contents.empty());
 
-            const std::string styled = styled_contents(contents, "Error Log");
+            std::string const styled = styled_contents(contents, "Error Log");
             CATCH_CHECK(styled.starts_with("\x1b[1;31m"));
             CATCH_CHECK(styled.ends_with("\x1b[0m"));
         }

@@ -52,7 +52,7 @@ concept StandardStringLike = !fly::SameAs<StandardStringType<T>, std::false_type
  * T, and that specialization implements a |format| method.
  */
 template <typename T, typename FormatContext>
-concept Formattable = requires(FormatContext context, const T &value)
+concept Formattable = requires(FormatContext context, T const &value)
 {
     typename FormatContext::template formatter_type<T>;
 

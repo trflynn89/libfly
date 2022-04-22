@@ -26,8 +26,8 @@
 
 namespace {
 
-constexpr const char *s_localhost = "localhost";
-constexpr const fly::net::port_type s_port = 12389;
+constexpr char const *s_localhost = "localhost";
+constexpr fly::net::port_type s_port = 12389;
 
 } // namespace
 
@@ -84,7 +84,7 @@ CATCH_TEMPLATE_TEST_CASE("SocketService", "[net]", fly::net::IPv4Address, fly::n
             CATCH_REQUIRE(client_socket);
             client_signal.wait();
 
-            const std::string message(fly::String::generate_random_string(128));
+            std::string const message(fly::String::generate_random_string(128));
             CATCH_CHECK(client_socket->send(s_localhost, s_port, message) == message.size());
         };
 
@@ -103,7 +103,7 @@ CATCH_TEMPLATE_TEST_CASE("SocketService", "[net]", fly::net::IPv4Address, fly::n
 
     CATCH_SECTION("Many socket service requests are all satisfied")
     {
-        static constexpr const std::size_t s_requests = 100;
+        static constexpr std::size_t s_requests = 100;
 
         auto socket = socket_service->create_socket<UdpSocket>();
         CATCH_REQUIRE(socket);

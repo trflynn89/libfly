@@ -57,7 +57,7 @@ StringType reserved_codepoint()
 {
     using char_type = typename StringType::value_type;
 
-    static constexpr const std::uint32_t s_reserved = 0xd800;
+    static constexpr std::uint32_t s_reserved = 0xd800;
     StringType result;
 
     if constexpr (sizeof(char_type) == 1)
@@ -442,15 +442,15 @@ CATCH_TEMPLATE_TEST_CASE("Format", "[string]", char, wchar_t, char8_t, char16_t,
         test_format(FMT("{:.3s}"), FMT("abc"), FLY_STR(char16_t, "abcdef"));
         test_format(FMT("{:.3s}"), FMT("abc"), FLY_STR(char32_t, "abcdef"));
 
-        const char arr[] = {'a', 'b', 'c', 'd'};
+        char const arr[] = {'a', 'b', 'c', 'd'};
         test_format(FMT("{:.3s}"), FMT("abc"), arr);
-        const wchar_t warr[] = {L'a', L'b', L'c', L'd'};
+        wchar_t const warr[] = {L'a', L'b', L'c', L'd'};
         test_format(FMT("{:.3s}"), FMT("abc"), warr);
-        const char8_t arr8[] = {u8'a', u8'b', u8'c', u8'd'};
+        char8_t const arr8[] = {u8'a', u8'b', u8'c', u8'd'};
         test_format(FMT("{:.3s}"), FMT("abc"), arr8);
-        const char16_t arr16[] = {u'a', u'b', u'c', u'd'};
+        char16_t const arr16[] = {u'a', u'b', u'c', u'd'};
         test_format(FMT("{:.3s}"), FMT("abc"), arr16);
-        const char32_t arr32[] = {U'a', U'b', U'c', U'd'};
+        char32_t const arr32[] = {U'a', U'b', U'c', U'd'};
         test_format(FMT("{:.3s}"), FMT("abc"), arr32);
 
         test_format(FMT("{:.0s}"), FMT(""), FLY_STR(char_type, "a"));
@@ -499,7 +499,7 @@ CATCH_TEMPLATE_TEST_CASE("FormatTypes", "[string]", char, wchar_t, char8_t, char
             value = value.substr(2);
         }
 
-        for (const auto &ch : value)
+        for (auto const &ch : value)
         {
             if (!BasicString::is_x_digit(ch))
             {
@@ -548,15 +548,15 @@ CATCH_TEMPLATE_TEST_CASE("FormatTypes", "[string]", char, wchar_t, char8_t, char
         test_format(FMT("{:s}"), FMT("ab"), FLY_STR(char16_t, "ab"));
         test_format(FMT("{:s}"), FMT("ab"), FLY_STR(char32_t, "ab"));
 
-        const char arr[] = {'a', 'b'};
+        char const arr[] = {'a', 'b'};
         test_format(FMT("{:s}"), FMT("ab"), arr);
-        const wchar_t warr[] = {L'a', L'b'};
+        wchar_t const warr[] = {L'a', L'b'};
         test_format(FMT("{:s}"), FMT("ab"), warr);
-        const char8_t arr8[] = {u8'a', u8'b'};
+        char8_t const arr8[] = {u8'a', u8'b'};
         test_format(FMT("{:s}"), FMT("ab"), arr8);
-        const char16_t arr16[] = {u'a', u'b'};
+        char16_t const arr16[] = {u'a', u'b'};
         test_format(FMT("{:s}"), FMT("ab"), arr16);
-        const char32_t arr32[] = {U'a', U'b'};
+        char32_t const arr32[] = {U'a', U'b'};
         test_format(FMT("{:s}"), FMT("ab"), arr32);
 
         test_format(FMT("{:s}"), FMT("true"), true);
@@ -569,7 +569,7 @@ CATCH_TEMPLATE_TEST_CASE("FormatTypes", "[string]", char, wchar_t, char8_t, char
 
         int i = 0;
         void *p1 = &i;
-        const void *p2 = &i;
+        void const *p2 = &i;
 
         auto result = BasicString::format(FMT("{:p}"), p1);
         CATCH_CHECK(is_all_hex(result));
@@ -854,35 +854,35 @@ CATCH_TEMPLATE_TEST_CASE("FormatErrors", "[string]", char, wchar_t, char8_t, cha
     {
         if constexpr (!std::is_same_v<char_type, char>)
         {
-            const auto reserved = reserved_codepoint<std::string>();
+            auto const reserved = reserved_codepoint<std::string>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), "ab" + reserved);
         }
         if constexpr (!std::is_same_v<char_type, wchar_t>)
         {
-            const auto reserved = reserved_codepoint<std::wstring>();
+            auto const reserved = reserved_codepoint<std::wstring>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), L"ab" + reserved);
         }
         if constexpr (!std::is_same_v<char_type, char8_t>)
         {
-            const auto reserved = reserved_codepoint<std::u8string>();
+            auto const reserved = reserved_codepoint<std::u8string>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), u8"ab" + reserved);
         }
         if constexpr (!std::is_same_v<char_type, char16_t>)
         {
-            const auto reserved = reserved_codepoint<std::u16string>();
+            auto const reserved = reserved_codepoint<std::u16string>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), u"ab" + reserved);
         }
         if constexpr (!std::is_same_v<char_type, char32_t>)
         {
-            const auto reserved = reserved_codepoint<std::u32string>();
+            auto const reserved = reserved_codepoint<std::u32string>();
             test_format(FMT("{}"), FMT(""), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), reserved);
             test_format(FMT("ab {} ab"), FMT("ab  ab"), U"ab" + reserved);

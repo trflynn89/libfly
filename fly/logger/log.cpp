@@ -4,8 +4,8 @@ namespace fly::logger {
 
 namespace {
 
-    constexpr const char s_record_separator = '\x1e';
-    constexpr const char s_unit_separator = '\x1f';
+    constexpr char const s_record_separator = '\x1e';
+    constexpr char const s_unit_separator = '\x1f';
 
 } // namespace
 
@@ -39,7 +39,7 @@ Log &Log::operator=(Log &&log) noexcept
 }
 
 //==================================================================================================
-std::ostream &operator<<(std::ostream &stream, const Log &log)
+std::ostream &operator<<(std::ostream &stream, Log const &log)
 {
     stream << log.m_index << s_unit_separator;
     stream << static_cast<std::uint8_t>(log.m_level) << s_unit_separator;

@@ -63,7 +63,7 @@ CATCH_TEST_CASE("JsonException", "[json]")
         {
             throw fly::OutOfRangeJsonException(string, 12389);
         }
-        catch (const fly::OutOfRangeJsonException &ex)
+        catch (fly::OutOfRangeJsonException const &ex)
         {
             offset = ex.offset();
         }

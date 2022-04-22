@@ -1,5 +1,5 @@
-# Clang-Format 13.0.0
-# https://releases.llvm.org/13.0.0/tools/clang/docs/ClangFormatStyleOptions.html
+# Clang-Format 14.0.0
+# https://releases.llvm.org/14.0.0/tools/clang/docs/ClangFormatStyleOptions.html
 ---
 AccessModifierOffset: -4
 AlignAfterOpenBracket: AlwaysBreak
@@ -12,7 +12,6 @@ AlignEscapedNewlines: Right
 AlignOperands: DontAlign
 AlignTrailingComments: false
 AllowAllArgumentsOnNextLine: false
-AllowAllConstructorInitializersOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
@@ -55,7 +54,6 @@ BreakInheritanceList: AfterColon
 BreakStringLiterals: true
 ColumnLimit: 100
 CompactNamespaces: false
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
 Cpp11BracedListStyle: true
@@ -92,9 +90,26 @@ LambdaBodyIndentation: Signature
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: Inner
 PPIndentWidth: -1
+PackConstructorInitializers: Never
 PointerAlignment: Right
+QualifierAlignment: Custom
+QualifierOrder: ['static', 'constexpr', 'inline', 'type', 'const']
 ReferenceAlignment: Right
 ReflowComments: true
+RemoveBracesLLVM: false
+
+# It would be nice to set this to Always, but it breaks code such as:
+#
+#     template <typename T>
+#     template <typename U>
+#     requires Concept<U>
+#     void Class<T>::function()
+#     {
+#     }
+#
+# By inserting a new line after the requires clause.
+SeparateDefinitionBlocks: Leave
+
 ShortNamespaceLines: 0
 SortIncludes: CaseInsensitive
 SortUsingDeclarations: true
@@ -113,7 +128,7 @@ SpaceBeforeSquareBrackets: false
 SpaceInEmptyBlock: true
 SpaceInEmptyParentheses: false
 SpacesBeforeTrailingComments: 1
-SpacesInAngles: false
+SpacesInAngles: Never
 SpacesInCStyleCastParentheses: false
 SpacesInConditionalStatement: false
 SpacesInContainerLiterals: false

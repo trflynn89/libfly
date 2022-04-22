@@ -25,7 +25,7 @@ using namespace fly::literals::numeric_literals;
 
 namespace {
 
-constexpr const char *s_system_monitor_file = "system_monitor.cpp";
+constexpr char const *s_system_monitor_file = "system_monitor.cpp";
 
 /**
  * Subclass of the system config to decrease the poll interval for faster testing.
@@ -33,7 +33,8 @@ constexpr const char *s_system_monitor_file = "system_monitor.cpp";
 class TestSystemConfig : public fly::system::SystemConfig
 {
 public:
-    TestSystemConfig() noexcept : fly::system::SystemConfig()
+    TestSystemConfig() noexcept :
+        fly::system::SystemConfig()
     {
         m_default_poll_interval = 100_i64;
     }

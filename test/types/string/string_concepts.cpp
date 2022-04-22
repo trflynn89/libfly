@@ -8,37 +8,37 @@
 namespace {
 
 template <fly::StandardString T>
-constexpr bool is_supported_string(const T &)
+constexpr bool is_supported_string(T const &)
 {
     return true;
 }
 
 template <typename T>
-constexpr bool is_supported_string(const T &) requires(!fly::StandardString<T>)
+constexpr bool is_supported_string(T const &) requires(!fly::StandardString<T>)
 {
     return false;
 }
 
 template <fly::StandardCharacter T>
-constexpr bool is_supported_character(const T &)
+constexpr bool is_supported_character(T const &)
 {
     return true;
 }
 
 template <typename T>
-constexpr bool is_supported_character(const T &) requires(!fly::StandardCharacter<T>)
+constexpr bool is_supported_character(T const &) requires(!fly::StandardCharacter<T>)
 {
     return false;
 }
 
 template <fly::StandardStringLike T>
-constexpr bool is_like_supported_string(const T &)
+constexpr bool is_like_supported_string(T const &)
 {
     return true;
 }
 
 template <typename T>
-constexpr bool is_like_supported_string(const T &) requires(!fly::StandardStringLike<T>)
+constexpr bool is_like_supported_string(T const &) requires(!fly::StandardStringLike<T>)
 {
     return false;
 }
@@ -66,55 +66,45 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_SECTION("Plain data types")
         {
             CATCH_CHECK_FALSE(fly::StandardString<int>);
-            CATCH_CHECK_FALSE(fly::StandardString<const int>);
             CATCH_CHECK_FALSE(fly::StandardString<int const>);
 
             CATCH_CHECK_FALSE(fly::StandardString<char_type>);
-            CATCH_CHECK_FALSE(fly::StandardString<const char_type>);
             CATCH_CHECK_FALSE(fly::StandardString<char_type const>);
 
             CATCH_CHECK_FALSE(fly::StandardString<char_type &>);
-            CATCH_CHECK_FALSE(fly::StandardString<const char_type &>);
             CATCH_CHECK_FALSE(fly::StandardString<char_type const &>);
         }
 
         CATCH_SECTION("C-string types")
         {
             CATCH_CHECK_FALSE(fly::StandardString<char_type *>);
-            CATCH_CHECK_FALSE(fly::StandardString<const char_type *>);
             CATCH_CHECK_FALSE(fly::StandardString<char_type const *>);
         }
 
         CATCH_SECTION("C++-string types")
         {
             CATCH_CHECK(fly::StandardString<string_type>);
-            CATCH_CHECK(fly::StandardString<const string_type>);
             CATCH_CHECK(fly::StandardString<string_type const>);
 
             CATCH_CHECK_FALSE(fly::StandardString<view_type>);
-            CATCH_CHECK_FALSE(fly::StandardString<const view_type>);
             CATCH_CHECK_FALSE(fly::StandardString<view_type const>);
         }
 
         CATCH_SECTION("C++-string type references")
         {
             CATCH_CHECK(fly::StandardString<string_type &>);
-            CATCH_CHECK(fly::StandardString<const string_type &>);
             CATCH_CHECK(fly::StandardString<string_type const &>);
 
             CATCH_CHECK_FALSE(fly::StandardString<view_type &>);
-            CATCH_CHECK_FALSE(fly::StandardString<const view_type &>);
             CATCH_CHECK_FALSE(fly::StandardString<view_type const &>);
         }
 
         CATCH_SECTION("C++-string type pointers")
         {
             CATCH_CHECK_FALSE(fly::StandardString<string_type *>);
-            CATCH_CHECK_FALSE(fly::StandardString<const string_type *>);
             CATCH_CHECK_FALSE(fly::StandardString<string_type const *>);
 
             CATCH_CHECK_FALSE(fly::StandardString<view_type *>);
-            CATCH_CHECK_FALSE(fly::StandardString<const view_type *>);
             CATCH_CHECK_FALSE(fly::StandardString<view_type const *>);
         }
     }
@@ -124,55 +114,45 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_SECTION("Plain data types")
         {
             CATCH_CHECK_FALSE(fly::StandardCharacter<int>);
-            CATCH_CHECK_FALSE(fly::StandardCharacter<const int>);
             CATCH_CHECK_FALSE(fly::StandardCharacter<int const>);
 
             CATCH_CHECK(fly::StandardCharacter<char_type>);
-            CATCH_CHECK(fly::StandardCharacter<const char_type>);
             CATCH_CHECK(fly::StandardCharacter<char_type const>);
 
             CATCH_CHECK(fly::StandardCharacter<char_type &>);
-            CATCH_CHECK(fly::StandardCharacter<const char_type &>);
             CATCH_CHECK(fly::StandardCharacter<char_type const &>);
         }
 
         CATCH_SECTION("C-string types")
         {
             CATCH_CHECK_FALSE(fly::StandardCharacter<char_type *>);
-            CATCH_CHECK_FALSE(fly::StandardCharacter<const char_type *>);
             CATCH_CHECK_FALSE(fly::StandardCharacter<char_type const *>);
         }
 
         CATCH_SECTION("C++-string types")
         {
             CATCH_CHECK_FALSE(fly::StandardCharacter<string_type>);
-            CATCH_CHECK_FALSE(fly::StandardCharacter<const string_type>);
             CATCH_CHECK_FALSE(fly::StandardCharacter<string_type const>);
 
             CATCH_CHECK_FALSE(fly::StandardString<view_type>);
-            CATCH_CHECK_FALSE(fly::StandardString<const view_type>);
             CATCH_CHECK_FALSE(fly::StandardString<view_type const>);
         }
 
         CATCH_SECTION("C++-string type references")
         {
             CATCH_CHECK_FALSE(fly::StandardCharacter<string_type &>);
-            CATCH_CHECK_FALSE(fly::StandardCharacter<const string_type &>);
             CATCH_CHECK_FALSE(fly::StandardCharacter<string_type const &>);
 
             CATCH_CHECK_FALSE(fly::StandardString<view_type &>);
-            CATCH_CHECK_FALSE(fly::StandardString<const view_type &>);
             CATCH_CHECK_FALSE(fly::StandardString<view_type const &>);
         }
 
         CATCH_SECTION("C++-string type pointers")
         {
             CATCH_CHECK_FALSE(fly::StandardCharacter<string_type *>);
-            CATCH_CHECK_FALSE(fly::StandardCharacter<const string_type *>);
             CATCH_CHECK_FALSE(fly::StandardCharacter<string_type const *>);
 
             CATCH_CHECK_FALSE(fly::StandardString<view_type *>);
-            CATCH_CHECK_FALSE(fly::StandardString<const view_type *>);
             CATCH_CHECK_FALSE(fly::StandardString<view_type const *>);
         }
     }
@@ -182,67 +162,54 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_SECTION("Plain data types")
         {
             CATCH_CHECK_FALSE(fly::StandardStringLike<int>);
-            CATCH_CHECK_FALSE(fly::StandardStringLike<const int>);
             CATCH_CHECK_FALSE(fly::StandardStringLike<int const>);
 
             CATCH_CHECK_FALSE(fly::StandardStringLike<char_type>);
-            CATCH_CHECK_FALSE(fly::StandardStringLike<const char_type>);
             CATCH_CHECK_FALSE(fly::StandardStringLike<char_type const>);
 
             CATCH_CHECK_FALSE(fly::StandardStringLike<char_type &>);
-            CATCH_CHECK_FALSE(fly::StandardStringLike<const char_type &>);
             CATCH_CHECK_FALSE(fly::StandardStringLike<char_type const &>);
         }
 
         CATCH_SECTION("C-string types")
         {
             CATCH_CHECK(fly::StandardStringLike<char_type *>);
-            CATCH_CHECK(fly::StandardStringLike<const char_type *>);
             CATCH_CHECK(fly::StandardStringLike<char_type const *>);
 
             CATCH_CHECK(fly::SameAs<fly::StandardStringType<char_type *>, string_type>);
-            CATCH_CHECK(fly::SameAs<fly::StandardStringType<const char_type *>, string_type>);
             CATCH_CHECK(fly::SameAs<fly::StandardStringType<char_type const *>, string_type>);
         }
 
         CATCH_SECTION("C++-string types")
         {
             CATCH_CHECK(fly::StandardStringLike<string_type>);
-            CATCH_CHECK(fly::StandardStringLike<const string_type>);
             CATCH_CHECK(fly::StandardStringLike<string_type const>);
 
             CATCH_CHECK(fly::SameAs<fly::StandardStringType<string_type>, string_type>);
-            CATCH_CHECK(fly::SameAs<fly::StandardStringType<const string_type>, string_type>);
             CATCH_CHECK(fly::SameAs<fly::StandardStringType<string_type const>, string_type>);
 
             CATCH_CHECK(fly::StandardStringLike<view_type>);
-            CATCH_CHECK(fly::StandardStringLike<const view_type>);
             CATCH_CHECK(fly::StandardStringLike<view_type const>);
         }
 
         CATCH_SECTION("C++-string type references")
         {
             CATCH_CHECK(fly::StandardStringLike<string_type &>);
-            CATCH_CHECK(fly::StandardStringLike<const string_type &>);
             CATCH_CHECK(fly::StandardStringLike<string_type const &>);
 
             CATCH_CHECK(fly::SameAs<fly::StandardStringType<string_type &>, string_type>);
-            CATCH_CHECK(fly::SameAs<fly::StandardStringType<const string_type &>, string_type>);
             CATCH_CHECK(fly::SameAs<fly::StandardStringType<string_type const &>, string_type>);
 
             CATCH_CHECK(fly::StandardStringLike<view_type &>);
-            CATCH_CHECK(fly::StandardStringLike<const view_type &>);
             CATCH_CHECK(fly::StandardStringLike<view_type const &>);
         }
 
         CATCH_SECTION("C++-string type pointers")
         {
             CATCH_CHECK_FALSE(fly::StandardStringLike<string_type *>);
-            CATCH_CHECK_FALSE(fly::StandardStringLike<const string_type *>);
             CATCH_CHECK_FALSE(fly::StandardStringLike<string_type const *>);
 
             CATCH_CHECK_FALSE(fly::StandardStringLike<view_type *>);
-            CATCH_CHECK_FALSE(fly::StandardStringLike<const view_type *>);
             CATCH_CHECK_FALSE(fly::StandardStringLike<view_type const *>);
         }
     }

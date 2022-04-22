@@ -26,7 +26,7 @@ UdpSocket<EndpointType>::UdpSocket(std::shared_ptr<NetworkConfig> config, IOMode
 //==================================================================================================
 template <IPEndpoint EndpointType>
 UdpSocket<EndpointType>::UdpSocket(
-    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<SocketService> const &service,
     std::shared_ptr<NetworkConfig> config) noexcept :
     BaseSocket(service, std::move(config), detail::socket<EndpointType, UdpSocket<EndpointType>>())
 {
@@ -34,14 +34,15 @@ UdpSocket<EndpointType>::UdpSocket(
 
 //==================================================================================================
 template <IPEndpoint EndpointType>
-UdpSocket<EndpointType>::UdpSocket(UdpSocket &&socket) noexcept : BaseSocket(std::move(socket))
+UdpSocket<EndpointType>::UdpSocket(UdpSocket &&socket) noexcept :
+    BaseSocket(std::move(socket))
 {
 }
 
 //==================================================================================================
 template <IPEndpoint EndpointType>
 auto UdpSocket<EndpointType>::create_socket(
-    const std::shared_ptr<SocketService> &service,
+    std::shared_ptr<SocketService> const &service,
     std::shared_ptr<NetworkConfig> config) -> std::shared_ptr<UdpSocket>
 {
     // UdpSocket's constructor for socket-service-based sockets is private, thus cannot be used with
@@ -49,7 +50,7 @@ auto UdpSocket<EndpointType>::create_socket(
     struct UdpSocketImpl final : public UdpSocket
     {
         UdpSocketImpl(
-            const std::shared_ptr<SocketService> &service,
+            std::shared_ptr<SocketService> const &service,
             std::shared_ptr<NetworkConfig> config) noexcept :
             UdpSocket(service, std::move(config))
         {
@@ -68,7 +69,7 @@ UdpSocket<EndpointType> &UdpSocket<EndpointType>::operator=(UdpSocket &&socket) 
 
 //==================================================================================================
 template <IPEndpoint EndpointType>
-size_t UdpSocket<EndpointType>::send(const EndpointType &endpoint, std::string_view message)
+size_t UdpSocket<EndpointType>::send(EndpointType const &endpoint, std::string_view message)
 {
     bool would_block = false;
 
@@ -105,7 +106,7 @@ UdpSocket<EndpointType>::send(std::string_view hostname, port_type port, std::st
 //==================================================================================================
 template <IPEndpoint EndpointType>
 bool UdpSocket<EndpointType>::send_async(
-    const EndpointType &endpoint,
+    EndpointType const &endpoint,
     std::string_view message,
     SendCompletion &&callback)
 {
@@ -150,7 +151,7 @@ std::string UdpSocket<EndpointType>::receive()
     EndpointType endpoint;
     bool would_block = false;
 
-    const std::string received = detail::recv_from(handle(), endpoint, packet_size(), would_block);
+    std::string const received = detail::recv_from(handle(), endpoint, packet_size(), would_block);
 
     if (received.size() == 0)
     {
@@ -186,7 +187,7 @@ bool UdpSocket<EndpointType>::receive_async(ReceiveCompletion &&callback)
 //==================================================================================================
 template <IPEndpoint EndpointType>
 void UdpSocket<EndpointType>::ready_to_send(
-    const EndpointType &endpoint,
+    EndpointType const &endpoint,
     std::string_view message,
     SendCompletion &&callback,
     std::size_t bytes_sent,
@@ -194,7 +195,7 @@ void UdpSocket<EndpointType>::ready_to_send(
 {
     bool would_block = false;
 
-    const std::size_t current_sent =
+    std::size_t const current_sent =
         detail::send_to(handle(), endpoint, message, packet_size(), would_block);
     bytes_sent += current_sent;
 
@@ -236,7 +237,7 @@ void UdpSocket<EndpointType>::ready_to_receive(ReceiveCompletion &&callback, std
     EndpointType endpoint;
     bool would_block = false;
 
-    const std::string current_received =
+    std::string const current_received =
         detail::recv_from(handle(), endpoint, packet_size(), would_block);
     received += current_received;
 

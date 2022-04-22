@@ -12,10 +12,8 @@ namespace fly::coders {
 
 namespace {
 
-    constexpr const std::ios::openmode s_input_mode = std::ios::in | std::ios::binary;
-
-    constexpr const std::ios::openmode s_output_mode =
-        std::ios::out | std::ios::binary | std::ios::trunc;
+    constexpr std::ios::openmode s_input_mode = std::ios::in | std::ios::binary;
+    constexpr std::ios::openmode s_output_mode = std::ios::out | std::ios::binary | std::ios::trunc;
 
     template <typename SizeType>
     void log_encoder_stats(
@@ -23,8 +21,8 @@ namespace {
         SizeType decoded_size,
         SizeType encoded_size)
     {
-        const auto end = std::chrono::steady_clock::now();
-        const auto ratio = (static_cast<double>(decoded_size) - encoded_size) / decoded_size;
+        auto const end = std::chrono::steady_clock::now();
+        auto const ratio = (static_cast<double>(decoded_size) - encoded_size) / decoded_size;
 
         LOGD(
             "Encoded {} bytes to {} bytes ({:.2f}%) in {:.2f} seconds",
@@ -40,7 +38,7 @@ namespace {
         SizeType encoded_size,
         SizeType decoded_size)
     {
-        const auto end = std::chrono::steady_clock::now();
+        auto const end = std::chrono::steady_clock::now();
 
         LOGD(
             "Decoded {} bytes to {} bytes in {:.2f} seconds",
@@ -52,9 +50,9 @@ namespace {
 } // namespace
 
 //==================================================================================================
-bool Encoder::encode_string(const std::string &decoded, std::string &encoded)
+bool Encoder::encode_string(std::string const &decoded, std::string &encoded)
 {
-    const auto start = std::chrono::steady_clock::now();
+    auto const start = std::chrono::steady_clock::now();
     bool successful = false;
 
     std::istringstream input(decoded, s_input_mode);
@@ -76,10 +74,10 @@ bool Encoder::encode_string(const std::string &decoded, std::string &encoded)
 
 //==================================================================================================
 bool Encoder::encode_file(
-    const std::filesystem::path &decoded,
-    const std::filesystem::path &encoded)
+    std::filesystem::path const &decoded,
+    std::filesystem::path const &encoded)
 {
-    const auto start = std::chrono::steady_clock::now();
+    auto const start = std::chrono::steady_clock::now();
     bool successful = false;
     {
         std::ifstream input(decoded, s_input_mode);
@@ -110,9 +108,9 @@ bool BinaryEncoder::encode_internal(std::istream &decoded, std::ostream &encoded
 }
 
 //==================================================================================================
-bool Decoder::decode_string(const std::string &encoded, std::string &decoded)
+bool Decoder::decode_string(std::string const &encoded, std::string &decoded)
 {
-    const auto start = std::chrono::steady_clock::now();
+    auto const start = std::chrono::steady_clock::now();
     bool successful = false;
 
     std::istringstream input(encoded, s_input_mode);
@@ -134,10 +132,10 @@ bool Decoder::decode_string(const std::string &encoded, std::string &decoded)
 
 //==================================================================================================
 bool Decoder::decode_file(
-    const std::filesystem::path &encoded,
-    const std::filesystem::path &decoded)
+    std::filesystem::path const &encoded,
+    std::filesystem::path const &decoded)
 {
-    const auto start = std::chrono::steady_clock::now();
+    auto const start = std::chrono::steady_clock::now();
     bool successful = false;
     {
         std::ifstream input(encoded, s_input_mode);

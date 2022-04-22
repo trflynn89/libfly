@@ -28,17 +28,17 @@ void BitStreamWriter::write_byte(byte_type byte)
 //==================================================================================================
 bool BitStreamWriter::finish()
 {
-    const byte_type bits_in_buffer = detail::s_most_significant_bit_position - m_position;
+    byte_type const bits_in_buffer = detail::s_most_significant_bit_position - m_position;
 
     if (bits_in_buffer > 0)
     {
-        const byte_type bits_to_flush = bits_in_buffer + (m_position % detail::s_bits_per_byte);
+        byte_type const bits_to_flush = bits_in_buffer + (m_position % detail::s_bits_per_byte);
 
         flush(m_buffer, bits_to_flush / detail::s_bits_per_byte);
         m_position = detail::s_most_significant_bit_position;
         m_buffer = 0;
 
-        const byte_type remainder = (bits_to_flush - bits_in_buffer);
+        byte_type const remainder = (bits_to_flush - bits_in_buffer);
         flush_header(remainder);
     }
 
@@ -50,7 +50,7 @@ void BitStreamWriter::flush_header(byte_type remainder)
 {
     m_stream_buffer->pubseekpos(0);
 
-    const byte_type header =
+    byte_type const header =
         (detail::s_magic << detail::s_magic_shift) | (remainder << detail::s_remainder_shift);
     flush(header, detail::s_byte_type_size);
 }

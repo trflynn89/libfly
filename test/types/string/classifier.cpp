@@ -16,10 +16,10 @@ CATCH_TEMPLATE_TEST_CASE("BasicClassifier", "[string]", char, wchar_t, char8_t, 
 
     CATCH_SECTION("Get the size of a string-like type")
     {
-        const char_type *cstr = FLY_STR(char_type, "ten chars!");
+        char_type const *cstr = FLY_STR(char_type, "ten chars!");
         string_type str = cstr;
         view_type view = str;
-        const char_type arr[] = {'t', 'e', 'n', ' ', 'c', 'h', 'a', 'r', 's', '!'};
+        char_type const arr[] = {'t', 'e', 'n', ' ', 'c', 'h', 'a', 'r', 's', '!'};
 
         CATCH_CHECK(BasicString::size(cstr) == 10);
         CATCH_CHECK(BasicString::size(str) == 10);

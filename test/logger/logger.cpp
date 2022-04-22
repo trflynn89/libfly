@@ -28,7 +28,8 @@ namespace {
 class QueueSink : public fly::logger::Sink
 {
 public:
-    QueueSink(fly::ConcurrentQueue<fly::logger::Log> &logs) : m_logs(logs)
+    QueueSink(fly::ConcurrentQueue<fly::logger::Log> &logs) :
+        m_logs(logs)
     {
     }
 
@@ -87,7 +88,8 @@ public:
 class FailStreamSink : public QueueSink
 {
 public:
-    FailStreamSink(fly::ConcurrentQueue<fly::logger::Log> &logs) : QueueSink(logs)
+    FailStreamSink(fly::ConcurrentQueue<fly::logger::Log> &logs) :
+        QueueSink(logs)
     {
     }
 
@@ -105,7 +107,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
     fly::ConcurrentQueue<fly::logger::Log> received_logs;
 
     auto validate_log_points = [&](fly::logger::Level expected_level,
-                                   const char *expected_function,
+                                   char const *expected_function,
                                    std::vector<std::string> &&expected_messages) {
         double last_time = 0.0;
 
@@ -191,7 +193,7 @@ CATCH_TEST_CASE("Logger", "[logger]")
     CATCH_SECTION("Log points")
     {
         // Run all of the log point tests with both synchronous and asynchronous loggers.
-        const bool synchronous_logger = GENERATE(true, false);
+        bool const synchronous_logger = GENERATE(true, false);
 
         auto task_runner = fly::task::SequencedTaskRunner::create(fly::test::task_manager());
         auto sink = std::make_unique<QueueSink>(received_logs);

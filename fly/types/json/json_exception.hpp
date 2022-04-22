@@ -31,12 +31,12 @@ public:
      * @param json The Json instance for which the error was encountered.
      * @param message Message indicating what error was encountered.
      */
-    JsonException(const Json &json, std::string &&message) noexcept;
+    JsonException(Json const &json, std::string &&message) noexcept;
 
     /**
      * @return C-string representing this exception.
      */
-    virtual const char *what() const noexcept override;
+    virtual char const *what() const noexcept override;
 
 protected:
     /**
@@ -45,10 +45,10 @@ protected:
      * @param class_name Name of the subclass.
      * @param message Message indicating what error was encountered.
      */
-    JsonException(const char *class_name, std::string &&message) noexcept;
+    JsonException(char const *class_name, std::string &&message) noexcept;
 
 private:
-    const std::string m_message;
+    std::string const m_message;
 };
 
 /**
@@ -63,7 +63,7 @@ public:
      * @param json The Json instance for which the error was encountered.
      * @param message Message indicating what error was encountered.
      */
-    JsonIteratorException(const Json &json, std::string &&message) noexcept;
+    JsonIteratorException(Json const &json, std::string &&message) noexcept;
 };
 
 /**
@@ -78,7 +78,7 @@ public:
      * @param json1 The first Json instance in the comparison.
      * @param json2 The second Json instance in the comparison.
      */
-    BadJsonComparisonException(const Json &json1, const Json &json2) noexcept;
+    BadJsonComparisonException(Json const &json1, Json const &json2) noexcept;
 };
 
 /**
@@ -97,7 +97,7 @@ public:
      *
      * @param json The Json instance for which the error was encountered.
      */
-    explicit NullJsonException(const Json &json) noexcept;
+    explicit NullJsonException(Json const &json) noexcept;
 };
 
 /**
@@ -113,7 +113,7 @@ public:
      * @param json The Json instance for which the error was encountered.
      * @param offset The iterator offset attempted to be accessed.
      */
-    OutOfRangeJsonException(const Json &json, std::ptrdiff_t offset) noexcept;
+    OutOfRangeJsonException(Json const &json, std::ptrdiff_t offset) noexcept;
 
     /**
      * @return The iterator offset attempted to be accessed.

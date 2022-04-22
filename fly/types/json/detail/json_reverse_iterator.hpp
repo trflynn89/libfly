@@ -42,14 +42,14 @@ public:
      *
      * @param it The forward iterator to intialize with.
      */
-    explicit JsonReverseIterator(const JsonIterator &it) noexcept;
+    explicit JsonReverseIterator(JsonIterator const &it) noexcept;
 
     /**
      * Constructor to initialize the reverse iterator with an existing reverse iterator.
      *
      * @param it The reverse iterator to intialize with.
      */
-    explicit JsonReverseIterator(const reverse_iterator &it) noexcept;
+    explicit JsonReverseIterator(reverse_iterator const &it) noexcept;
 
     /**
      * Retrieve a reference to the Json instance pointed to by this iterator.
@@ -202,7 +202,7 @@ public:
      * @throws JsonIteratorException If the Json instance is an object.
      * @throws NullJsonException If either iterator is empty.
      */
-    difference_type operator-(const JsonReverseIterator &other) const;
+    difference_type operator-(JsonReverseIterator const &other) const;
 
     /**
      * Retrieve a reference to the key of the Json instance pointed to by this iterator. Only valid
@@ -235,20 +235,21 @@ private:
 
 //==================================================================================================
 template <typename JsonIterator>
-JsonReverseIterator<JsonIterator>::JsonReverseIterator() noexcept : reverse_iterator()
+JsonReverseIterator<JsonIterator>::JsonReverseIterator() noexcept :
+    reverse_iterator()
 {
 }
 
 //==================================================================================================
 template <typename JsonIterator>
-JsonReverseIterator<JsonIterator>::JsonReverseIterator(const JsonIterator &it) noexcept :
+JsonReverseIterator<JsonIterator>::JsonReverseIterator(JsonIterator const &it) noexcept :
     reverse_iterator(it)
 {
 }
 
 //==================================================================================================
 template <typename JsonIterator>
-JsonReverseIterator<JsonIterator>::JsonReverseIterator(const reverse_iterator &it) noexcept :
+JsonReverseIterator<JsonIterator>::JsonReverseIterator(reverse_iterator const &it) noexcept :
     reverse_iterator(it)
 {
 }
@@ -261,7 +262,7 @@ auto JsonReverseIterator<JsonIterator>::operator*() const -> reference
     {
         return reverse_iterator::operator*();
     }
-    catch (const fly::OutOfRangeJsonException &)
+    catch (fly::OutOfRangeJsonException const &)
     {
         throw fly::NullJsonException(json());
     }
@@ -275,7 +276,7 @@ auto JsonReverseIterator<JsonIterator>::operator->() const -> pointer
     {
         return reverse_iterator::operator->();
     }
-    catch (const fly::OutOfRangeJsonException &)
+    catch (fly::OutOfRangeJsonException const &)
     {
         throw fly::NullJsonException(json());
     }
@@ -348,7 +349,7 @@ auto JsonReverseIterator<JsonIterator>::operator-(difference_type offset) const
 
 //==================================================================================================
 template <typename JsonIterator>
-auto JsonReverseIterator<JsonIterator>::operator-(const JsonReverseIterator &other) const
+auto JsonReverseIterator<JsonIterator>::operator-(JsonReverseIterator const &other) const
     -> difference_type
 {
     return reverse_iterator(*this) - reverse_iterator(other);
@@ -363,7 +364,7 @@ const typename json_object_type::key_type &JsonReverseIterator<JsonIterator>::ke
         auto it = --(reverse_iterator::base());
         return it.key();
     }
-    catch (const fly::OutOfRangeJsonException &)
+    catch (fly::OutOfRangeJsonException const &)
     {
         throw fly::NullJsonException(json());
     }
@@ -378,7 +379,7 @@ auto JsonReverseIterator<JsonIterator>::value() const -> reference
         auto it = --(reverse_iterator::base());
         return it.value();
     }
-    catch (const fly::OutOfRangeJsonException &)
+    catch (fly::OutOfRangeJsonException const &)
     {
         throw fly::NullJsonException(json());
     }

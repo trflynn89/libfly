@@ -28,7 +28,7 @@ CATCH_TEMPLATE_TEST_CASE(
     using char_type = typename string_type::value_type;
 
     auto reserved_codepoint = []() -> string_type {
-        static constexpr const std::uint32_t s_reserved = 0xd800;
+        static constexpr std::uint32_t s_reserved = 0xd800;
         string_type result;
 
         if constexpr (sizeof(char_type) == 1)
@@ -47,19 +47,19 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Construct a JSON instance from string-like types")
     {
-        const string_type str1 = J_STR("a");
+        string_type const str1 = J_STR("a");
         CATCH_CHECK(fly::Json(str1).is_string());
 
         string_type str2 = J_STR("b");
         CATCH_CHECK(fly::Json(str2).is_string());
 
-        const char_type *cstr1 = J_STR("c");
+        char_type const *cstr1 = J_STR("c");
         CATCH_CHECK(fly::Json(cstr1).is_string());
 
         char_type *cstr2 = const_cast<char_type *>(J_STR("d"));
         CATCH_CHECK(fly::Json(cstr2).is_string());
 
-        const char_type arr1[] = {J_CHR('g'), '\0'};
+        char_type const arr1[] = {J_CHR('g'), '\0'};
         CATCH_CHECK(fly::Json(arr1).is_string());
 
         char_type arr2[] = {J_CHR('h'), '\0'};
@@ -218,16 +218,16 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("Construct a JSON instance from initializer lists")
     {
-        const fly::Json empty {};
+        fly::Json const empty {};
         CATCH_CHECK(fly::Json(empty).is_null());
 
-        const fly::Json array {J_CHR('7'), 8, J_STR("nine"), 10};
+        fly::Json const array {J_CHR('7'), 8, J_STR("nine"), 10};
         CATCH_CHECK(fly::Json(array).is_array());
 
-        const fly::Json object {{J_STR("a"), 1}, {J_STR("b"), 2}};
+        fly::Json const object {{J_STR("a"), 1}, {J_STR("b"), 2}};
         CATCH_CHECK(fly::Json(object).is_object());
 
-        const fly::Json almost {{J_STR("a"), 1}, {J_STR("b"), 2}, 4};
+        fly::Json const almost {{J_STR("a"), 1}, {J_STR("b"), 2}, 4};
         CATCH_CHECK(fly::Json(almost).is_array());
     }
 

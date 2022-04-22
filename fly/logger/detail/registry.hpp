@@ -54,7 +54,7 @@ public:
      *
      * @param name Name of the logger to unregister.
      */
-    void unregister_logger(const std::string &name);
+    void unregister_logger(std::string const &name);
 
     /**
      * Retrieve a logger from the registry. If the logger is not found, or if the logger instance
@@ -64,7 +64,7 @@ public:
      *
      * @return The logger instance, or null.
      */
-    std::shared_ptr<fly::logger::Logger> get_logger(const std::string &name);
+    std::shared_ptr<fly::logger::Logger> get_logger(std::string const &name);
 
 private:
     /**

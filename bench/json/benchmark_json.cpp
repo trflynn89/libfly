@@ -23,14 +23,14 @@ class JsonParserBase
 {
 public:
     virtual ~JsonParserBase() = default;
-    virtual void parse(const std::filesystem::path &path) = 0;
+    virtual void parse(std::filesystem::path const &path) = 0;
 };
 
 // libfly - https://github.com/trflynn89/libfly
 class LibflyJsonParser : public JsonParserBase
 {
 public:
-    void parse(const std::filesystem::path &path) override
+    void parse(std::filesystem::path const &path) override
     {
         FLY_UNUSED(m_parser.parse_file(path));
     }
@@ -43,12 +43,12 @@ private:
 class BoostJsonParser : public JsonParserBase
 {
 public:
-    void parse(const std::filesystem::path &path) override
+    void parse(std::filesystem::path const &path) override
     {
         boost::json::error_code error_code;
         m_parser.reset();
 
-        const std::string contents = fly::test::PathUtil::read_file(path);
+        std::string const contents = fly::test::PathUtil::read_file(path);
         m_parser.write(contents.data(), contents.size(), error_code);
 
         m_parser.finish(error_code);
@@ -63,7 +63,7 @@ private:
 class NLohmannJsonParser : public JsonParserBase
 {
 public:
-    void parse(const std::filesystem::path &path) override
+    void parse(std::filesystem::path const &path) override
     {
         std::ifstream stream(path);
         auto ignored = nlohmann::json::parse(stream);
@@ -77,8 +77,8 @@ CATCH_TEST_CASE("JSON", "[bench]")
 {
     static constexpr std::size_t s_iterations = 11;
 
-    const auto here = std::filesystem::path(__FILE__).parent_path();
-    const auto root = here.parent_path().parent_path();
+    auto const here = std::filesystem::path(__FILE__).parent_path();
+    auto const root = here.parent_path().parent_path();
 
     static std::vector<std::filesystem::path> s_test_files {
         root / "test" / "parser" / "json" / "unicode" / "all_unicode.json",
@@ -93,7 +93,7 @@ CATCH_TEST_CASE("JSON", "[bench]")
 #endif
     parsers.emplace("libfly", std::make_unique<LibflyJsonParser>());
 
-    for (const auto &file : s_test_files)
+    for (auto const &file : s_test_files)
     {
         JsonTable table(
             "JSON: " + file.filename().string(),
@@ -105,19 +105,19 @@ CATCH_TEST_CASE("JSON", "[bench]")
 
             for (std::size_t i = 0; i < s_iterations; ++i)
             {
-                const auto start = std::chrono::steady_clock::now();
+                auto const start = std::chrono::steady_clock::now();
                 parser.second->parse(file);
-                const auto end = std::chrono::steady_clock::now();
+                auto const end = std::chrono::steady_clock::now();
 
-                const auto duration = std::chrono::duration<double>(end - start);
+                auto const duration = std::chrono::duration<double>(end - start);
                 results.push_back(duration.count());
             }
 
             std::sort(results.rbegin(), results.rend());
 
-            const auto size = std::filesystem::file_size(file);
-            const auto duration = results[s_iterations / 2];
-            const auto speed = size / duration / 1024.0 / 1024.0;
+            auto const size = std::filesystem::file_size(file);
+            auto const duration = results[s_iterations / 2];
+            auto const speed = size / duration / 1024.0 / 1024.0;
 
             table.append_row(parser.first, duration * 1000, speed);
         }

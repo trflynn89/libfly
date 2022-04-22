@@ -48,7 +48,7 @@ protected:
     void poll(std::chrono::milliseconds timeout) override;
 
     std::unique_ptr<PathMonitor::PathInfo>
-    create_path_info(const std::filesystem::path &path) const override;
+    create_path_info(std::filesystem::path const &path) const override;
 
 private:
     /**
@@ -58,7 +58,7 @@ private:
      */
     struct PathInfoImpl : public PathMonitor::PathInfo
     {
-        explicit PathInfoImpl(const std::filesystem::path &path) noexcept;
+        explicit PathInfoImpl(std::filesystem::path const &path) noexcept;
         ~PathInfoImpl() override;
 
         /**
@@ -72,7 +72,7 @@ private:
          *
          * @param path Name of the monitored path.
          */
-        bool refresh(const std::filesystem::path &path);
+        bool refresh(std::filesystem::path const &path);
 
         bool m_valid {false};
         HANDLE m_handle {INVALID_HANDLE_VALUE};
@@ -86,7 +86,7 @@ private:
      * @param info The path's entry in the PathInfo map.
      * @param path Name of the path.
      */
-    void handle_events(const PathInfoImpl *info, const std::filesystem::path &path) const;
+    void handle_events(PathInfoImpl const *info, std::filesystem::path const &path) const;
 
     /**
      * Convert a FILE_NOTIFY_INFORMATION event to a PathEvent.

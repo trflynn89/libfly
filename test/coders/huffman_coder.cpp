@@ -25,7 +25,8 @@ namespace {
 class BadCoderConfig : public fly::coders::CoderConfig
 {
 public:
-    BadCoderConfig() noexcept : fly::coders::CoderConfig()
+    BadCoderConfig() noexcept :
+        fly::coders::CoderConfig()
     {
         m_default_huffman_encoder_max_code_length =
             std::numeric_limits<decltype(m_default_huffman_encoder_max_code_length)>::max();
@@ -38,7 +39,8 @@ public:
 class SmallCodeLengthConfig : public fly::coders::CoderConfig
 {
 public:
-    SmallCodeLengthConfig() noexcept : fly::coders::CoderConfig()
+    SmallCodeLengthConfig() noexcept :
+        fly::coders::CoderConfig()
     {
         m_default_huffman_encoder_max_code_length = 3;
     }
@@ -53,7 +55,7 @@ create_stream_with_remainder(std::vector<fly::byte_type> bytes, fly::byte_type r
     std::ostringstream stream(std::ios::out | std::ios::binary);
     fly::BitStreamWriter output(stream);
 
-    for (const fly::byte_type &byte : bytes)
+    for (fly::byte_type const &byte : bytes)
     {
         output.write_byte(byte);
     }
@@ -85,7 +87,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
 
     CATCH_SECTION("Cannot encode stream using an invalid configuration")
     {
-        const std::string raw;
+        std::string const raw;
         std::string enc;
 
         config = std::make_shared<BadCoderConfig>();
@@ -96,7 +98,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
 
     CATCH_SECTION("Cannot decode stream missing the encoder's version")
     {
-        const std::string enc;
+        std::string const enc;
         std::string dec;
 
         CATCH_CHECK_FALSE(decoder.decode_string(enc, dec));
@@ -108,7 +110,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
             0_u8, // Version
         };
 
-        const std::string enc = create_stream(std::move(bytes));
+        std::string const enc = create_stream(std::move(bytes));
         std::string dec;
 
         CATCH_CHECK_FALSE(enc.empty());
@@ -121,7 +123,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
             1_u8, // Version
         };
 
-        const std::string enc = create_stream(std::move(bytes));
+        std::string const enc = create_stream(std::move(bytes));
         std::string dec;
 
         CATCH_CHECK_FALSE(enc.empty());
@@ -136,7 +138,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
             0_u8, // Chunk size KB (low)
         };
 
-        const std::string enc = create_stream(std::move(bytes));
+        std::string const enc = create_stream(std::move(bytes));
         std::string dec;
 
         CATCH_CHECK_FALSE(enc.empty());
@@ -151,7 +153,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
             1_u8, // Chunk size KB (low)
         };
 
-        const std::string enc = create_stream(std::move(bytes));
+        std::string const enc = create_stream(std::move(bytes));
         std::string dec;
 
         CATCH_CHECK_FALSE(enc.empty());
@@ -167,7 +169,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
             0_u8, // Maximum Huffman code length
         };
 
-        const std::string enc = create_stream(std::move(bytes));
+        std::string const enc = create_stream(std::move(bytes));
         std::string dec;
 
         CATCH_CHECK_FALSE(enc.empty());
@@ -183,7 +185,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
             255_u8, // Maximum Huffman code length
         };
 
-        const std::string enc = create_stream(std::move(bytes));
+        std::string const enc = create_stream(std::move(bytes));
         std::string dec;
 
         CATCH_CHECK_FALSE(enc.empty());
@@ -199,7 +201,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
             4_u8, // Maximum Huffman code length
         };
 
-        const std::string enc = create_stream_with_remainder(std::move(bytes), 1_u8);
+        std::string const enc = create_stream_with_remainder(std::move(bytes), 1_u8);
         std::string dec;
 
         CATCH_CHECK_FALSE(enc.empty());
@@ -216,7 +218,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
             0_u8, // Number of code length counts
         };
 
-        const std::string enc = create_stream(std::move(bytes));
+        std::string const enc = create_stream(std::move(bytes));
         std::string dec;
 
         CATCH_CHECK_FALSE(enc.empty());
@@ -233,7 +235,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
             8_u8, // Number of code length counts
         };
 
-        const std::string enc = create_stream(std::move(bytes));
+        std::string const enc = create_stream(std::move(bytes));
         std::string dec;
 
         CATCH_CHECK_FALSE(enc.empty());
@@ -254,7 +256,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
 
         for (fly::byte_type i = 0; i < number_of_code_length_counts; ++i)
         {
-            const std::string enc = create_stream(bytes);
+            std::string const enc = create_stream(bytes);
             std::string dec;
 
             CATCH_CHECK_FALSE(enc.empty());
@@ -279,7 +281,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
             1_u8, // Code length count 2 (low)
         };
 
-        const std::string enc = create_stream(std::move(bytes));
+        std::string const enc = create_stream(std::move(bytes));
         std::string dec;
 
         CATCH_CHECK_FALSE(enc.empty());
@@ -305,7 +307,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
             bytes.push_back(1_u8);
         }
 
-        const std::string enc = create_stream(std::move(bytes));
+        std::string const enc = create_stream(std::move(bytes));
         std::string dec;
 
         CATCH_CHECK_FALSE(enc.empty());
@@ -325,7 +327,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
             0x41, // Single symbol (A)
         };
 
-        const std::string enc = create_stream_with_remainder(std::move(bytes), 1);
+        std::string const enc = create_stream_with_remainder(std::move(bytes), 1);
         std::string dec;
 
         CATCH_CHECK_FALSE(enc.empty());
@@ -334,7 +336,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
 
     CATCH_SECTION("Encode and decode empty stream")
     {
-        const std::string raw;
+        std::string const raw;
         std::string enc, dec;
 
         CATCH_REQUIRE(encoder.encode_string(raw, enc));
@@ -345,7 +347,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
 
     CATCH_SECTION("Encode and decode a stream with a single symbol")
     {
-        const std::string raw = "a";
+        std::string const raw = "a";
         std::string enc, dec;
 
         CATCH_REQUIRE(encoder.encode_string(raw, enc));
@@ -356,7 +358,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
 
     CATCH_SECTION("Encode and decode a stream with a single symbol repeated")
     {
-        const std::string raw = "aaaaaaaaaa";
+        std::string const raw = "aaaaaaaaaa";
         std::string enc, dec;
 
         CATCH_REQUIRE(encoder.encode_string(raw, enc));
@@ -367,7 +369,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
 
     CATCH_SECTION("Encode and decode a small stream")
     {
-        const std::string raw = "abcdefabcbbb";
+        std::string const raw = "abcdefabcbbb";
         std::string enc, dec;
 
         CATCH_REQUIRE(encoder.encode_string(raw, enc));
@@ -378,7 +380,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
 
     CATCH_SECTION("Encode and decode a large stream")
     {
-        const std::string raw = fly::String::generate_random_string(100 << 10);
+        std::string const raw = fly::String::generate_random_string(100 << 10);
         std::string enc, dec;
 
         CATCH_REQUIRE(encoder.encode_string(raw, enc));
@@ -390,7 +392,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
 
     CATCH_SECTION("Limit code lengths to a small value and validate the Kraft-McMillan inequality")
     {
-        const std::string raw = "abcdefabcbbb";
+        std::string const raw = "abcdefabcbbb";
         std::string enc, dec;
 
         config = std::make_shared<SmallCodeLengthConfig>();
@@ -401,7 +403,7 @@ CATCH_TEST_CASE("Huffman", "[coders]")
 
         CATCH_CHECK(raw == dec);
 
-        const auto max_allowed_kraft = (1_u16 << config->huffman_encoder_max_code_length()) - 1;
+        auto const max_allowed_kraft = (1_u16 << config->huffman_encoder_max_code_length()) - 1;
         CATCH_CHECK(decoder.compute_kraft_mcmillan_constant() <= max_allowed_kraft);
     }
 
@@ -432,8 +434,8 @@ CATCH_TEST_CASE("Huffman", "[coders]")
         {
             // Generated with:
             // tr -dc '[:graph:]' </dev/urandom | head -c 4194304 > test.txt
-            const auto here = std::filesystem::path(__FILE__).parent_path();
-            const auto raw = here / "data" / "test.txt";
+            auto const here = std::filesystem::path(__FILE__).parent_path();
+            auto const raw = here / "data" / "test.txt";
 
             CATCH_REQUIRE(encoder.encode_file(raw, encoded_file));
             CATCH_REQUIRE(decoder.decode_file(encoded_file, decoded_file));
@@ -446,8 +448,8 @@ CATCH_TEST_CASE("Huffman", "[coders]")
         {
             // Generated with:
             // dd if=/dev/urandom of=test.bin count=1 bs=4194304
-            const auto here = std::filesystem::path(__FILE__).parent_path();
-            const auto raw = here / "data" / "test.bin";
+            auto const here = std::filesystem::path(__FILE__).parent_path();
+            auto const raw = here / "data" / "test.bin";
 
             CATCH_REQUIRE(encoder.encode_file(raw, encoded_file));
             CATCH_REQUIRE(decoder.decode_file(encoded_file, decoded_file));

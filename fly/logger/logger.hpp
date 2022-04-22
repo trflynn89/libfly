@@ -269,12 +269,12 @@ public:
      *
      * @return The logger instance, or null.
      */
-    static std::shared_ptr<Logger> get(const std::string &name);
+    static std::shared_ptr<Logger> get(std::string const &name);
 
     /**
      * @return This logger's name.
      */
-    const std::string &name() const;
+    std::string const &name() const;
 
     /**
      * Add a debug log point to the logger.
@@ -423,7 +423,7 @@ private:
         std::string &&message,
         std::chrono::steady_clock::time_point time);
 
-    const std::string m_name;
+    std::string const m_name;
 
     std::shared_ptr<LoggerConfig> m_config;
     std::unique_ptr<Sink> m_sink;
@@ -431,7 +431,7 @@ private:
     std::shared_ptr<fly::task::SequencedTaskRunner> m_task_runner;
     std::atomic_bool m_last_task_failed {true};
 
-    const std::chrono::steady_clock::time_point m_start_time;
+    std::chrono::steady_clock::time_point const m_start_time;
     std::uintmax_t m_index {0};
 };
 

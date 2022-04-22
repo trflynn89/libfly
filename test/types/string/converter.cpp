@@ -54,7 +54,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
     using codepoint_type = typename BasicString::codepoint_type;
 
     auto out_of_range_codepoint = []() -> string_type {
-        static constexpr const codepoint_type s_out_of_range = 0x110000;
+        static constexpr codepoint_type s_out_of_range = 0x110000;
         string_type result;
 
         if constexpr (sizeof(char_type) == 1)
@@ -82,7 +82,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
         string_type s = FLY_STR(char_type, "abc");
         CATCH_CHECK(BasicString::template convert<string_type>(s) == s);
 
-        const char_type *c = FLY_STR(char_type, "def");
+        char_type const *c = FLY_STR(char_type, "def");
         CATCH_CHECK(BasicString::template convert<string_type>(c) == c);
 
         char_type *d = const_cast<char_type *>(FLY_STR(char_type, "ghi"));
@@ -97,7 +97,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
             CATCH_CHECK(BasicString::template convert<std::string>(test) == utf8);
         }
         {
-            const auto utf8 = FLY_STR(std::string::value_type, "\U0001f355 in the morning");
+            auto const utf8 = FLY_STR(std::string::value_type, "\U0001f355 in the morning");
             CATCH_CHECK(BasicString::template convert<std::string>(test) == utf8);
         }
         {
@@ -105,7 +105,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
             CATCH_CHECK(BasicString::template convert<std::u8string>(test) == utf8);
         }
         {
-            const auto utf8 = FLY_STR(std::u8string::value_type, "\U0001f355 in the morning");
+            auto const utf8 = FLY_STR(std::u8string::value_type, "\U0001f355 in the morning");
             CATCH_CHECK(BasicString::template convert<std::u8string>(test) == utf8);
         }
 
@@ -122,7 +122,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
             CATCH_CHECK(BasicString::template convert<std::u16string>(test) == utf16);
         }
         {
-            const auto utf16 = FLY_STR(std::u16string::value_type, "\U0001f355 in the morning");
+            auto const utf16 = FLY_STR(std::u16string::value_type, "\U0001f355 in the morning");
             CATCH_CHECK(BasicString::template convert<std::u16string>(test) == utf16);
         }
 
@@ -136,7 +136,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
                 CATCH_CHECK(BasicString::template convert<std::wstring>(test) == utf16);
             }
             {
-                const auto utf16 = FLY_STR(std::wstring::value_type, "\U0001f355 in the morning");
+                auto const utf16 = FLY_STR(std::wstring::value_type, "\U0001f355 in the morning");
                 CATCH_CHECK(BasicString::template convert<std::wstring>(test) == utf16);
             }
 
@@ -153,7 +153,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
             CATCH_CHECK(BasicString::template convert<std::u32string>(test) == utf32);
         }
         {
-            const auto utf32 = FLY_STR(std::u32string::value_type, "\U0001f355 in the morning");
+            auto const utf32 = FLY_STR(std::u32string::value_type, "\U0001f355 in the morning");
             CATCH_CHECK(BasicString::template convert<std::u32string>(test) == utf32);
         }
 
@@ -167,7 +167,7 @@ CATCH_TEMPLATE_TEST_CASE("Converter", "[string]", char, wchar_t, char8_t, char16
                 CATCH_CHECK(BasicString::template convert<std::wstring>(test) == utf32);
             }
             {
-                const auto utf32 = FLY_STR(std::wstring::value_type, "\U0001f355 in the morning");
+                auto const utf32 = FLY_STR(std::wstring::value_type, "\U0001f355 in the morning");
                 CATCH_CHECK(BasicString::template convert<std::wstring>(test) == utf32);
             }
 

@@ -26,8 +26,8 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Insert a value into a JSON array")
     {
-        const fly::Json array = {1, 2, 3, 4};
-        const fly::Json value = 1;
+        fly::Json const array = {1, 2, 3, 4};
+        fly::Json const value = 1;
 
         if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
@@ -64,7 +64,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Insert a moved value into a JSON array")
     {
-        const fly::Json array = {1, 2, 3};
+        fly::Json const array = {1, 2, 3};
 
         auto value = []() -> fly::Json {
             return fly::Json(1);
@@ -105,8 +105,8 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Insert copies of a value into a JSON array")
     {
-        const fly::Json array = {1, 2, 3};
-        const fly::Json value = 1;
+        fly::Json const array = {1, 2, 3};
+        fly::Json const value = 1;
 
         if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
@@ -154,8 +154,8 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Insert copies of a value into a JSON array")
     {
-        const fly::Json object = {{"c", 3}, {"d", 4}};
-        const fly::Json array = {1, 2, 3};
+        fly::Json const object = {{"c", 3}, {"d", 4}};
+        fly::Json const array = {1, 2, 3};
 
         if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
@@ -209,7 +209,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Insert a list of values into a JSON array")
     {
-        const fly::Json array = {1, 2, 3};
+        fly::Json const array = {1, 2, 3};
 
         if constexpr (std::is_same_v<json_type, fly::json_array_type>)
         {
@@ -254,9 +254,9 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
         if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::json_array_type>)
         {
-            const auto size_before = json.size();
+            auto const size_before = json.size();
             auto &result = json.emplace_back(std::move(value));
-            const auto size_after = json.size();
+            auto const size_after = json.size();
 
             CATCH_CHECK((size_after - size_before) == 1);
             CATCH_CHECK(result == 3);
@@ -272,12 +272,12 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Push a value into a JSON array")
     {
-        const fly::Json value1 = 3;
-        const fly::Json value2 = 4;
+        fly::Json const value1 = 3;
+        fly::Json const value2 = 4;
 
         if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::json_array_type>)
         {
-            const auto starting_size = json.size();
+            auto const starting_size = json.size();
 
             json.push_back(value1);
             CATCH_CHECK(json.size() == (starting_size + 1));
@@ -303,7 +303,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
         if constexpr (fly::test::is_null_or_other_type_v<json_type, fly::json_array_type>)
         {
-            const auto starting_size = json.size();
+            auto const starting_size = json.size();
 
             json.push_back(std::move(value1));
             CATCH_CHECK(json.size() == (starting_size + 1));
@@ -501,7 +501,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
 
     CATCH_SECTION("Swap a JSON instance with an array-like type")
     {
-        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name) {
+        auto validate = [&json]<typename T1, typename T2, typename T3>(char const *name) {
             CATCH_CAPTURE(name);
             json = {1, 2};
 
@@ -538,7 +538,7 @@ CATCH_JSON_TEST_CASE("JsonModifiers")
             CATCH_CHECK(test3 == T3 {nullptr, true});
         };
 
-        auto invalidate = [&json]<typename T>(const char *name) {
+        auto invalidate = [&json]<typename T>(char const *name) {
             CATCH_CAPTURE(name);
             T test {};
 
@@ -620,12 +620,12 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
     using char_type = typename string_type::value_type;
 
     fly::Json json = fly::test::create_json<json_type, string_type>();
-    const string_type key = J_STR("k\\u0065y"); // "key"
+    string_type const key = J_STR("k\\u0065y"); // "key"
 
     CATCH_SECTION("Insert a value into a JSON object")
     {
-        const fly::Json value1 = 3;
-        const fly::Json value2 = 4;
+        fly::Json const value1 = 3;
+        fly::Json const value2 = 4;
 
         if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
@@ -702,11 +702,11 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
 
     CATCH_SECTION("Insert a range of values into a JSON object")
     {
-        const fly::Json object = {{J_STR("c"), fly::Json(3)}, {J_STR("d"), fly::Json(4)}};
+        fly::Json const object = {{J_STR("c"), fly::Json(3)}, {J_STR("d"), fly::Json(4)}};
 
         if constexpr (std::is_same_v<json_type, fly::json_object_type>)
         {
-            const fly::Json array = {J_STR("c"), J_STR("d")};
+            fly::Json const array = {J_STR("c"), J_STR("d")};
 
             CATCH_CHECK_THROWS_JSON(
                 json.insert(object.begin(), fly::Json::const_iterator()),
@@ -809,7 +809,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
 
     CATCH_SECTION("Swap a JSON instance with an object-like type")
     {
-        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name) {
+        auto validate = [&json]<typename T1, typename T2, typename T3>(char const *name) {
             CATCH_CAPTURE(name);
             json = {{J_STR("c"), 100}, {J_STR("d"), 200}};
 
@@ -834,7 +834,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
             CATCH_CHECK(test1 == T1 {{J_STR("a"), 5}, {J_STR("b"), 6}});
         };
 
-        auto invalidate = [&json]<typename T>(const char *name) {
+        auto invalidate = [&json]<typename T>(char const *name) {
             CATCH_CAPTURE(name);
             T test {};
 
@@ -851,7 +851,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
 
     CATCH_SECTION("Merge an object-like type into a JSON instance")
     {
-        auto validate = [&json]<typename T1, typename T2, typename T3>(const char *name) {
+        auto validate = [&json]<typename T1, typename T2, typename T3>(char const *name) {
             json = fly::test::create_json<json_type, string_type>();
             CATCH_CAPTURE(name);
 
@@ -886,7 +886,7 @@ CATCH_JSON_STRING_TEST_CASE("JsonModifiersByString")
             CATCH_CHECK(json[J_STR("g")] == "8");
         };
 
-        auto invalidate = [&json]<typename T>(const char *name) {
+        auto invalidate = [&json]<typename T>(char const *name) {
             CATCH_CAPTURE(name);
             T test {};
 

@@ -39,7 +39,7 @@ std::filesystem::path PathUtil::ScopedTempDirectory::file() const
 }
 
 //==================================================================================================
-bool PathUtil::write_file(const std::filesystem::path &path, const std::string &contents)
+bool PathUtil::write_file(std::filesystem::path const &path, std::string const &contents)
 {
     std::ofstream stream(path, std::ios::out);
 
@@ -52,7 +52,7 @@ bool PathUtil::write_file(const std::filesystem::path &path, const std::string &
 }
 
 //==================================================================================================
-std::string PathUtil::read_file(const std::filesystem::path &path)
+std::string PathUtil::read_file(std::filesystem::path const &path)
 {
     std::ifstream stream(path, std::ios::in);
     std::stringstream sstream;
@@ -66,7 +66,7 @@ std::string PathUtil::read_file(const std::filesystem::path &path)
 }
 
 //==================================================================================================
-bool PathUtil::compare_files(const std::filesystem::path &path1, const std::filesystem::path &path2)
+bool PathUtil::compare_files(std::filesystem::path const &path1, std::filesystem::path const &path2)
 {
     if (std::filesystem::file_size(path1) != std::filesystem::file_size(path2))
     {

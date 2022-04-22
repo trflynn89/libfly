@@ -40,7 +40,7 @@ public:
      * @param address The IP address to initialize the endpoint with.
      * @param port The port to initialize the endpoint with.
      */
-    constexpr Endpoint(const IPAddressType &address, port_type port) noexcept;
+    constexpr Endpoint(IPAddressType const &address, port_type port) noexcept;
 
     /**
      * Constructor. Create an endpoint from an IP address and port.
@@ -50,10 +50,10 @@ public:
      */
     constexpr Endpoint(IPAddressType &&address, port_type port) noexcept;
 
-    Endpoint(const Endpoint &) = default;
+    Endpoint(Endpoint const &) = default;
     Endpoint(Endpoint &&) = default;
 
-    Endpoint &operator=(const Endpoint &) = default;
+    Endpoint &operator=(Endpoint const &) = default;
     Endpoint &operator=(Endpoint &&) = default;
 
     /**
@@ -81,7 +81,7 @@ public:
     /**
      * @return The endoint's IP address.
      */
-    constexpr const IPAddressType &address() const;
+    constexpr IPAddressType const &address() const;
 
     /**
      * @return The endoint's IP port.
@@ -93,18 +93,18 @@ public:
      * Comparison operators. Apple's Clang does not fully support the three-way comparison operator,
      * so these must be manually defined.
      */
-    constexpr bool operator==(const Endpoint &endpoint) const;
-    constexpr bool operator!=(const Endpoint &endpoint) const;
-    constexpr bool operator<(const Endpoint &endpoint) const;
-    constexpr bool operator<=(const Endpoint &endpoint) const;
-    constexpr bool operator>(const Endpoint &endpoint) const;
-    constexpr bool operator>=(const Endpoint &endpoint) const;
+    constexpr bool operator==(Endpoint const &endpoint) const;
+    constexpr bool operator!=(Endpoint const &endpoint) const;
+    constexpr bool operator<(Endpoint const &endpoint) const;
+    constexpr bool operator<=(Endpoint const &endpoint) const;
+    constexpr bool operator>(Endpoint const &endpoint) const;
+    constexpr bool operator>=(Endpoint const &endpoint) const;
 #else
     /**
      * Three-way-comparison operator. Defaulted to perform the comparison on the underlying IP
      * address and port.
      */
-    auto operator<=>(const Endpoint &) const = default;
+    auto operator<=>(Endpoint const &) const = default;
 #endif
 
 private:
@@ -114,7 +114,7 @@ private:
 
 //==================================================================================================
 template <IPAddress IPAddressType>
-constexpr Endpoint<IPAddressType>::Endpoint(const IPAddressType &address, port_type port) noexcept :
+constexpr Endpoint<IPAddressType>::Endpoint(IPAddressType const &address, port_type port) noexcept :
     m_address(address),
     m_port(port)
 {
@@ -147,11 +147,11 @@ template <IPAddress IPAddressType>
 constexpr std::optional<Endpoint<IPAddressType>>
 Endpoint<IPAddressType>::from_string(std::string_view endpoint)
 {
-    constexpr const auto s_max16 =
+    constexpr auto const s_max16 =
         static_cast<std::size_t>(std::numeric_limits<std::uint16_t>::max());
-    constexpr const auto s_colon = ':';
+    constexpr auto const s_colon = ':';
 
-    const std::size_t separator = endpoint.find_last_of(s_colon);
+    std::size_t const separator = endpoint.find_last_of(s_colon);
 
     if ((separator == std::string_view::npos) || (separator == 0) || (separator == endpoint.size()))
     {
@@ -163,8 +163,8 @@ Endpoint<IPAddressType>::from_string(std::string_view endpoint)
 
     if constexpr (is_ipv6())
     {
-        constexpr const auto s_left_bracket = '[';
-        constexpr const auto s_right_bracket = ']';
+        constexpr auto const s_left_bracket = '[';
+        constexpr auto const s_right_bracket = ']';
 
         if (address_view.starts_with(s_left_bracket) && address_view.ends_with(s_right_bracket))
         {
@@ -191,7 +191,7 @@ Endpoint<IPAddressType>::from_string(std::string_view endpoint)
 
 //==================================================================================================
 template <IPAddress IPAddressType>
-constexpr const IPAddressType &Endpoint<IPAddressType>::address() const
+constexpr IPAddressType const &Endpoint<IPAddressType>::address() const
 {
     return m_address;
 }
@@ -207,21 +207,21 @@ constexpr port_type Endpoint<IPAddressType>::port() const
 
 //==================================================================================================
 template <IPAddress IPAddressType>
-constexpr bool Endpoint<IPAddressType>::operator==(const Endpoint<IPAddressType> &endpoint) const
+constexpr bool Endpoint<IPAddressType>::operator==(Endpoint<IPAddressType> const &endpoint) const
 {
     return (m_address == endpoint.m_address) && (m_port == endpoint.m_port);
 }
 
 //==================================================================================================
 template <IPAddress IPAddressType>
-constexpr bool Endpoint<IPAddressType>::operator!=(const Endpoint<IPAddressType> &endpoint) const
+constexpr bool Endpoint<IPAddressType>::operator!=(Endpoint<IPAddressType> const &endpoint) const
 {
     return !(*this == endpoint);
 }
 
 //==================================================================================================
 template <IPAddress IPAddressType>
-constexpr bool Endpoint<IPAddressType>::operator<(const Endpoint<IPAddressType> &endpoint) const
+constexpr bool Endpoint<IPAddressType>::operator<(Endpoint<IPAddressType> const &endpoint) const
 {
     if (m_address < endpoint.m_address)
     {
@@ -233,21 +233,21 @@ constexpr bool Endpoint<IPAddressType>::operator<(const Endpoint<IPAddressType> 
 
 //==================================================================================================
 template <IPAddress IPAddressType>
-constexpr bool Endpoint<IPAddressType>::operator<=(const Endpoint<IPAddressType> &endpoint) const
+constexpr bool Endpoint<IPAddressType>::operator<=(Endpoint<IPAddressType> const &endpoint) const
 {
     return !(endpoint < *this);
 }
 
 //==================================================================================================
 template <IPAddress IPAddressType>
-constexpr bool Endpoint<IPAddressType>::operator>(const Endpoint<IPAddressType> &endpoint) const
+constexpr bool Endpoint<IPAddressType>::operator>(Endpoint<IPAddressType> const &endpoint) const
 {
     return !(*this <= endpoint);
 }
 
 //==================================================================================================
 template <IPAddress IPAddressType>
-constexpr bool Endpoint<IPAddressType>::operator>=(const Endpoint<IPAddressType> &endpoint) const
+constexpr bool Endpoint<IPAddressType>::operator>=(Endpoint<IPAddressType> const &endpoint) const
 {
     return !(*this < endpoint);
 }
@@ -269,7 +269,7 @@ struct fly::Formatter<fly::net::Endpoint<fly::net::IPv4Address>>
      * @param context The context holding the formatting state.
      */
     template <typename FormatContext>
-    void format(const fly::net::Endpoint<fly::net::IPv4Address> &endpoint, FormatContext &context)
+    void format(fly::net::Endpoint<fly::net::IPv4Address> const &endpoint, FormatContext &context)
     {
         fly::String::format_to(context.out(), "{}:{}", endpoint.address(), endpoint.port());
     }
@@ -288,7 +288,7 @@ struct fly::Formatter<fly::net::Endpoint<fly::net::IPv6Address>>
      * @param context The context holding the formatting state.
      */
     template <typename FormatContext>
-    void format(const fly::net::Endpoint<fly::net::IPv6Address> &endpoint, FormatContext &context)
+    void format(fly::net::Endpoint<fly::net::IPv6Address> const &endpoint, FormatContext &context)
     {
         fly::String::format_to(context.out(), "[{}]:{}", endpoint.address(), endpoint.port());
     }

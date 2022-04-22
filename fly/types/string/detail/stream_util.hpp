@@ -77,24 +77,24 @@ public:
     void precision(std::streamsize size);
 
 private:
-    ScopedStreamModifiers(const ScopedStreamModifiers &) = delete;
-    ScopedStreamModifiers &operator=(const ScopedStreamModifiers &) = delete;
+    ScopedStreamModifiers(ScopedStreamModifiers const &) = delete;
+    ScopedStreamModifiers &operator=(ScopedStreamModifiers const &) = delete;
 
     std::ostream &m_stream;
 
-    const std::ios_base::fmtflags m_flags;
+    std::ios_base::fmtflags const m_flags;
     bool m_changed_flags {false};
 
-    const std::locale m_locale;
+    std::locale const m_locale;
     bool m_changed_locale {false};
 
-    const char m_fill;
+    char const m_fill;
     bool m_changed_fill {false};
 
-    const std::streamsize m_width;
+    std::streamsize const m_width;
     bool m_changed_width {false};
 
-    const std::streamsize m_precision;
+    std::streamsize const m_precision;
     bool m_changed_precision {false};
 };
 
@@ -111,11 +111,11 @@ class PositivePaddingFacet : public std::ctype<CharType>
 protected:
     CharType do_widen(char ch) const override;
 
-    const char *do_widen(const char *begin, const char *end, CharType *dest) const override;
+    char const *do_widen(char const *begin, char const *end, CharType *dest) const override;
 
 private:
-    static constexpr const auto s_plus_sign = FLY_CHR(char, '+');
-    static constexpr const auto s_space = FLY_CHR(CharType, ' ');
+    static constexpr auto const s_plus_sign = FLY_CHR(char, '+');
+    static constexpr auto const s_space = FLY_CHR(CharType, ' ');
 };
 
 //==================================================================================================
@@ -206,8 +206,8 @@ CharType PositivePaddingFacet<CharType>::do_widen(char ch) const
 
 //==================================================================================================
 template <fly::StandardCharacter CharType>
-const char *
-PositivePaddingFacet<CharType>::do_widen(const char *begin, const char *end, CharType *dest) const
+char const *
+PositivePaddingFacet<CharType>::do_widen(char const *begin, char const *end, CharType *dest) const
 {
     while (begin != end)
     {

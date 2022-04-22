@@ -25,8 +25,8 @@
 
 namespace {
 
-constexpr const char *s_localhost = "localhost";
-constexpr const fly::net::port_type s_port = 12389;
+constexpr char const *s_localhost = "localhost";
+constexpr fly::net::port_type s_port = 12389;
 
 } // namespace
 
@@ -38,8 +38,8 @@ CATCH_TEMPLATE_TEST_CASE("ListenSocket", "[net]", fly::net::IPv4Address, fly::ne
 
     fly::test::ScopedSocketServiceSetup::create();
 
-    constexpr const auto in_addr_any = IPAddressType::in_addr_any();
-    constexpr const auto in_addr_loopback = IPAddressType::in_addr_loopback();
+    constexpr auto in_addr_any = IPAddressType::in_addr_any();
+    constexpr auto in_addr_loopback = IPAddressType::in_addr_loopback();
 
     CATCH_SECTION("Moving a socket marks the moved-from socket as invalid")
     {

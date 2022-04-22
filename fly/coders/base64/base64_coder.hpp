@@ -38,8 +38,8 @@ protected:
     bool decode_internal(std::istream &encoded, std::ostream &decoded) override;
 
 private:
-    static constexpr const std::size_t s_decoded_chunk_size = 3;
-    static constexpr const std::size_t s_encoded_chunk_size = 4;
+    static constexpr std::size_t const s_decoded_chunk_size = 3;
+    static constexpr std::size_t const s_encoded_chunk_size = 4;
 
     std::array<std::ios::char_type, (64 * s_decoded_chunk_size) << 10> m_decoded;
     std::array<std::ios::char_type, (64 * s_encoded_chunk_size) << 10> m_encoded;

@@ -38,7 +38,7 @@ public:
      * @return A reference to the stored stream.
      */
     template <typename T>
-    friend std::ostream &operator<<(const StylerProxy &proxy, const T &value)
+    friend std::ostream &operator<<(StylerProxy const &proxy, T const &value)
     {
         return proxy.m_stream << value;
     }
@@ -46,8 +46,8 @@ public:
 protected:
     std::ostream &m_stream;
 
-    const bool m_stream_is_stdout;
-    const bool m_stream_is_stderr;
+    bool const m_stream_is_stdout;
+    bool const m_stream_is_stderr;
 };
 
 } // namespace fly::logger::detail

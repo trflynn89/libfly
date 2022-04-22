@@ -71,7 +71,7 @@ public:
      *
      * @return The number of bytes transmitted.
      */
-    std::size_t send(const EndpointType &endpoint, std::string_view message);
+    std::size_t send(EndpointType const &endpoint, std::string_view message);
 
     /**
      * Transmit a message to a specific remote endpoint. If an error occurs on the socket, the
@@ -101,7 +101,7 @@ public:
      * @return True if the socket service and the provided callback are valid.
      */
     bool
-    send_async(const EndpointType &endpoint, std::string_view message, SendCompletion &&callback);
+    send_async(EndpointType const &endpoint, std::string_view message, SendCompletion &&callback);
 
     /**
      * Asynchronously transmit a message to a specific remote endpoint. May only be used if this
@@ -163,7 +163,7 @@ private:
      * @return The created socket.
      */
     static std::shared_ptr<UdpSocket> create_socket(
-        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<SocketService> const &service,
         std::shared_ptr<NetworkConfig> config);
 
     /**
@@ -174,7 +174,7 @@ private:
      * @param config Reference to network configuration.
      */
     UdpSocket(
-        const std::shared_ptr<SocketService> &service,
+        std::shared_ptr<SocketService> const &service,
         std::shared_ptr<NetworkConfig> config) noexcept;
 
     /**
@@ -191,7 +191,7 @@ private:
      * @param total_bytes The total number of bytes expected to be transmitted.
      */
     void ready_to_send(
-        const EndpointType &endpoint,
+        EndpointType const &endpoint,
         std::string_view message,
         SendCompletion &&callback,
         std::size_t bytes_sent,
@@ -209,8 +209,8 @@ private:
      */
     void ready_to_receive(ReceiveCompletion &&callback, std::string received);
 
-    UdpSocket(const UdpSocket &) = delete;
-    UdpSocket &operator=(const UdpSocket &) = delete;
+    UdpSocket(UdpSocket const &) = delete;
+    UdpSocket &operator=(UdpSocket const &) = delete;
 
     using BaseSocket::packet_size;
     using BaseSocket::socket_service;

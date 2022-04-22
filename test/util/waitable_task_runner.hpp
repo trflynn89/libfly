@@ -35,7 +35,7 @@ public:
      *
      * @param location The location to wait upon.
      */
-    void wait_for_task_to_complete(const std::string &location);
+    void wait_for_task_to_complete(std::string const &location);
 
 protected:
     /**
