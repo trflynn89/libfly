@@ -222,6 +222,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\test\fly.cpp" />
     <ClCompile Include="..\..\..\test\main.cpp" />
+    <ClCompile Include="..\..\..\test\assert\assert.cpp" />
     <ClCompile Include="..\..\..\test\coders\base64_coder.cpp" />
     <ClCompile Include="..\..\..\test\coders\huffman_coder.cpp" />
     <ClCompile Include="..\..\..\test\concepts\concepts.cpp" />
