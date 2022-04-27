@@ -1,16 +1,12 @@
 #include "test/util/task_manager.hpp"
 
-#include "fly/fly.hpp"
+#include "fly/assert/assert.hpp"
 #include "fly/task/task_manager.hpp"
 
 #include "catch2/catch_test_macros.hpp"
 
 #include <cstdint>
 #include <thread>
-
-#if !defined(NDEBUG)
-#    include <cassert>
-#endif
 
 namespace fly::test {
 
@@ -42,12 +38,7 @@ namespace {
         {
             // Cannot wrap with CATCH_REQUIRE because the Catch2 framework will have been torn down.
             bool const stopped = m_task_manager->stop();
-
-#if defined(NDEBUG)
-            FLY_UNUSED(stopped);
-#else
-            assert(stopped);
-#endif
+            FLY_ASSERT(stopped);
         }
 
         std::shared_ptr<fly::task::TaskManager> m_task_manager;
