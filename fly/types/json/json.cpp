@@ -128,11 +128,11 @@ json_string_type Json::serialize() const
         }
         else if constexpr (JsonBoolean<S>)
         {
-            serialized += JsonStringType::format(FLY_JSON_ARR("{:s}"), storage);
+            serialized += fly::string::format(FLY_JSON_ARR("{:s}"), storage);
         }
         else
         {
-            serialized += JsonStringType::format(FLY_JSON_ARR("{}"), storage);
+            serialized += fly::string::format(FLY_JSON_ARR("{}"), storage);
         }
     };
 
@@ -236,7 +236,7 @@ Json::reference Json::at(size_type index)
 
     if (index >= storage.size())
     {
-        throw JsonException(*this, String::format("Given index ({}) not found", index));
+        throw JsonException(*this, fly::string::format("Given index ({}) not found", index));
     }
 
     return storage.at(index);
@@ -249,7 +249,7 @@ Json::const_reference Json::at(size_type index) const
 
     if (index >= storage.size())
     {
-        throw JsonException(*this, String::format("Given index ({}) not found", index));
+        throw JsonException(*this, fly::string::format("Given index ({}) not found", index));
     }
 
     return storage.at(index);
@@ -698,7 +698,7 @@ void Json::erase(size_type index)
 
     if (index >= storage.size())
     {
-        throw JsonException(*this, String::format("Given index ({}) not found", index));
+        throw JsonException(*this, fly::string::format("Given index ({}) not found", index));
     }
 
     storage.erase(storage.begin() + static_cast<difference_type>(index));
@@ -840,11 +840,11 @@ json_string_type Json::validate_string(json_string_type &&value)
         }
         else if ((ch >= s_null) && (ch < s_space))
         {
-            throw JsonException(String::format("Character {:#04x} must be escaped", ch));
+            throw JsonException(fly::string::format("Character {:#04x} must be escaped", ch));
         }
         else if ((ch == s_quote) || (ch == s_reverse_solidus))
         {
-            throw JsonException(String::format("Character '{}' must be escaped", ch));
+            throw JsonException(fly::string::format("Character '{}' must be escaped", ch));
         }
     }
 
@@ -910,7 +910,7 @@ void Json::read_escaped_character(json_string_type &value, json_string_type::ite
             break;
 
         default:
-            throw JsonException(String::format("Invalid escape character '{}'", *next));
+            throw JsonException(fly::string::format("Invalid escape character '{}'", *next));
     }
 }
 

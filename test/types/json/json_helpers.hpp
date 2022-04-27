@@ -3,7 +3,7 @@
 #include "fly/concepts/concepts.hpp"
 #include "fly/types/json/json.hpp"
 #include "fly/types/json/json_exception.hpp"
-#include "fly/types/string/string.hpp"
+#include "fly/types/string/format.hpp"
 
 #include "catch2/catch_template_test_macros.hpp"
 #include "catch2/catch_test_macros.hpp"
@@ -28,20 +28,20 @@
         expression,                                                                                \
         fly::JsonException,                                                                        \
         Catch::Matchers::ExceptionMessageMatcher(                                                  \
-            fly::String::format("JsonException: " __VA_ARGS__)))
+            fly::string::format("JsonException: " __VA_ARGS__)))
 
 #define CATCH_CHECK_THROWS_ITERATOR(expression, ...)                                               \
     CATCH_CHECK_THROWS_MATCHES(                                                                    \
         expression,                                                                                \
         fly::JsonIteratorException,                                                                \
         Catch::Matchers::ExceptionMessageMatcher(                                                  \
-            fly::String::format("JsonIteratorException: " __VA_ARGS__)))
+            fly::string::format("JsonIteratorException: " __VA_ARGS__)))
 
 #define CATCH_CHECK_THROWS_BAD_COMPARISON(expression, json1, json2)                                \
     CATCH_CHECK_THROWS_MATCHES(                                                                    \
         expression,                                                                                \
         fly::BadJsonComparisonException,                                                           \
-        Catch::Matchers::ExceptionMessageMatcher(fly::String::format(                              \
+        Catch::Matchers::ExceptionMessageMatcher(fly::string::format(                              \
             "BadJsonComparisonException: Cannot compare iterators of different JSON instances: "   \
             "({}) ({})",                                                                           \
             json1,                                                                                 \
@@ -52,14 +52,14 @@
         expression,                                                                                \
         fly::NullJsonException,                                                                    \
         Catch::Matchers::ExceptionMessageMatcher(                                                  \
-            fly::String::format("NullJsonException: Cannot dereference an empty or past-the-end "  \
+            fly::string::format("NullJsonException: Cannot dereference an empty or past-the-end "  \
                                 "iterator")))
 
 #define CATCH_CHECK_THROWS_NULL_WITH(expression, json)                                             \
     CATCH_CHECK_THROWS_MATCHES(                                                                    \
         expression,                                                                                \
         fly::NullJsonException,                                                                    \
-        Catch::Matchers::ExceptionMessageMatcher(fly::String::format(                              \
+        Catch::Matchers::ExceptionMessageMatcher(fly::string::format(                              \
             "NullJsonException: Cannot dereference an empty or past-the-end iterator: ({})",       \
             json)))
 
@@ -67,7 +67,7 @@
     CATCH_CHECK_THROWS_MATCHES(                                                                    \
         expression,                                                                                \
         fly::OutOfRangeJsonException,                                                              \
-        Catch::Matchers::ExceptionMessageMatcher(fly::String::format(                              \
+        Catch::Matchers::ExceptionMessageMatcher(fly::string::format(                              \
             "OutOfRangeJsonException: Offset {} is out-of-range: ({})",                            \
             offset,                                                                                \
             json)))

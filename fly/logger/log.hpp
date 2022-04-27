@@ -1,7 +1,7 @@
 #pragma once
 
+#include "fly/types/string/format.hpp"
 #include "fly/types/string/literals.hpp"
-#include "fly/types/string/string.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -99,7 +99,7 @@ struct fly::Formatter<fly::logger::Trace>
     {
         if (!trace.m_file.empty() && !trace.m_function.empty())
         {
-            fly::String::format_to(
+            fly::string::format_to(
                 context.out(),
                 "{}:{}:{}",
                 trace.m_file,

@@ -24,4 +24,12 @@ struct BasicStringTraits
     using codepoint_type = std::uint32_t;
 };
 
+// clang-format off
+#define FLY_ENUMERATE_STANDARD_CHARACTERS(enumerator)                                              \
+    enumerator(char, std::string)                                                                  \
+    enumerator(wchar_t, std::wstring)                                                              \
+    enumerator(char8_t, std::u8string)                                                             \
+    enumerator(char16_t, std::u16string)                                                           \
+    enumerator(char32_t, std::u32string)
+
 } // namespace fly::detail

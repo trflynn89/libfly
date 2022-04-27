@@ -4,14 +4,9 @@
 #include "fly/types/string/concepts.hpp"
 #include "fly/types/string/detail/classifier.hpp"
 #include "fly/types/string/detail/converter.hpp"
-#include "fly/types/string/detail/format_context.hpp"
-#include "fly/types/string/detail/format_parameters.hpp"
-#include "fly/types/string/detail/format_parse_context.hpp"
-#include "fly/types/string/detail/format_specifier.hpp"
-#include "fly/types/string/detail/format_string.hpp"
 #include "fly/types/string/detail/traits.hpp"
 #include "fly/types/string/detail/unicode.hpp"
-#include "fly/types/string/formatters.hpp"
+#include "fly/types/string/format.hpp"
 #include "fly/types/string/literals.hpp"
 
 #include <algorithm>
@@ -22,7 +17,6 @@
 #include <cstdint>
 #include <cstdlib>
 #include <ios>
-#include <iterator>
 #include <optional>
 #include <random>
 #include <string>
@@ -59,10 +53,6 @@ public:
     using view_type = typename traits::view_type;
     using int_type = typename traits::int_type;
     using codepoint_type = typename traits::codepoint_type;
-
-    template <typename... ParameterTypes>
-    using FormatString =
-        detail::BasicFormatString<char_type, std::type_identity_t<ParameterTypes>...>;
 
     /**
      * Determine the length of any string-like value. Accepts character arrays, std::basic_string
@@ -393,137 +383,6 @@ public:
      * @return The generated string.
      */
     static string_type generate_random_string(size_type length);
-
-    /**
-     * Format a string with a set of format parameters, returning the formatted string. Based
-     * strongly upon: https://en.cppreference.com/w/cpp/utility/format/format.
-     *
-     * A format string consists of:
-     *
-     *     1. Any character other than "{" or "}", which are copied unchanged to the output.
-     *     2. Escape sequences "{{" and "}}", which are replaced with "{" and "}" in the output.
-     *     3. Replacement fields.
-     *
-     * Replacement fields may be of the form:
-     *
-     *     1. An introductory "{" character.
-     *     2. An optional non-negative position.
-     *     3. An optional colon ":" following by formatting options.
-     *     4. A final "}" character.
-     *
-     * For a detailed description of replacement fields, see fly::detail::BasicFormatSpecifier.
-     *
-     * This implementation differs from std::format in the following ways:
-     *
-     *    1. All standard string types are supported as format strings.
-     *
-     *    2. All standard string types are supported as format parameters, even if that type differs
-     *       from the format string type. If the type differs, the format parameter is transcoded to
-     *       the type of the format string.
-     *
-     *    3. This implementation is exceptionless. Any error encountered (such as failed transcoding
-     *       in (2) above) results in the format parameter that caused the error to be dropped.
-     *
-     *    4. Locale-specific form is not supported. If the option appears in the format string, it
-     *       will be parsed, but will be ignored.
-     *
-     * The format string type is implicitly constructed from a C-string literal. Callers should only
-     * invoke this method accordingly:
-     *
-     *     fly::String::format("Format {:d}", 1);
-     *
-     * On compilers that support immediate functions (consteval), the format string is validated at
-     * compile time against the types of the format parameters. If the format string is invalid, a
-     * compile error with a diagnostic message will be raised. On other compilers, the error message
-     * will be returned rather than a formatted string.
-     *
-     * Replacement fields for user-defined types are parsed at runtime. To format a user-defined
-     * type, a fly::Formatter specialization must be defined, analagous to std::formatter. The
-     * specialization may extend a standard fly::Formatter, for example:
-     *
-     *     template <typename CharType>
-     *     struct fly::Formatter<MyType, CharType> : public fly::Formatter<int, CharType>
-     *     {
-     *         template <typename FormatContext>
-     *         void format(MyType const &value, FormatContext &context)
-     *         {
-     *             fly::Formatter<int, CharType>::format(value.as_int(), context);
-     *         }
-     *     };
-     *
-     * Or, the formatter may be defined without without inheritence:
-     *
-     *     template <typename CharType>
-     *     struct fly::Formatter<MyType, CharType>
-     *     {
-     *         bool m_option {false};
-     *
-     *         template <typename FormatParseContext>
-     *         constexpr void parse(FormatParseContext &context)
-     *         {
-     *             if (context.lexer().consume_if(FLY_CHR(CharType, 'o')))
-     *             {
-     *                 m_option = true;
-     *             }
-     *             if (!context.lexer().consume_if(FLY_CHR(CharType, '}')))
-     *             {
-     *                 context.on_error("UserDefinedTypeWithParser error!");
-     *             }
-     *         }
-     *
-     *         template <typename FormatContext>
-     *         void format(MyType const &value, FormatContext &context)
-     *         {
-     *             fly::BasicString<CharType>::format_to(context.out(), "{}", value.as_int());
-     *         }
-     *     };
-     *
-     * The |parse| method is optional. If defined, it is provided a BasicFormatParseContext which
-     * contains a lexer that may be used to parse the format string. The position of the lexer
-     * will be one of the following within the replacement field:
-     *
-     *     1. The position immediately after the colon, if there is one.
-     *     2. Otherwise, the position immediately after the format parameter index, if there is one.
-     *     3. Otherwise, the position immeidately after the opening brace.
-     *
-     * The |parse| method is expected to consume up to and including the closing "}" character. It
-     * must be declared constexpr, as it will be invoked at compile time to validate the replacement
-     * field. The parser may indicate any parsing errors through the parsing context; if an error
-     * occurs, the error is handled the same as any standard replacement field (see above). Even
-     * though the parser is invoked at compile time, the result of user-defined parsing cannot be
-     * stored generically. Thus, parsing is invoked again at runtime immediately before |format|.
-     *
-     * @tparam ParameterTypes Variadic format parameter types.
-     *
-     * @param fmt The string to format.
-     * @param parameters The variadic list of format parameters to be formatted.
-     *
-     * @return A string that has been formatted with the given format parameters.
-     */
-    template <typename... ParameterTypes>
-    static string_type
-    format(FormatString<ParameterTypes...> &&fmt, ParameterTypes &&...parameters);
-
-    /**
-     * Format a string with a set of format parameters to an existing output iterator. Based
-     * strongly upon: https://en.cppreference.com/w/cpp/utility/format/format.
-     *
-     * For a detailed description of string formatting, see fly::BasicString::format.
-     *
-     * @tparam OutputIterator The type of the output iterator.
-     * @tparam ParameterTypes Variadic format parameter types.
-     *
-     * @param output The output iterator to write to.
-     * @param fmt The string to format.
-     * @param parameters The variadic list of format parameters to be formatted.
-     *
-     * @return A string that has been formatted with the given format parameters.
-     */
-    template <typename OutputIterator, typename... ParameterTypes>
-    static void format_to(
-        OutputIterator output,
-        FormatString<ParameterTypes...> &&fmt,
-        ParameterTypes &&...parameters);
 
     /**
      * Concatenate a list of objects with the given separator.
@@ -917,85 +776,6 @@ auto BasicString<CharType>::generate_random_string(size_type length) -> string_t
 
 //==================================================================================================
 template <StandardCharacter CharType>
-template <typename... ParameterTypes>
-inline auto
-BasicString<CharType>::format(FormatString<ParameterTypes...> &&fmt, ParameterTypes &&...parameters)
-    -> string_type
-{
-    string_type formatted;
-    formatted.reserve(fmt.context().view().size() * 2);
-
-    format_to(
-        std::back_inserter(formatted),
-        std::move(fmt),
-        std::forward<ParameterTypes>(parameters)...);
-
-    return formatted;
-}
-
-//==================================================================================================
-template <StandardCharacter CharType>
-template <typename OutputIterator, typename... ParameterTypes>
-void BasicString<CharType>::format_to(
-    OutputIterator output,
-    FormatString<ParameterTypes...> &&fmt,
-    ParameterTypes &&...parameters)
-{
-    using FormatContext = detail::BasicFormatContext<OutputIterator, char_type>;
-    using FormatParseContext = detail::BasicFormatParseContext<char_type>;
-
-    FormatParseContext &parse_context = fmt.context();
-    view_type const view = parse_context.view();
-
-    if (parse_context.has_error())
-    {
-        format_to(
-            output,
-            FLY_ARR(char_type, "Ignored invalid formatter: {}"),
-            parse_context.error());
-
-        return;
-    }
-
-    auto params =
-        detail::make_format_parameters<FormatContext>(std::forward<ParameterTypes>(parameters)...);
-    FormatContext context(output, params);
-
-    for (std::size_t pos = 0; pos < view.size();)
-    {
-        switch (auto const &ch = view[pos])
-        {
-            case s_left_brace:
-                if (view[pos + 1] == s_left_brace)
-                {
-                    *context.out()++ = ch;
-                    pos += 2;
-                }
-                else
-                {
-                    auto specifier = *std::move(fmt.next_specifier());
-                    pos += specifier.m_size;
-
-                    auto const parameter = context.arg(specifier.m_position);
-                    parameter.format(parse_context, context, std::move(specifier));
-                }
-                break;
-
-            case s_right_brace:
-                *context.out()++ = ch;
-                pos += 2;
-                break;
-
-            default:
-                *context.out()++ = ch;
-                ++pos;
-                break;
-        }
-    }
-}
-
-//==================================================================================================
-template <StandardCharacter CharType>
 template <typename... Args>
 inline auto BasicString<CharType>::join(char_type separator, Args &&...args) -> string_type
 {
@@ -1014,7 +794,7 @@ inline void BasicString<CharType>::join_internal(
     T &&value,
     Args &&...args)
 {
-    result += format(FLY_ARR(char_type, "{}{}"), std::forward<T>(value), separator);
+    result += fly::string::format(FLY_ARR(char_type, "{}{}"), std::forward<T>(value), separator);
     join_internal(result, separator, std::forward<Args>(args)...);
 }
 
@@ -1023,7 +803,7 @@ template <StandardCharacter CharType>
 template <typename T>
 inline void BasicString<CharType>::join_internal(string_type &result, char_type, T &&value)
 {
-    result += format(FLY_ARR(char_type, "{}"), std::forward<T>(value));
+    result += fly::string::format(FLY_ARR(char_type, "{}"), std::forward<T>(value));
 }
 
 //==================================================================================================

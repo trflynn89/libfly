@@ -2,7 +2,7 @@
 #include "fly/logger/logger_config.hpp"
 #include "fly/logger/sink.hpp"
 #include "fly/logger/styler.hpp"
-#include "fly/types/string/string.hpp"
+#include "fly/types/string/format.hpp"
 
 #include "catch2/catch_session.hpp"
 #include "catch2/catch_test_case_info.hpp"
@@ -57,7 +57,7 @@ public:
     void testCaseStarting(Catch::TestCaseInfo const &info) override
     {
         auto const style = fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Cyan);
-        m_stream << style << fly::String::format("[{:=>13}{}{:=<13}]\n\n", ' ', info.name, ' ');
+        m_stream << style << fly::string::format("[{:=>13}{}{:=<13}]\n\n", ' ', info.name, ' ');
     }
 };
 

@@ -2,6 +2,8 @@
 
 #include "test/types/json/json_helpers.hpp"
 
+#include "fly/types/string/format.hpp"
+
 #include "catch2/catch_test_macros.hpp"
 
 #include <array>
@@ -899,8 +901,7 @@ CATCH_TEST_CASE("Json", "[json]")
 
 CATCH_TEMPLATE_TEST_CASE("JsonFormat", "[json]", char, wchar_t, char8_t, char16_t, char32_t)
 {
-    using BasicString = fly::BasicString<TestType>;
-    using char_type = typename BasicString::char_type;
+    using char_type = TestType;
 
     CATCH_SECTION("Format a JSON instance")
     {
@@ -913,13 +914,13 @@ CATCH_TEMPLATE_TEST_CASE("JsonFormat", "[json]", char, wchar_t, char8_t, char16_
         fly::Json floating = 1.0f;
         fly::Json null = nullptr;
 
-        CATCH_CHECK(BasicString::format(J_ARR("{}"), string) == J_STR("\"abc\""));
-        CATCH_CHECK(BasicString::format(J_ARR("{}"), object) == J_STR("{\"a\":1,\"b\":2}"));
-        CATCH_CHECK(BasicString::format(J_ARR("{}"), array) == J_STR("[55,8]"));
-        CATCH_CHECK(BasicString::format(J_ARR("{}"), boolean) == J_STR("true"));
-        CATCH_CHECK(BasicString::format(J_ARR("{}"), sign) == J_STR("1"));
-        CATCH_CHECK(BasicString::format(J_ARR("{}"), unsign) == J_STR("1"));
-        CATCH_CHECK(BasicString::format(J_ARR("{}"), floating) == J_STR("1"));
-        CATCH_CHECK(BasicString::format(J_ARR("{}"), null) == J_STR("null"));
+        CATCH_CHECK(fly::string::format(J_ARR("{}"), string) == J_STR("\"abc\""));
+        CATCH_CHECK(fly::string::format(J_ARR("{}"), object) == J_STR("{\"a\":1,\"b\":2}"));
+        CATCH_CHECK(fly::string::format(J_ARR("{}"), array) == J_STR("[55,8]"));
+        CATCH_CHECK(fly::string::format(J_ARR("{}"), boolean) == J_STR("true"));
+        CATCH_CHECK(fly::string::format(J_ARR("{}"), sign) == J_STR("1"));
+        CATCH_CHECK(fly::string::format(J_ARR("{}"), unsign) == J_STR("1"));
+        CATCH_CHECK(fly::string::format(J_ARR("{}"), floating) == J_STR("1"));
+        CATCH_CHECK(fly::string::format(J_ARR("{}"), null) == J_STR("null"));
     }
 }

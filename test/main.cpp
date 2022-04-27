@@ -1,5 +1,6 @@
 #include "fly/logger/styler.hpp"
 #include "fly/types/numeric/literals.hpp"
+#include "fly/types/string/format.hpp"
 #include "fly/types/string/string.hpp"
 
 #include "catch2/catch_session.hpp"
@@ -87,7 +88,7 @@ void FlyReporter::testCaseStarting(Catch::TestCaseInfo const &info)
 {
     Catch::StreamingReporterBase::testCaseStarting(info);
 
-    stream_header(fly::logger::Color::Green, fly::String::format("{} Test", info.name));
+    stream_header(fly::logger::Color::Green, fly::string::format("{} Test", info.name));
     m_current_test_case_start = std::chrono::steady_clock::now();
 }
 
@@ -116,10 +117,10 @@ void FlyReporter::sectionStarting(Catch::SectionInfo const &info)
 
     if (level != 1)
     {
-        m_stream << fly::String::format("{: >{}}└─➤ ", "", (level - 2) * 4);
+        m_stream << fly::string::format("{: >{}}└─➤ ", "", (level - 2) * 4);
     }
 
-    m_stream << fly::String::format("{} ]\n", info.name);
+    m_stream << fly::string::format("{} ]\n", info.name);
 
     m_sections.push_back(std::move(section));
 }
@@ -155,13 +156,13 @@ void FlyReporter::testCaseEnded(Catch::TestCaseStats const &stats)
     {
         stream_header(
             fly::logger::Color::Green,
-            fly::String::format("PASSED {} ({:.3f} seconds)", name, duration.count()));
+            fly::string::format("PASSED {} ({:.3f} seconds)", name, duration.count()));
     }
     else
     {
         stream_header(
             fly::logger::Color::Red,
-            fly::String::format("FAILED {} ({:.3f} seconds)", name, duration.count()));
+            fly::string::format("FAILED {} ({:.3f} seconds)", name, duration.count()));
     }
 
     m_stream << '\n';
@@ -180,14 +181,14 @@ void FlyReporter::testRunEnded(Catch::TestRunStats const &stats)
 
     m_stream << fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Cyan)
              << "Total time ";
-    m_stream << fly::String::format("{:.3f} seconds\n", duration.count());
+    m_stream << fly::string::format("{:.3f} seconds\n", duration.count());
 }
 
 //==================================================================================================
 void FlyReporter::stream_header(fly::logger::Color::StandardColor color, std::string message)
 {
     m_stream << fly::logger::Styler(fly::logger::Style::Bold, color)
-             << fly::String::format("[==== {} ====]\n", message);
+             << fly::string::format("[==== {} ====]\n", message);
 }
 
 //==================================================================================================
@@ -197,7 +198,7 @@ void FlyReporter::stream_summary(Catch::Totals const &totals)
 
     auto stream_divider = [this](auto color, auto width) {
         m_stream << fly::logger::Styler(fly::logger::Style::Bold, color)
-                 << fly::String::format("{:=>{}}", "", width);
+                 << fly::string::format("{:=>{}}", "", width);
     };
 
     if (totals.testCases.total() == 0)
@@ -224,8 +225,8 @@ void FlyReporter::stream_summary(Catch::Totals const &totals)
 
     auto pluralise = [](auto number, auto label) {
         if (number == 1)
-            return fly::String::format("{} {}", number, label);
-        return fly::String::format("{} {}s", number, label);
+            return fly::string::format("{} {}", number, label);
+        return fly::string::format("{} {}s", number, label);
     };
 
     if (totals.testCases.total() == 0)
@@ -242,13 +243,13 @@ void FlyReporter::stream_summary(Catch::Totals const &totals)
     else
     {
         m_stream << fly::logger::Styler(fly::logger::Color::Red) << "Failed";
-        m_stream << fly::String::format(
+        m_stream << fly::string::format(
             " {} of {}\n",
             totals.testCases.failed,
             pluralise(totals.testCases.total(), "test case"));
 
         m_stream << fly::logger::Styler(fly::logger::Color::Red) << "Failed";
-        m_stream << fly::String::format(
+        m_stream << fly::string::format(
             " {} of {}\n",
             totals.assertions.failed,
             pluralise(totals.assertions.total(), "assertion"));

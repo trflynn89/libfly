@@ -9,7 +9,7 @@
 #include "fly/types/json/types.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/concepts.hpp"
-#include "fly/types/string/string.hpp"
+#include "fly/types/string/format.hpp"
 
 #include <concepts>
 #include <cstddef>
@@ -1664,7 +1664,7 @@ Json::operator T() const &noexcept(false)
         else if constexpr (JsonNumber<S>)
         {
             using char_type = typename T::value_type;
-            return BasicString<char_type>::format(FLY_ARR(char_type, "{}"), storage);
+            return fly::string::format(FLY_ARR(char_type, "{}"), storage);
         }
         else
         {
@@ -1785,7 +1785,7 @@ Json::reference Json::at(T key)
 
     if (it == storage.end())
     {
-        throw JsonException(*this, String::format("Given key ({}) not found", key));
+        throw JsonException(*this, fly::string::format("Given key ({}) not found", key));
     }
 
     return it->second;
@@ -1800,7 +1800,7 @@ Json::const_reference Json::at(T key) const
 
     if (it == storage.end())
     {
-        throw JsonException(*this, String::format("Given key ({}) not found", key));
+        throw JsonException(*this, fly::string::format("Given key ({}) not found", key));
     }
 
     return it->second;

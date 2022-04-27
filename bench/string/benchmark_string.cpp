@@ -1,6 +1,6 @@
 #include "bench/util/table.hpp"
 
-#include "fly/types/string/string.hpp"
+#include "fly/types/string/format.hpp"
 
 #include "catch2/catch_test_macros.hpp"
 #include "fmt/format.h"
@@ -33,7 +33,7 @@ class LibflyFormat : public StringBase
 public:
     void format_with_floats() override
     {
-        FLY_UNUSED(fly::String::format(
+        FLY_UNUSED(fly::string::format(
             "{:.10f}:{:04}:{:+}:{}:{}:{}:%\n",
             1.234,
             42,
@@ -45,7 +45,7 @@ public:
 
     void format_without_floats() override
     {
-        FLY_UNUSED(fly::String::format(
+        FLY_UNUSED(fly::string::format(
             "{:10}:{:04}:{:+}:{}:{}:{}:%\n",
             1234,
             42,

@@ -2,7 +2,7 @@
 
 #include "fly/logger/logger.hpp"
 #include "fly/task/task_runner.hpp"
-#include "fly/types/string/string.hpp"
+#include "fly/types/string/format.hpp"
 
 #import <Foundation/Foundation.h>
 
@@ -42,7 +42,7 @@ PathMonitorImpl::PathMonitorImpl(
     PathMonitor(std::move(task_runner), std::move(config)),
     m_context(std::make_unique<FSEventStreamContext>()),
     m_dispatch_queue(dispatch_queue_create(
-        fly::String::format("fly.PathMonitor.{:p}", this).c_str(),
+        fly::string::format("fly.PathMonitor.{:p}", this).c_str(),
         DISPATCH_QUEUE_SERIAL)),
     m_stream(nullptr)
 {

@@ -6,6 +6,7 @@
 #include "fly/task/task_manager.hpp"
 #include "fly/types/concurrency/concurrent_queue.hpp"
 #include "fly/types/numeric/literals.hpp"
+#include "fly/types/string/format.hpp"
 
 #include "catch2/catch_test_macros.hpp"
 
@@ -82,7 +83,7 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
                 break;
 
             default:
-                CATCH_FAIL("Unrecognized PathEvent: " << fly::String::format("{}", event));
+                CATCH_FAIL("Unrecognized PathEvent: " << fly::string::format("{}", event));
                 break;
         }
 
@@ -99,11 +100,11 @@ CATCH_TEST_CASE("PathMonitor", "[path]")
 
     CATCH_SECTION("Verify formatting of path events")
     {
-        CATCH_CHECK(fly::String::format("{}", static_cast<fly::path::PathEvent>(-1)).empty());
-        CATCH_CHECK(fly::String::format("{}", fly::path::PathEvent::None) == "None");
-        CATCH_CHECK(fly::String::format("{}", fly::path::PathEvent::Created) == "Created");
-        CATCH_CHECK(fly::String::format("{}", fly::path::PathEvent::Deleted) == "Deleted");
-        CATCH_CHECK(fly::String::format("{}", fly::path::PathEvent::Changed) == "Changed");
+        CATCH_CHECK(fly::string::format("{}", static_cast<fly::path::PathEvent>(-1)).empty());
+        CATCH_CHECK(fly::string::format("{}", fly::path::PathEvent::None) == "None");
+        CATCH_CHECK(fly::string::format("{}", fly::path::PathEvent::Created) == "Created");
+        CATCH_CHECK(fly::string::format("{}", fly::path::PathEvent::Deleted) == "Deleted");
+        CATCH_CHECK(fly::string::format("{}", fly::path::PathEvent::Changed) == "Changed");
     }
 
     CATCH_SECTION("Cannot monitor paths that do not exist")

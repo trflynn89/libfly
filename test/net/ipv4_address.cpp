@@ -2,6 +2,7 @@
 
 #include "fly/fly.hpp"
 #include "fly/types/numeric/endian.hpp"
+#include "fly/types/string/format.hpp"
 
 #include "catch2/catch_test_macros.hpp"
 
@@ -132,9 +133,9 @@ CATCH_TEST_CASE("IPv4Address", "[net]")
         constexpr auto address2 = fly::net::IPv4Address::in_addr_loopback();
         constexpr auto address3 = fly::net::IPv4Address::in_addr_broadcast();
 
-        CATCH_CHECK(fly::String::format("{}", address1) == "0.0.0.0");
-        CATCH_CHECK(fly::String::format("{}", address2) == "127.0.0.1");
-        CATCH_CHECK(fly::String::format("{}", address3) == "255.255.255.255");
+        CATCH_CHECK(fly::string::format("{}", address1) == "0.0.0.0");
+        CATCH_CHECK(fly::string::format("{}", address2) == "127.0.0.1");
+        CATCH_CHECK(fly::string::format("{}", address3) == "255.255.255.255");
     }
 
     CATCH_SECTION("Single-part strings are parsed as 32-bit values")

@@ -5,6 +5,7 @@
 #include "fly/logger/log.hpp"
 #include "fly/logger/logger_config.hpp"
 #include "fly/system/system.hpp"
+#include "fly/types/string/format.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <string>
@@ -75,7 +76,7 @@ bool FileSink::create_log_file()
     fly::String::replace_all(time, ":", '-');
     fly::String::replace_all(time, " ", '_');
 
-    std::string file_name = fly::String::format("Log_{}_{}_{}.log", ++m_log_index, time, random);
+    std::string file_name = fly::string::format("Log_{}_{}_{}.log", ++m_log_index, time, random);
     m_log_file = m_log_directory / std::move(file_name);
 
     m_log_stream.open(m_log_file, std::ios::out);
