@@ -168,6 +168,9 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\fly\assert\assert.hpp" />
+    <ClInclude Include="..\..\..\fly\assert\detail\assert_disabled.hpp" />
+    <ClInclude Include="..\..\..\fly\assert\detail\assert_enabled.hpp" />
     <ClInclude Include="..\..\..\fly\fly.hpp" />
     <ClInclude Include="..\..\..\fly\coders\base64\base64_coder.hpp" />
     <ClInclude Include="..\..\..\fly\coders\coder.hpp" />
@@ -256,6 +259,7 @@
     <ClInclude Include="..\..\..\fly\types\string\string.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\fly\assert\detail\assert_enabled.cpp" />
     <ClCompile Include="..\..\..\fly\coders\base64\base64_coder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\coder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\coder_config.cpp" />

@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="assert">
+      <UniqueIdentifier>{1aada429-0cbe-4b9e-8153-ab53003d9c30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assert\detail">
+      <UniqueIdentifier>{9e236f25-631d-40a4-b95c-50271a01e7fd}</UniqueIdentifier>
+    </Filter>
     <Filter Include="coders">
       <UniqueIdentifier>{c63b5aa5-4f36-4425-b00e-a823e8ed55fd}</UniqueIdentifier>
     </Filter>
@@ -91,6 +97,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\fly\fly.hpp" />
+    <ClInclude Include="..\..\..\fly\assert\assert.hpp">
+      <Filter>assert</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\assert\detail\assert_disabled.hpp">
+      <Filter>assert\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\assert\detail\assert_enabled.hpp">
+      <Filter>assert\detail</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\coders\coder.hpp">
       <Filter>coders</Filter>
     </ClInclude>
@@ -348,6 +363,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\fly\assert\detail\assert_enabled.cpp">
+      <Filter>assert\detail</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\fly\coders\coder.cpp">
       <Filter>coders</Filter>
     </ClCompile>

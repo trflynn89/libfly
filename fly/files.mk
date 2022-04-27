@@ -1,4 +1,5 @@
 SRC_DIRS_$(d) := \
+    $(d)/assert \
     $(d)/coders \
     $(d)/config \
     $(d)/logger \

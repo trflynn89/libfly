@@ -1,6 +1,7 @@
 include $(SOURCE_ROOT)/extern/catchorg/flags.mk
 
 SRC_DIRS_$(d) += \
+    $(d)/assert \
     $(d)/coders \
     $(d)/concepts \
     $(d)/config \
