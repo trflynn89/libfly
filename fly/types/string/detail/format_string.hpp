@@ -200,7 +200,7 @@ constexpr void BasicFormatString<CharType, ParameterTypes...>::parse_user_define
         }
 
         using T = std::tuple_element_t<N, std::tuple<std::remove_cvref_t<ParameterTypes>...>>;
-        using Formatter = fly::Formatter<T, CharType>;
+        using Formatter = fly::string::Formatter<T, CharType>;
 
         if constexpr (fly::FormattableWithParsing<FormatParseContext, Formatter>)
         {

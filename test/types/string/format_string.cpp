@@ -157,7 +157,7 @@ constexpr char const *s_bad_bool = "Boolean types must be formatted with {} or o
 } // namespace
 
 template <typename CharType>
-struct fly::Formatter<UserDefinedType, CharType>
+struct fly::string::Formatter<UserDefinedType, CharType>
 {
     template <typename FormatContext>
     void format(UserDefinedType, FormatContext &)
@@ -166,7 +166,7 @@ struct fly::Formatter<UserDefinedType, CharType>
 };
 
 template <typename CharType>
-struct fly::Formatter<UserDefinedTypeWithParser, CharType>
+struct fly::string::Formatter<UserDefinedTypeWithParser, CharType>
 {
     template <typename FormatParseContext>
     constexpr void parse(FormatParseContext &context)
@@ -194,7 +194,7 @@ struct fly::Formatter<UserDefinedTypeWithParser, CharType>
 };
 
 template <typename CharType>
-struct fly::Formatter<UserDefinedTypeWithParserWhichFails, CharType>
+struct fly::string::Formatter<UserDefinedTypeWithParserWhichFails, CharType>
 {
     template <typename FormatParseContext>
     constexpr void parse(FormatParseContext &context)
@@ -209,8 +209,8 @@ struct fly::Formatter<UserDefinedTypeWithParserWhichFails, CharType>
 };
 
 template <typename CharType>
-struct fly::Formatter<UserFormattedEnum, CharType> :
-    public fly::Formatter<std::basic_string_view<CharType>, CharType>
+struct fly::string::Formatter<UserFormattedEnum, CharType> :
+    public fly::string::Formatter<std::basic_string_view<CharType>, CharType>
 {
     template <typename FormatContext>
     void format(UserFormattedEnum, FormatContext &)

@@ -73,7 +73,7 @@ StringType reserved_codepoint()
 } // namespace
 
 template <typename CharType>
-struct fly::Formatter<UserDefinedType, CharType>
+struct fly::string::Formatter<UserDefinedType, CharType>
 {
     template <typename FormatContext>
     void format(UserDefinedType, FormatContext &context)
@@ -86,7 +86,7 @@ struct fly::Formatter<UserDefinedType, CharType>
 };
 
 template <typename CharType>
-struct fly::Formatter<UserDefinedTypeWithParser, CharType>
+struct fly::string::Formatter<UserDefinedTypeWithParser, CharType>
 {
     bool m_option {false};
 
@@ -111,13 +111,13 @@ struct fly::Formatter<UserDefinedTypeWithParser, CharType>
 };
 
 template <typename CharType>
-struct fly::Formatter<UserFormattedEnum, CharType> :
-    public fly::Formatter<std::basic_string_view<CharType>, CharType>
+struct fly::string::Formatter<UserFormattedEnum, CharType> :
+    public fly::string::Formatter<std::basic_string_view<CharType>, CharType>
 {
     template <typename FormatContext>
     void format(UserFormattedEnum value, FormatContext &context)
     {
-        fly::Formatter<std::basic_string_view<CharType>, CharType>::format(
+        fly::string::Formatter<std::basic_string_view<CharType>, CharType>::format(
             value == UserFormattedEnum::One ? FLY_STR(CharType, "One") : FLY_STR(CharType, "Two"),
             context);
     }

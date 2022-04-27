@@ -242,7 +242,7 @@ JsonParser::Features operator|(JsonParser::Features a, JsonParser::Features b);
 
 //==================================================================================================
 template <>
-struct fly::Formatter<fly::parser::JsonParser::Token>
+struct fly::string::Formatter<fly::parser::JsonParser::Token>
 {
     /**
      * Format a JSON parser token.

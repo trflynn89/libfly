@@ -63,7 +63,7 @@ enum class ConnectedState : std::uint8_t
 
 //==================================================================================================
 template <>
-struct fly::Formatter<fly::net::IOMode> : public fly::Formatter<std::uint8_t>
+struct fly::string::Formatter<fly::net::IOMode> : public fly::string::Formatter<std::uint8_t>
 {
     /**
      * Format an IO processing mode.
@@ -76,6 +76,6 @@ struct fly::Formatter<fly::net::IOMode> : public fly::Formatter<std::uint8_t>
     template <typename FormatContext>
     void format(fly::net::IOMode mode, FormatContext &context)
     {
-        fly::Formatter<std::uint8_t>::format(static_cast<std::uint8_t>(mode), context);
+        fly::string::Formatter<std::uint8_t>::format(static_cast<std::uint8_t>(mode), context);
     }
 };

@@ -25,7 +25,7 @@ public:
     using char_type = CharType;
 
     template <typename T>
-    using formatter_type = fly::Formatter<std::remove_cvref_t<T>, CharType>;
+    using formatter_type = fly::string::Formatter<std::remove_cvref_t<T>, CharType>;
 
     /**
      * Constructor.

@@ -169,7 +169,8 @@ std::shared_ptr<T> ConfigManager::create_config()
 
 //==================================================================================================
 template <>
-struct fly::Formatter<fly::config::ConfigFileType> : public fly::Formatter<std::uint8_t>
+struct fly::string::Formatter<fly::config::ConfigFileType> :
+    public fly::string::Formatter<std::uint8_t>
 {
     /**
      * Format a configuration file type.
@@ -182,6 +183,6 @@ struct fly::Formatter<fly::config::ConfigFileType> : public fly::Formatter<std::
     template <typename FormatContext>
     void format(fly::config::ConfigFileType file_type, FormatContext &context)
     {
-        fly::Formatter<std::uint8_t>::format(static_cast<std::uint8_t>(file_type), context);
+        fly::string::Formatter<std::uint8_t>::format(static_cast<std::uint8_t>(file_type), context);
     }
 };

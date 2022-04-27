@@ -62,23 +62,24 @@ using FormatString =
  * will be returned rather than a formatted string.
  *
  * Replacement fields for user-defined types are parsed at runtime. To format a user-defined type, a
- * fly::Formatter specialization must be defined, analagous to std::formatter. The specialization
- * may extend a standard fly::Formatter, for example:
+ * fly::string::Formatter specialization must be defined, analagous to std::formatter. The
+ * specialization may extend a standard fly::string::Formatter, for example:
  *
  *     template <typename CharType>
- *     struct fly::Formatter<MyType, CharType> : public fly::Formatter<int, CharType>
+ *     struct fly::string::Formatter<MyType, CharType> :
+ *         public fly::string::Formatter<int, CharType>
  *     {
  *         template <typename FormatContext>
  *         void format(MyType const &value, FormatContext &context)
  *         {
- *             fly::Formatter<int, CharType>::format(value.as_int(), context);
+ *             fly::string::Formatter<int, CharType>::format(value.as_int(), context);
  *         }
  *     };
  *
  * Or, the formatter may be defined without without inheritence:
  *
  *     template <typename CharType>
- *     struct fly::Formatter<MyType, CharType>
+ *     struct fly::string::Formatter<MyType, CharType>
  *     {
  *         bool m_option {false};
  *
