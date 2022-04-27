@@ -6,7 +6,6 @@
 #include "fly/types/string/literals.hpp"
 
 #include <array>
-#include <functional>
 #include <iterator>
 #include <optional>
 #include <string>
@@ -283,8 +282,8 @@ private:
      *
      * @return If successful, the created Unicode codepoint. Otherwise, an invalid codepoint.
      */
-    static codepoint_type
-    create_codepoint_from_surrogates(std::function<codepoint_type()> next_codepoint);
+    template <typename NextCodepointCallback>
+    static codepoint_type create_codepoint_from_surrogates(NextCodepointCallback &&next_codepoint);
 
     /**
      * Validate a Unicode codepoint is not out-of-range or reserved by the Unicode Standard.
@@ -731,8 +730,9 @@ void BasicUnicode<CharType>::codepoint_to_string(codepoint_type codepoint, Outpu
 
 //==================================================================================================
 template <fly::StandardCharacter CharType>
+template <typename NextCodepointCallback>
 auto BasicUnicode<CharType>::create_codepoint_from_surrogates(
-    std::function<codepoint_type()> next_codepoint) -> codepoint_type
+    NextCodepointCallback &&next_codepoint) -> codepoint_type
 {
     auto is_high_surrogate = [](codepoint_type c) -> bool {
         return (c >= s_high_surrogate_min) && (c <= s_high_surrogate_max);

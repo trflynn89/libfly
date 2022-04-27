@@ -1,8 +1,7 @@
 #pragma once
 
+#include "fly/fly.hpp"
 #include "fly/types/string/concepts.hpp"
-
-#include <filesystem>
 
 /**
  * Helper macros to choose the correct string literal prefix to use for either a given type or the
@@ -18,9 +17,17 @@
 #define FLY_ARR(type, arr)                                                                         \
     (fly::detail::BasicStringArray<type>::value(arr, L##arr, u8##arr, u##arr, U##arr))
 
-#define FLY_SYS_CHR(str) FLY_CH(std::filesystem::path::value_type, str)
-#define FLY_SYS_STR(str) FLY_STR(std::filesystem::path::value_type, str)
-#define FLY_SYS_ARR(arr) FLY_ARR(std::filesystem::path::value_type, arr)
+#if defined(FLY_LINUX) || defined(FLY_MACOS)
+#    define FLY_SYS_CHR(str) FLY_CH(char, str)
+#    define FLY_SYS_STR(str) FLY_STR(char, str)
+#    define FLY_SYS_ARR(arr) FLY_ARR(char, arr)
+#elif defined(FLY_WINDOWS)
+#    define FLY_SYS_CHR(str) FLY_CH(wchar_t, str)
+#    define FLY_SYS_STR(str) FLY_STR(wchar_t, str)
+#    define FLY_SYS_ARR(arr) FLY_ARR(wchar_t, arr)
+#else
+#    error Unknown system character type.
+#endif
 
 namespace fly::detail {
 
