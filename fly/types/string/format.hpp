@@ -38,17 +38,17 @@ using FormatString = detail::BasicFormatString<CharType, std::type_identity_t<Pa
  *
  * This implementation differs from std::format in the following ways:
  *
- *    1. All standard string types are supported as format strings.
+ *     1. All standard string types are supported as format strings.
  *
- *    2. All standard string types are supported as format parameters, even if that type differs
- *       from the format string type. If the type differs, the format parameter is transcoded to the
- *       type of the format string.
+ *     2. All standard string types are supported as format parameters, even if that type differs
+ *        from the format string type. If the type differs, the format parameter is transcoded to
+ *        the type of the format string.
  *
- *    3. This implementation is exceptionless. Any error encountered (such as failed transcoding in
- *       (2) above) results in the format parameter that caused the error to be dropped.
+ *     3. This implementation is exceptionless. Any error encountered (such as failed transcoding in
+ *        (2) above) results in the format parameter that caused the error to be dropped.
  *
- *    4. Locale-specific form is not supported. If the option appears in the format string, it will
- *       be parsed, but will be ignored.
+ *     4. Locale-specific form is not supported. If the option appears in the format string, it will
+ *        be parsed, but will be ignored.
  *
  * The format string type is implicitly constructed from a C-string literal. Callers should only
  * invoke this method accordingly:
