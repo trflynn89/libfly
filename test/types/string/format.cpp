@@ -3,6 +3,8 @@
 // comment out the following line (and note that parsing error tests will not be run).
 #define FLY_COMPILER_DISABLE_CONSTEVAL
 
+#include "fly/types/string/format.hpp"
+
 #include "fly/fly.hpp"
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/concepts.hpp"
@@ -35,20 +37,14 @@ enum class UserFormattedEnum
     Two = 2,
 };
 
-template <typename CharType, typename... ParameterTypes>
-using FormatString =
-    fly::detail::BasicFormatString<CharType, std::type_identity_t<ParameterTypes>...>;
-
 template <typename StringType, typename... ParameterTypes>
 void test_format(
-    FormatString<fly::StandardCharacterType<StringType>, ParameterTypes...> format,
+    fly::string::FormatString<fly::StandardCharacterType<StringType>, ParameterTypes...> &&format,
     StringType &&expected,
     ParameterTypes &&...parameters)
 {
-    auto result = fly::BasicString<fly::StandardCharacterType<StringType>>::format(
-        std::move(format),
-        std::forward<ParameterTypes>(parameters)...);
-
+    auto result =
+        fly::string::format(std::move(format), std::forward<ParameterTypes>(parameters)...);
     CATCH_CHECK(result == expected);
 }
 
@@ -82,7 +78,7 @@ struct fly::Formatter<UserDefinedType, CharType>
     template <typename FormatContext>
     void format(UserDefinedType, FormatContext &context)
     {
-        fly::BasicString<CharType>::format_to(
+        fly::string::format_to(
             context.out(),
             FLY_ARR(CharType, "{}"),
             FLY_STR(CharType, "UserDefinedType"));
@@ -110,7 +106,7 @@ struct fly::Formatter<UserDefinedTypeWithParser, CharType>
     template <typename FormatContext>
     void format(UserDefinedTypeWithParser, FormatContext &context)
     {
-        fly::BasicString<CharType>::format_to(context.out(), FLY_ARR(CharType, "{}"), m_option);
+        fly::string::format_to(context.out(), FLY_ARR(CharType, "{}"), m_option);
     }
 };
 
@@ -571,10 +567,10 @@ CATCH_TEMPLATE_TEST_CASE("FormatTypes", "[string]", char, wchar_t, char8_t, char
         void *p1 = &i;
         void const *p2 = &i;
 
-        auto result = BasicString::format(FMT("{:p}"), p1);
+        auto result = fly::string::format(FMT("{:p}"), p1);
         CATCH_CHECK(is_all_hex(result));
 
-        result = BasicString::format(FMT("{:p}"), p2);
+        result = fly::string::format(FMT("{:p}"), p2);
         CATCH_CHECK(is_all_hex(result));
     }
 

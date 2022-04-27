@@ -1,6 +1,7 @@
 #include "fly/types/string/string.hpp"
 
 #include "fly/types/numeric/literals.hpp"
+#include "fly/types/string/format.hpp"
 
 #include "catch2/catch_template_test_macros.hpp"
 #include "catch2/catch_test_macros.hpp"
@@ -43,7 +44,7 @@ struct fly::Formatter<UserDefinedType<CharType>, CharType>
     template <typename FormatContext>
     void format(UserDefinedType<CharType> const &value, FormatContext &context)
     {
-        fly::BasicString<CharType>::format_to(
+        fly::string::format_to(
             context.out(),
             FLY_ARR(CharType, "[{} {:x}]"),
             value.str(),

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "fly/types/numeric/endian.hpp"
+#include "fly/types/string/format.hpp"
 #include "fly/types/string/lexer.hpp"
-#include "fly/types/string/string.hpp"
 
 #include <array>
 #include <compare>
@@ -224,7 +224,7 @@ struct fly::Formatter<fly::net::IPv4Address>
     {
         auto const network_order = address.network_order();
 
-        fly::String::format_to(
+        fly::string::format_to(
             context.out(),
             "{}.{}.{}.{}",
             network_order & 0xff,

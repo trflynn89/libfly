@@ -6,6 +6,7 @@
 #include "fly/types/numeric/literals.hpp"
 #include "fly/types/string/concepts.hpp"
 #include "fly/types/string/detail/stream_util.hpp"
+#include "fly/types/string/format.hpp"
 #include "fly/types/string/string.hpp"
 
 #include <array>
@@ -267,7 +268,7 @@ void Table<Args...>::print_title(std::ostream &stream, std::size_t table_width) 
     std::size_t const title_width = table_width - 4;
 
     auto title = std::string_view(m_title).substr(0, title_width);
-    stream << style << fly::String::format(" {:^{}} ", title, title_width);
+    stream << style << fly::string::format(" {:^{}} ", title, title_width);
 
     print_column_separator(stream, s_border_style) << '\n';
     print_row_separator(stream, table_width);
@@ -284,7 +285,7 @@ void Table<Args...>::print_headers(std::ostream &stream, std::size_t table_width
         auto const style = fly::logger::Styler(s_header_style, s_header_color);
         stream << style;
 
-        stream << fly::String::format(" {:^{}} ", m_headers[index], m_column_widths[index]);
+        stream << fly::string::format(" {:^{}} ", m_headers[index], m_column_widths[index]);
     }
 
     print_column_separator(stream, s_border_style) << '\n';
@@ -306,11 +307,11 @@ void Table<Args...>::print_row(std::ostream &stream, Row const &row) const
         if constexpr (std::is_floating_point_v<std::remove_cvref_t<decltype(value)>>)
         {
             stream
-                << fly::String::format(" {:{}.{}f} ", value, m_column_widths[index], s_precision);
+                << fly::string::format(" {:{}.{}f} ", value, m_column_widths[index], s_precision);
         }
         else
         {
-            stream << fly::String::format(" {:{}} ", value, m_column_widths[index]);
+            stream << fly::string::format(" {:{}} ", value, m_column_widths[index]);
         }
 
         ++index;
@@ -328,7 +329,7 @@ std::ostream &Table<Args...>::print_row_separator(
     fly::logger::Style style) const
 {
     stream << fly::logger::Styler(style, s_border_color)
-           << fly::String::format("{:->{}}\n", '-', width);
+           << fly::string::format("{:->{}}\n", '-', width);
     return stream;
 }
 

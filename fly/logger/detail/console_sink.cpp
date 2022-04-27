@@ -3,7 +3,7 @@
 #include "fly/logger/log.hpp"
 #include "fly/logger/styler.hpp"
 #include "fly/system/system.hpp"
-#include "fly/types/string/string.hpp"
+#include "fly/types/string/format.hpp"
 
 #include <iostream>
 #include <optional>
@@ -48,7 +48,7 @@ bool ConsoleSink::stream(fly::logger::Log &&log)
     {
         auto styler = color ? fly::logger::Styler(std::move(style), *std::move(color)) :
                               fly::logger::Styler(std::move(style));
-        *stream << styler << fly::String::format("{} {}", fly::system::local_time(), log.m_trace);
+        *stream << styler << fly::string::format("{} {}", fly::system::local_time(), log.m_trace);
     }
 
     *stream << ": " << log.m_message << std::endl;

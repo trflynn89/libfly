@@ -44,7 +44,7 @@ std::ostream &operator<<(std::ostream &stream, Log const &log)
     stream << log.m_index << s_unit_separator;
     stream << static_cast<std::uint8_t>(log.m_level) << s_unit_separator;
     stream << log.m_time << s_unit_separator;
-    stream << fly::String::format("{}", log.m_trace) << s_unit_separator;
+    stream << fly::string::format("{}", log.m_trace) << s_unit_separator;
     stream << log.m_message << s_record_separator;
 
     return stream;

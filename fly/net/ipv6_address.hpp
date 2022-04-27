@@ -1,8 +1,8 @@
 #pragma once
 
 #include "fly/fly.hpp"
+#include "fly/types/string/format.hpp"
 #include "fly/types/string/lexer.hpp"
-#include "fly/types/string/string.hpp"
 
 #include <algorithm>
 #include <array>
@@ -289,12 +289,12 @@ struct fly::Formatter<fly::net::IPv6Address>
                     i += 2;
                 } while ((i < s_address_size) && (join_segments(i) == 0));
 
-                fly::String::format_to(context.out(), "{}", (i < s_address_size) ? ":" : "::");
+                fly::string::format_to(context.out(), "{}", (i < s_address_size) ? ":" : "::");
                 used_short_form = true;
             }
             else
             {
-                fly::String::format_to(context.out(), "{:.{}}{:x}", ":", (i > 0) ? 1 : 0, segment);
+                fly::string::format_to(context.out(), "{:.{}}{:x}", ":", (i > 0) ? 1 : 0, segment);
                 i += 2;
             }
         }

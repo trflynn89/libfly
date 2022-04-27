@@ -1,3 +1,4 @@
+#include "fly/types/string/format.hpp"
 #include "fly/types/string/literals.hpp"
 #include "fly/types/string/string.hpp"
 
@@ -28,7 +29,7 @@ CATCH_TEMPLATE_TEST_CASE("BasicUnicode", "[string]", char, wchar_t, char8_t, cha
     };
 
     auto make_escaped_unicode_string = [](auto value) -> string_type {
-        return BasicString::format(FLY_ARR(char_type, "\\u{:04x}"), value);
+        return fly::string::format(FLY_ARR(char_type, "\\u{:04x}"), value);
     };
 
     auto escape_should_fail = [](string_type &&test, int line) {

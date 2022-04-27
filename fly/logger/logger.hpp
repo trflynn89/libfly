@@ -2,7 +2,7 @@
 
 #include "fly/logger/log.hpp"
 #include "fly/system/system.hpp"
-#include "fly/types/string/string.hpp"
+#include "fly/types/string/format.hpp"
 
 #include <atomic>
 #include <chrono>
@@ -204,7 +204,7 @@ std::shared_ptr<Logger> create_console_logger(
 class Logger : public std::enable_shared_from_this<Logger>
 {
     template <typename... ParameterTypes>
-    using FormatString = fly::String::FormatString<ParameterTypes...>;
+    using FormatString = fly::string::FormatString<char, ParameterTypes...>;
 
 public:
     /**
@@ -451,7 +451,7 @@ inline void Logger::debug(
 {
     log(Level::Debug,
         std::move(trace),
-        fly::String::format(std::move(format), std::forward<ParameterTypes>(parameters)...));
+        fly::string::format(std::move(format), std::forward<ParameterTypes>(parameters)...));
 }
 
 //==================================================================================================
@@ -470,7 +470,7 @@ inline void Logger::info(
 {
     log(Level::Info,
         std::move(trace),
-        fly::String::format(std::move(format), std::forward<ParameterTypes>(parameters)...));
+        fly::string::format(std::move(format), std::forward<ParameterTypes>(parameters)...));
 }
 
 //==================================================================================================
@@ -489,7 +489,7 @@ inline void Logger::warn(
 {
     log(Level::Warn,
         std::move(trace),
-        fly::String::format(std::move(format), std::forward<ParameterTypes>(parameters)...));
+        fly::string::format(std::move(format), std::forward<ParameterTypes>(parameters)...));
 }
 
 //==================================================================================================
@@ -508,7 +508,7 @@ inline void Logger::error(
 {
     log(Level::Error,
         std::move(trace),
-        fly::String::format(std::move(format), std::forward<ParameterTypes>(parameters)...));
+        fly::string::format(std::move(format), std::forward<ParameterTypes>(parameters)...));
 }
 
 } // namespace fly::logger

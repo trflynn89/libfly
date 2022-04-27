@@ -1,7 +1,7 @@
 #include "fly/system/system.hpp"
 
 #include "fly/fly.hpp"
-#include "fly/types/string/string.hpp"
+#include "fly/types/string/format.hpp"
 
 #include <array>
 #include <csignal>
@@ -29,7 +29,7 @@ std::string get_error_string()
 //==================================================================================================
 std::string get_error_string(int code)
 {
-    return fly::String::format("({}) {}", code, std::system_category().message(code));
+    return fly::string::format("({}) {}", code, std::system_category().message(code));
 }
 
 //==================================================================================================

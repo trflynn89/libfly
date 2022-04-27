@@ -5,8 +5,8 @@
 #include "fly/net/ipv6_address.hpp"
 #include "fly/net/socket/concepts.hpp"
 #include "fly/net/socket/types.hpp"
+#include "fly/types/string/format.hpp"
 #include "fly/types/string/lexer.hpp"
-#include "fly/types/string/string.hpp"
 
 #include <compare>
 #include <limits>
@@ -271,7 +271,7 @@ struct fly::Formatter<fly::net::Endpoint<fly::net::IPv4Address>>
     template <typename FormatContext>
     void format(fly::net::Endpoint<fly::net::IPv4Address> const &endpoint, FormatContext &context)
     {
-        fly::String::format_to(context.out(), "{}:{}", endpoint.address(), endpoint.port());
+        fly::string::format_to(context.out(), "{}:{}", endpoint.address(), endpoint.port());
     }
 };
 
@@ -290,6 +290,6 @@ struct fly::Formatter<fly::net::Endpoint<fly::net::IPv6Address>>
     template <typename FormatContext>
     void format(fly::net::Endpoint<fly::net::IPv6Address> const &endpoint, FormatContext &context)
     {
-        fly::String::format_to(context.out(), "[{}]:{}", endpoint.address(), endpoint.port());
+        fly::string::format_to(context.out(), "[{}]:{}", endpoint.address(), endpoint.port());
     }
 };

@@ -2,6 +2,7 @@
 
 #include "fly/net/ipv4_address.hpp"
 #include "fly/net/ipv6_address.hpp"
+#include "fly/types/string/format.hpp"
 
 #include "catch2/catch_template_test_macros.hpp"
 #include "catch2/catch_test_macros.hpp"
@@ -93,7 +94,7 @@ CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::I
         CATCH_SECTION("Endpoints may be converted to a string")
         {
             auto const endpoint = EndpointType(IPAddressType::in_addr_loopback(), 1);
-            CATCH_CHECK(fly::String::format("{}", endpoint) == "127.0.0.1:1");
+            CATCH_CHECK(fly::string::format("{}", endpoint) == "127.0.0.1:1");
         }
 
         CATCH_SECTION("Endpoints may be created from a string")
@@ -143,7 +144,7 @@ CATCH_TEMPLATE_TEST_CASE("Endpoint", "[net]", fly::net::IPv4Address, fly::net::I
         CATCH_SECTION("Endpoints may be converted to a string")
         {
             auto const endpoint = EndpointType(IPAddressType::in_addr_loopback(), 1);
-            CATCH_CHECK(fly::String::format("{}", endpoint) == "[::1]:1");
+            CATCH_CHECK(fly::string::format("{}", endpoint) == "[::1]:1");
         }
 
         CATCH_SECTION("Endpoints may be created from a string")

@@ -2,7 +2,7 @@
 
 #include "fly/logger/logger.hpp"
 #include "fly/types/json/json.hpp"
-#include "fly/types/string/string.hpp"
+#include "fly/types/string/format.hpp"
 
 #include "catch2/catch_approx.hpp"
 #include "catch2/catch_test_macros.hpp"
@@ -21,7 +21,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
     };
 
     auto validate_fail = [&](std::string const &test) {
-        validate_fail_raw(fly::String::format("{{ \"a\" : {} }}", test));
+        validate_fail_raw(fly::string::format("{{ \"a\" : {} }}", test));
     };
 
     auto validate_pass_raw =
@@ -47,7 +47,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         };
 
     auto validate_pass = [&](std::string const &test, fly::Json const &expected) {
-        validate_pass_raw(fly::String::format("{{ \"a\" : {} }}", test), "a", expected);
+        validate_pass_raw(fly::string::format("{{ \"a\" : {} }}", test), "a", expected);
     };
 
     // https://www.json.org/JSON_checker/
