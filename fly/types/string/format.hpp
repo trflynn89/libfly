@@ -15,8 +15,7 @@ namespace fly::string {
  * A container to hold and parse a format string at compile time.
  */
 template <StandardCharacter CharType, typename... ParameterTypes>
-using FormatString =
-    fly::detail::BasicFormatString<CharType, std::type_identity_t<ParameterTypes>...>;
+using FormatString = detail::BasicFormatString<CharType, std::type_identity_t<ParameterTypes>...>;
 
 /**
  * Format a string with a set of format parameters, returning the formatted string. Based strongly
@@ -35,7 +34,7 @@ using FormatString =
  *     3. An optional colon ":" following by formatting options.
  *     4. A final "}" character.
  *
- * For a detailed description of replacement fields, see fly::detail::BasicFormatSpecifier.
+ * For a detailed description of replacement fields, see fly::string::detail::BasicFormatSpecifier.
  *
  * This implementation differs from std::format in the following ways:
  *

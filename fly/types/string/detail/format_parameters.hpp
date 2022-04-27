@@ -12,7 +12,7 @@
 #include <string_view>
 #include <type_traits>
 
-namespace fly::detail {
+namespace fly::string::detail {
 
 /**
  * Empty placeholder structure used for an invalid formatting parameter state.
@@ -429,7 +429,9 @@ constexpr BasicFormatParameter<FormatContext>::BasicFormatParameter(T const &val
 
     if constexpr (std::is_array_v<U> || std::is_pointer_v<U>)
     {
-        view = standard_view_type(value, BasicClassifier<standard_character_type>::size(value));
+        view = standard_view_type(
+            value,
+            fly::detail::BasicClassifier<standard_character_type>::size(value));
     }
     else
     {
@@ -585,4 +587,4 @@ constexpr BasicFormatParameters<FormatContext, ParameterTypes...>::BasicFormatPa
 {
 }
 
-} // namespace fly::detail
+} // namespace fly::string::detail

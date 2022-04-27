@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-namespace fly::detail {
+namespace fly::string::detail {
 
 /**
  * Enumerated list of supported format parameter types.
@@ -60,4 +60,4 @@ constexpr ParameterType infer_parameter_type()
     }
 }
 
-} // namespace fly::detail
+} // namespace fly::string::detail
