@@ -209,7 +209,7 @@ constexpr auto IPv4Address::host_order() const -> int_type
 
 //==================================================================================================
 template <>
-struct fly::Formatter<fly::net::IPv4Address>
+struct fly::string::Formatter<fly::net::IPv4Address>
 {
     /**
      * Format an IPv4 address as a four octet string in dot-decimal notation.

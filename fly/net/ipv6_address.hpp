@@ -253,7 +253,7 @@ constexpr bool IPv6Address::operator>=(IPv6Address const &address) const
 
 //==================================================================================================
 template <>
-struct fly::Formatter<fly::net::IPv6Address>
+struct fly::string::Formatter<fly::net::IPv6Address>
 {
     /**
      * Format an IPv6 address as a string in shorthand form.

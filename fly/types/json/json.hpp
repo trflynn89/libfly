@@ -2117,8 +2117,8 @@ inline T const &Json::get(char const *error_message) const
 
 //==================================================================================================
 template <typename CharType>
-struct fly::Formatter<fly::Json, CharType> :
-    public fly::Formatter<std::basic_string<CharType>, CharType>
+struct fly::string::Formatter<fly::Json, CharType> :
+    public fly::string::Formatter<std::basic_string<CharType>, CharType>
 {
     using string_type = std::basic_string<CharType>;
 
@@ -2135,14 +2135,14 @@ struct fly::Formatter<fly::Json, CharType> :
     {
         if constexpr (fly::SameAs<CharType, fly::json_char_type>)
         {
-            fly::Formatter<string_type, CharType>::format(json.serialize(), context);
+            fly::string::Formatter<string_type, CharType>::format(json.serialize(), context);
         }
         else
         {
             auto serialized = JsonStringType::convert<string_type>(json.serialize());
 
             // The JSON string will have been validated for Unicode compliance during construction.
-            fly::Formatter<string_type, CharType>::format(*serialized, context);
+            fly::string::Formatter<string_type, CharType>::format(*serialized, context);
         }
     }
 };

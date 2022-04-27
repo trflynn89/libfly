@@ -207,7 +207,7 @@ private:
 
 //==================================================================================================
 template <>
-struct fly::Formatter<fly::path::PathEvent>
+struct fly::string::Formatter<fly::path::PathEvent>
 {
     /**
      * Format a path event.
@@ -250,7 +250,7 @@ struct fly::Formatter<fly::path::PathEvent>
 
 //==================================================================================================
 template <>
-struct fly::Formatter<std::filesystem::path> : public fly::Formatter<std::string>
+struct fly::string::Formatter<std::filesystem::path> : public fly::string::Formatter<std::string>
 {
     /**
      * Format a filesystem path.
@@ -263,6 +263,6 @@ struct fly::Formatter<std::filesystem::path> : public fly::Formatter<std::string
     template <typename FormatContext>
     void format(std::filesystem::path const &path, FormatContext &context)
     {
-        fly::Formatter<std::string>::format(path.string(), context);
+        fly::string::Formatter<std::string>::format(path.string(), context);
     }
 };

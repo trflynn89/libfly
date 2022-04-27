@@ -84,7 +84,7 @@ struct Log
 
 //==================================================================================================
 template <>
-struct fly::Formatter<fly::logger::Trace>
+struct fly::string::Formatter<fly::logger::Trace>
 {
     /**
      * Format a log trace.

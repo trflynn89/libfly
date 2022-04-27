@@ -24,7 +24,7 @@
 #    include <sstream>
 #endif
 
-namespace fly {
+namespace fly::string {
 
 /**
  * Class to define formatting rules for a given type. Enabled specializations must define the
@@ -654,7 +654,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
     /**
      * Format a single replacement field with the provided floating-point value.
      *
-     * Internally, a combination of an IO stream and the fly::Formatter<std::basic_string_view>
+     * Internally, a combination of an IO stream and the Formatter<std::basic_string_view>
      * specialization is used to format the value.
      *
      * @tparam FormatContext The type of the formatting context.
@@ -889,4 +889,4 @@ private:
     static constexpr CharType const *s_false = FLY_STR(CharType, "false");
 };
 
-} // namespace fly
+} // namespace fly::string

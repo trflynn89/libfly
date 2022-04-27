@@ -39,7 +39,7 @@ private:
 } // namespace
 
 template <typename CharType>
-struct fly::Formatter<UserDefinedType<CharType>, CharType>
+struct fly::string::Formatter<UserDefinedType<CharType>, CharType>
 {
     template <typename FormatContext>
     void format(UserDefinedType<CharType> const &value, FormatContext &context)

@@ -258,7 +258,7 @@ constexpr bool Endpoint<IPAddressType>::operator>=(Endpoint<IPAddressType> const
 
 //==================================================================================================
 template <>
-struct fly::Formatter<fly::net::Endpoint<fly::net::IPv4Address>>
+struct fly::string::Formatter<fly::net::Endpoint<fly::net::IPv4Address>>
 {
     /**
      * Format an IPv4 endpoint.
@@ -277,7 +277,7 @@ struct fly::Formatter<fly::net::Endpoint<fly::net::IPv4Address>>
 
 //==================================================================================================
 template <>
-struct fly::Formatter<fly::net::Endpoint<fly::net::IPv6Address>>
+struct fly::string::Formatter<fly::net::Endpoint<fly::net::IPv6Address>>
 {
     /**
      * Format an IPv6 endpoint.

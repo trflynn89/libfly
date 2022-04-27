@@ -21,7 +21,7 @@ struct UserDefinedType
 } // namespace
 
 template <typename CharType>
-struct fly::Formatter<UserDefinedType, CharType>
+struct fly::string::Formatter<UserDefinedType, CharType>
 {
     template <typename FormatContext>
     void format(UserDefinedType const &, FormatContext &)
