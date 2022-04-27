@@ -86,7 +86,8 @@ private:
 template <typename CharType, std::size_t N, typename... Types>
 FLY_CONSTEVAL auto make_format(CharType const (&format)[N], Types &&...)
 {
-    using FormatString = fly::detail::BasicFormatString<CharType, std::type_identity_t<Types>...>;
+    using FormatString =
+        fly::string::detail::BasicFormatString<CharType, std::type_identity_t<Types>...>;
     return FormatString(format);
 }
 
@@ -228,7 +229,7 @@ CATCH_TEMPLATE_TEST_CASE(
     char32_t)
 {
     using char_type = TestType;
-    using Specifier = fly::detail::BasicFormatSpecifier<char_type>;
+    using Specifier = fly::string::detail::BasicFormatSpecifier<char_type>;
 
     constexpr UserDefinedType u {};
     constexpr UserDefinedTypeWithParser up {};

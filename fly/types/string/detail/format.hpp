@@ -31,11 +31,11 @@ namespace fly::string::detail {
 template <StandardCharacter CharType, typename OutputIterator, typename... ParameterTypes>
 void format_to(
     OutputIterator output,
-    fly::detail::BasicFormatString<CharType, std::type_identity_t<ParameterTypes>...> &&format,
+    detail::BasicFormatString<CharType, std::type_identity_t<ParameterTypes>...> &&format,
     ParameterTypes &&...parameters)
 {
-    using FormatContext = fly::detail::BasicFormatContext<OutputIterator, CharType>;
-    using FormatParseContext = fly::detail::BasicFormatParseContext<CharType>;
+    using FormatContext = detail::BasicFormatContext<OutputIterator, CharType>;
+    using FormatParseContext = detail::BasicFormatParseContext<CharType>;
 
     FormatParseContext &parse_context = format.context();
     auto const view = parse_context.view();
@@ -49,8 +49,8 @@ void format_to(
         return;
     }
 
-    auto params = fly::detail::make_format_parameters<FormatContext>(
-        std::forward<ParameterTypes>(parameters)...);
+    auto params =
+        detail::make_format_parameters<FormatContext>(std::forward<ParameterTypes>(parameters)...);
     FormatContext context(output, params);
 
     for (std::size_t pos = 0; pos < view.size();)

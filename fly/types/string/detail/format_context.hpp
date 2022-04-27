@@ -7,7 +7,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace fly::detail {
+namespace fly::string::detail {
 
 /**
  * Provides access to the formatting state consisting of the format parameters, replacement fields
@@ -95,4 +95,4 @@ inline OutputIterator &BasicFormatContext<OutputIterator, CharType>::out()
     return m_out;
 }
 
-} // namespace fly::detail
+} // namespace fly::string::detail

@@ -14,7 +14,7 @@
 #include <string>
 #include <type_traits>
 
-namespace fly::detail {
+namespace fly::string::detail {
 
 /**
  * Structure to encapsulate positional and formatting options (which constitute a replacement field)
@@ -472,7 +472,7 @@ private:
  * BasicFormatSpecifier.
  */
 #define FLY_DEFINE_FORMATTER(CharType, parameter_type)                                             \
-    using FormatSpecifier = fly::detail::BasicFormatSpecifier<CharType>;                           \
+    using FormatSpecifier = fly::string::detail::BasicFormatSpecifier<CharType>;                   \
     using FormatSpecifier::m_position;                                                             \
     using FormatSpecifier::m_fill;                                                                 \
     using FormatSpecifier::m_alignment;                                                            \
@@ -678,7 +678,7 @@ constexpr void BasicFormatSpecifier<CharType>::parse_type(FormatParseContext &co
             m_type = type.value();
             context.lexer().consume();
 
-            if (BasicClassifier<CharType>::is_upper(ch.value()))
+            if (fly::detail::BasicClassifier<CharType>::is_upper(ch.value()))
             {
                 m_case = Case::Upper;
             }
@@ -978,4 +978,4 @@ bool operator==(
         (specifier1.m_type == specifier2.m_type) && (specifier1.m_case == specifier2.m_case);
 }
 
-} // namespace fly::detail
+} // namespace fly::string::detail

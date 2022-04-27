@@ -234,7 +234,7 @@ void Table<Args...>::append_row(Args... args)
 template <class... Args>
 void Table<Args...>::print_table(std::ostream &stream) const
 {
-    fly::detail::ScopedStreamModifiers scoped_modifiers(stream);
+    fly::string::detail::ScopedStreamModifiers scoped_modifiers(stream);
     scoped_modifiers.locale<CommaPunctuation>();
 
     // Compute the entire width of the table. There are 1 + the number of columns vertical

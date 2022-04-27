@@ -61,7 +61,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
         std::size_t const min_width = FormatSpecifier::width(context, 0);
         std::size_t const max_width = FormatSpecifier::precision(context, string_type::npos);
 
-        std::size_t const actual_size = detail::BasicClassifier<CharType>::size(value);
+        std::size_t const actual_size = fly::detail::BasicClassifier<CharType>::size(value);
         std::size_t const value_size = std::min(max_width, actual_size);
 
         std::size_t const padding_size = std::max(value_size, min_width) - value_size;
@@ -140,7 +140,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
         }
         else
         {
-            using unicode = detail::BasicUnicode<standard_character_type>;
+            using unicode = fly::detail::BasicUnicode<standard_character_type>;
 
             if (auto converted = unicode::template convert_encoding<string_type>(view); converted)
             {
@@ -441,7 +441,7 @@ private:
         {
             for (char *it = begin; it != result.ptr; ++it)
             {
-                *it = detail::BasicClassifier<char>::to_upper(*it);
+                *it = fly::detail::BasicClassifier<char>::to_upper(*it);
             }
         }
 
@@ -454,7 +454,7 @@ private:
         }
         else
         {
-            using unicode = detail::BasicUnicode<char>;
+            using unicode = fly::detail::BasicUnicode<char>;
 
             std::string_view view(
                 begin,
@@ -579,7 +579,7 @@ struct Formatter<T, CharType> : public detail::BasicFormatSpecifier<CharType>
             }
             else
             {
-                using unicode = detail::BasicUnicode<char>;
+                using unicode = fly::detail::BasicUnicode<char>;
 
                 unicode::template convert_encoding_into<string_type>(
                     result.m_digits,
@@ -840,7 +840,7 @@ private:
         {
             for (char *it = begin; it != to_chars_result.ptr; ++it)
             {
-                *it = detail::BasicClassifier<char>::to_upper(*it);
+                *it = fly::detail::BasicClassifier<char>::to_upper(*it);
             }
         }
 

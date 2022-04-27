@@ -8,7 +8,7 @@
 #include <locale>
 #include <ostream>
 
-namespace fly::detail {
+namespace fly::string::detail {
 
 /**
  * RAII helper class to make formatting modifications to a stream and ensure those modifications
@@ -217,4 +217,4 @@ PositivePaddingFacet<CharType>::do_widen(char const *begin, char const *end, Cha
     return end;
 }
 
-} // namespace fly::detail
+} // namespace fly::string::detail

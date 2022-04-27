@@ -17,7 +17,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace fly::detail {
+namespace fly::string::detail {
 
 /**
  * A container to hold and parse a format string at compile time.
@@ -223,4 +223,4 @@ constexpr void BasicFormatString<CharType, ParameterTypes...>::parse_user_define
     }
 }
 
-} // namespace fly::detail
+} // namespace fly::string::detail

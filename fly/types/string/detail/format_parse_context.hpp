@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <string_view>
 
-namespace fly::detail {
+namespace fly::string::detail {
 
 /**
  * Provides access to the format string parsing state consisting of the format string being parsed,
@@ -20,7 +20,7 @@ namespace fly::detail {
 template <fly::StandardCharacter CharType>
 class BasicFormatParseContext
 {
-    using traits = BasicStringTraits<CharType>;
+    using traits = fly::detail::BasicStringTraits<CharType>;
     using view_type = typename traits::view_type;
 
 public:
@@ -202,4 +202,4 @@ std::string BasicFormatParseContext<CharType>::error() const
     return std::string(m_error.data(), m_error.size());
 }
 
-} // namespace fly::detail
+} // namespace fly::string::detail

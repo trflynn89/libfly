@@ -44,18 +44,18 @@ CATCH_TEMPLATE_TEST_CASE(
     using char_type = typename traits::char_type;
     using view_type = typename traits::view_type;
 
-    using FormatParseContext = fly::detail::BasicFormatParseContext<char_type>;
+    using FormatParseContext = fly::string::detail::BasicFormatParseContext<char_type>;
     using FormatContext =
-        fly::detail::BasicFormatContext<std::back_insert_iterator<string_type>, char_type>;
-    using UserDefinedValue = fly::detail::UserDefinedValue<FormatContext>;
-    using StringValue = fly::detail::StringValue<FormatContext>;
+        fly::string::detail::BasicFormatContext<std::back_insert_iterator<string_type>, char_type>;
+    using UserDefinedValue = fly::string::detail::UserDefinedValue<FormatContext>;
+    using StringValue = fly::string::detail::StringValue<FormatContext>;
 
     string_type buffer;
     auto out = std::back_inserter(buffer);
 
     CATCH_SECTION("Empty parameters result in monostate status")
     {
-        auto params = fly::detail::make_format_parameters<FormatContext>();
+        auto params = fly::string::detail::make_format_parameters<FormatContext>();
         FormatParseContext parse_context(FLY_ARR(char_type, ""), nullptr, 0);
         FormatContext context(out, params);
 
@@ -63,7 +63,7 @@ CATCH_TEMPLATE_TEST_CASE(
         CATCH_CHECK_FALSE(parameter);
 
         parameter.visit([](auto value) {
-            CATCH_CHECK(std::is_same_v<decltype(value), fly::detail::MonoState>);
+            CATCH_CHECK(std::is_same_v<decltype(value), fly::string::detail::MonoState>);
         });
 
         parameter.format(parse_context, context, {});
@@ -71,7 +71,7 @@ CATCH_TEMPLATE_TEST_CASE(
 
     CATCH_SECTION("A single parameter can be visited, but no others")
     {
-        auto params = fly::detail::make_format_parameters<FormatContext>(1);
+        auto params = fly::string::detail::make_format_parameters<FormatContext>(1);
         FormatContext context(out, params);
         {
             auto parameter = context.arg(0);
@@ -85,7 +85,7 @@ CATCH_TEMPLATE_TEST_CASE(
             CATCH_CHECK_FALSE(parameter);
 
             parameter.visit([](auto value) {
-                CATCH_CHECK(std::is_same_v<decltype(value), fly::detail::MonoState>);
+                CATCH_CHECK(std::is_same_v<decltype(value), fly::string::detail::MonoState>);
             });
         }
     }
@@ -104,7 +104,7 @@ CATCH_TEMPLATE_TEST_CASE(
             }
         };
 
-        auto params = fly::detail::make_format_parameters<FormatContext>(user_defined);
+        auto params = fly::string::detail::make_format_parameters<FormatContext>(user_defined);
         FormatContext context(out, params);
 
         context.arg(0).visit(verify);
@@ -128,7 +128,8 @@ CATCH_TEMPLATE_TEST_CASE(
             }
         };
 
-        auto params = fly::detail::make_format_parameters<FormatContext>(arr, str, view_type(str));
+        auto params =
+            fly::string::detail::make_format_parameters<FormatContext>(arr, str, view_type(str));
         FormatContext context(out, params);
 
         context.arg(0).visit(verify);
@@ -146,7 +147,7 @@ CATCH_TEMPLATE_TEST_CASE(
         void *p2 = &i;
         void const *p3 = &i;
 
-        auto params = fly::detail::make_format_parameters<FormatContext>(p1, p2, p3);
+        auto params = fly::string::detail::make_format_parameters<FormatContext>(p1, p2, p3);
         FormatContext context(out, params);
 
         auto verify = [](auto expected_value, auto actual_value) {
@@ -171,7 +172,7 @@ CATCH_TEMPLATE_TEST_CASE(
         double d = 6.28;
         long double dd = 12.56;
 
-        auto params = fly::detail::make_format_parameters<FormatContext>(f, d, dd);
+        auto params = fly::string::detail::make_format_parameters<FormatContext>(f, d, dd);
         FormatContext context(out, params);
 
         auto verify = [](auto expected_value, auto actual_value) {
@@ -194,7 +195,7 @@ CATCH_TEMPLATE_TEST_CASE(
     {
         char_type c = FLY_CHR(char_type, 'c');
 
-        auto params = fly::detail::make_format_parameters<FormatContext>(c);
+        auto params = fly::string::detail::make_format_parameters<FormatContext>(c);
         FormatContext context(out, params);
 
         context.arg(0).visit([c](auto value) {
@@ -218,7 +219,7 @@ CATCH_TEMPLATE_TEST_CASE(
         std::int32_t i3 = 3;
         std::int64_t i4 = 4;
 
-        auto params = fly::detail::make_format_parameters<FormatContext>(i1, i2, i3, i4);
+        auto params = fly::string::detail::make_format_parameters<FormatContext>(i1, i2, i3, i4);
         FormatContext context(out, params);
 
         auto verify = [](auto expected_value, auto actual_value) {
@@ -245,7 +246,7 @@ CATCH_TEMPLATE_TEST_CASE(
         std::uint32_t u3 = 3;
         std::uint64_t u4 = 4;
 
-        auto params = fly::detail::make_format_parameters<FormatContext>(u1, u2, u3, u4);
+        auto params = fly::string::detail::make_format_parameters<FormatContext>(u1, u2, u3, u4);
         FormatContext context(out, params);
 
         auto verify = [](auto expected_value, auto actual_value) {
@@ -270,7 +271,7 @@ CATCH_TEMPLATE_TEST_CASE(
         bool b1 = true;
         bool b2 = false;
 
-        auto params = fly::detail::make_format_parameters<FormatContext>(b1, b2);
+        auto params = fly::string::detail::make_format_parameters<FormatContext>(b1, b2);
         FormatContext context(out, params);
 
         auto verify = [](auto expected_value, auto actual_value) {
