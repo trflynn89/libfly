@@ -292,6 +292,9 @@
     <ClInclude Include="..\..\..\fly\types\string\concepts.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\format.hpp">
+      <Filter>types\string</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\formatters.hpp">
       <Filter>types\string</Filter>
     </ClInclude>
@@ -311,6 +314,9 @@
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\converter.hpp">
+      <Filter>types\string\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\fly\types\string\detail\format.hpp">
       <Filter>types\string\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\fly\types\string\detail\format_context.hpp">
