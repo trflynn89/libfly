@@ -194,9 +194,7 @@ std::shared_ptr<Logger> create_console_logger(
  * callers may override the default logger.
  *
  * The logging macros above may be used to add log points to the default logger. They are useful for
- * providing trace information about the log point (e.g. file name, line number). The logging macros
- * support up to and including 50 format arguments. If more are needed, invoke the logger's public
- * logging methods directly.
+ * providing trace information about the log point (e.g. file name, line number).
  *
  * @author Timothy Flynn (trflynn89@pm.me)
  * @version July 21, 2016
