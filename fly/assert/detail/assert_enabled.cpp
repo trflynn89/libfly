@@ -8,9 +8,9 @@
 namespace fly::detail {
 
 //==================================================================================================
-void Capture::format(std::ostream_iterator<char> output, std::string_view capture_name) const
+std::string Capture::format(std::string_view capture_name) const
 {
-    m_format(output, capture_name, m_value);
+    return m_format(capture_name, m_value);
 }
 
 //==================================================================================================
@@ -49,7 +49,7 @@ void Assertion::log_assertion(std::string_view message, std::span<Capture const>
 
         for (std::size_t i = 0; i < captures.size(); ++i)
         {
-            captures[i].format(std::cerr, m_capture_names[i]);
+            std::cerr << captures[i].format(m_capture_names[i]);
         }
 
         std::cerr << '\n';

@@ -5,8 +5,8 @@
 
 #include <array>
 #include <cstdint>
-#include <iterator>
 #include <span>
+#include <string>
 #include <string_view>
 
 #define FLY_EXPAND(...) FLY_EXPAND0(FLY_EXPAND0(FLY_EXPAND0(FLY_EXPAND0(__VA_ARGS__))))
@@ -75,29 +75,28 @@ public:
     explicit Capture(CaptureType const &capture);
 
     /**
-     * Re-form the type-erased value and format that value to the provided output iterator.
+     * Re-form the type-erased value and format that value to a string.
      *
-     * @param output The output iterator to format the re-formed value to.
      * @param capture_name The stringified name of the captured value.
+     *
+     * @return The formatted value.
      */
-    void format(std::ostream_iterator<char> output, std::string_view capture_name) const;
+    std::string format(std::string_view capture_name) const;
 
 private:
     /**
-     * Re-form the type-erased value and format that value to the provided output iterator.
+     * Re-form the type-erased value and format that value to a string.
      *
-     * @param output The output iterator to format the re-formed value to.
      * @param capture_name The stringified name of the captured value.
      * @param capture A pointer to the type-erased captured value.
+     *
+     * @return The formatted value.
      */
     template <typename CaptureType>
-    static void format_capture(
-        std::ostream_iterator<char> output,
-        std::string_view capture_name,
-        void const *capture);
+    static std::string format_capture(std::string_view capture_name, void const *capture);
 
     void const *m_value {nullptr};
-    void (*m_format)(std::ostream_iterator<char>, std::string_view, void const *) {nullptr};
+    std::string (*m_format)(std::string_view, void const *) {nullptr};
 };
 
 /**
@@ -172,13 +171,10 @@ Capture::Capture(CaptureType const &capture) :
 
 //==================================================================================================
 template <typename CaptureType>
-void Capture::format_capture(
-    std::ostream_iterator<char> output,
-    std::string_view capture_name,
-    void const *capture)
+std::string Capture::format_capture(std::string_view capture_name, void const *capture)
 {
     auto const &reformed_capture = *static_cast<CaptureType const *>(capture);
-    fly::string::format_to(output, "\t{} => {}\n", capture_name, reformed_capture);
+    return fly::string::format("\t{} => {}\n", capture_name, reformed_capture);
 }
 
 //==================================================================================================
