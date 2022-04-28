@@ -121,13 +121,30 @@ CATCH_TEST_CASE("Assert", "[assert]")
     {
         int foo = 123;
         TEST_ASSERT(foo > 124, foo);
-        validate_assertion(trace, output, "foo > 124", {}, {"foo"}, foo);
+        validate_assertion(trace, output, "foo > 124", {}, {"foo"}, 123);
     }
 
     CATCH_SECTION("Failed assertion logs to stderr (with message and captures)")
     {
         int foo = 123;
         TEST_ASSERT(foo > 124, "Message to be logged", foo);
-        validate_assertion(trace, output, "foo > 124", "Message to be logged", {"foo"}, foo);
+        validate_assertion(trace, output, "foo > 124", "Message to be logged", {"foo"}, 123);
+    }
+
+    CATCH_SECTION("Assertion can capture member variables")
+    {
+        struct Foo
+        {
+            void foo(Trace &trace, std::string &output)
+            {
+                TEST_ASSERT(false, m_foo);
+            }
+
+            int m_foo {123};
+        };
+
+        Foo foo {};
+        foo.foo(trace, output);
+        validate_assertion(trace, output, "false", {}, {"m_foo"}, 123);
     }
 }

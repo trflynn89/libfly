@@ -27,10 +27,8 @@
     {                                                                                              \
         if (!static_cast<bool>(expression)) [[unlikely]]                                           \
         {                                                                                          \
-            static constexpr std::size_t captured_value_count =                                    \
-                fly::detail::captured_value_count(__VA_ARGS__);                                    \
-            static constexpr std::array<std::string_view, captured_value_count> capture_names {    \
-                FLY_STRINGIZE_ARGS(__VA_ARGS__)};                                                  \
+            static constexpr auto capture_names =                                                  \
+                fly::detail::make_captured_value_names_array(FLY_STRINGIZE_ARGS(__VA_ARGS__));     \
                                                                                                    \
             fly::detail::Assertion assertion(                                                      \
                 #expression,                                                                       \
@@ -47,12 +45,13 @@
 namespace fly::detail {
 
 /**
- * @return The number of variadic values captured by the assertion macros.
+ * @return The stringified names of any captured values converted to an array.
  */
-template <typename... CaptureTypes>
-consteval std::size_t captured_value_count(CaptureTypes &&...)
+template <typename... Ts>
+consteval std::array<std::string_view, sizeof...(Ts)>
+make_captured_value_names_array(Ts &&...capture_names)
 {
-    return sizeof...(CaptureTypes);
+    return {{std::forward<Ts>(capture_names)...}};
 }
 
 /**
