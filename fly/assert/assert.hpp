@@ -1,12 +1,12 @@
 #pragma once
 
-#include <cstdlib>
-
 #if defined(NDEBUG)
 #    include "fly/assert/detail/assert_disabled.hpp"
 #else
 #    include "fly/assert/detail/assert_enabled.hpp"
 #endif
+
+#include <cstdlib>
 
 /**
  * Assert that a boolean expression is true, aborting the application if the assertion fails.
@@ -40,3 +40,9 @@
  */
 #define FLY_ASSERT(expression, ...)                                                                \
     FLY_ASSERT_IMPL(std::abort, expression __VA_OPT__(, ) __VA_ARGS__)
+
+/**
+ * Assert that a source code location is never reached. Similar to FLY_ASSERT(), this macro may be
+ * invoked with an optional message and variables to be captured for debugging.
+ */
+#define FLY_ASSERT_NOT_REACHED(...) FLY_ASSERT(false __VA_OPT__(, ) __VA_ARGS__)
