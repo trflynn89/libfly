@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-namespace fly::detail {
+namespace fly::assert::detail {
 
 //==================================================================================================
 std::string Capture::format(std::string_view capture_name) const
@@ -19,7 +19,7 @@ Assertion::Assertion(
     std::string_view file,
     std::string_view function,
     std::uint32_t line,
-    std::span<std::string_view const> capture_names) :
+    std::span<std::string_view const> capture_names) noexcept :
     m_expression(expression),
     m_file(file),
     m_function(function),
@@ -60,4 +60,4 @@ void Assertion::log_assertion(std::string_view message, std::span<Capture const>
     std::cerr << '\n';
 }
 
-} // namespace fly::detail
+} // namespace fly::assert::detail

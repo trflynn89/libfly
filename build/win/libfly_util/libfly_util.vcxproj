@@ -179,6 +179,7 @@
     <ClCompile Include="..\..\..\test\util\waitable_task_runner.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\bench\util\assertion_handler.hpp" />
     <ClInclude Include="..\..\..\bench\util\stream_util.hpp" />
     <ClInclude Include="..\..\..\bench\util\table.hpp" />
     <ClInclude Include="..\..\..\test\util\capture_stream.hpp" />

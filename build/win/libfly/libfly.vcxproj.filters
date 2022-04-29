@@ -363,6 +363,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\fly\assert\assert.cpp">
+      <Filter>assert</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\fly\assert\detail\assert_enabled.cpp">
       <Filter>assert\detail</Filter>
     </ClCompile>

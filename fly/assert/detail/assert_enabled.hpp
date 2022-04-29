@@ -22,27 +22,29 @@
     FLY_STRINGIZE(arg) __VA_OPT__(, FLY_STRINGIZE_RECURSE FLY_PARENS(__VA_ARGS__))
 #define FLY_STRINGIZE_RECURSE() FLY_STRINGIZE_HELPER
 
-#define FLY_ASSERT_IMPL(handler, expression, ...)                                                  \
+#define FLY_ASSERT_IMPL(expression, ...)                                                           \
     do                                                                                             \
     {                                                                                              \
         if (!static_cast<bool>(expression)) [[unlikely]]                                           \
         {                                                                                          \
             static constexpr auto capture_names =                                                  \
-                fly::detail::make_captured_value_names_array(FLY_STRINGIZE_ARGS(__VA_ARGS__));     \
+                fly::assert::detail::make_captured_value_names_array(                              \
+                    FLY_STRINGIZE_ARGS(__VA_ARGS__));                                              \
                                                                                                    \
-            fly::detail::Assertion assertion(                                                      \
-                #expression,                                                                       \
-                __FILE__,                                                                          \
-                __FUNCTION__,                                                                      \
-                static_cast<std::uint32_t>(__LINE__),                                              \
-                capture_names);                                                                    \
+            auto line = static_cast<std::uint32_t>(__LINE__);                                      \
                                                                                                    \
+            fly::assert::detail::Assertion                                                         \
+                assertion(#expression, __FILE__, __FUNCTION__, line, capture_names);               \
             assertion.assertion_failed(__VA_ARGS__);                                               \
-            handler();                                                                             \
+                                                                                                   \
+            if (auto handler = fly::assert::assertion_handler(); handler != nullptr)               \
+            {                                                                                      \
+                handler(#expression, __FILE__, __FUNCTION__, line);                                \
+            }                                                                                      \
         }                                                                                          \
     } while (0)
 
-namespace fly::detail {
+namespace fly::assert::detail {
 
 /**
  * @return The stringified names of any captured values converted to an array.
@@ -71,7 +73,7 @@ public:
      * @param capture The captured value.
      */
     template <typename CaptureType>
-    explicit Capture(CaptureType const &capture);
+    explicit Capture(CaptureType const &capture) noexcept;
 
     /**
      * Re-form the type-erased value and format that value to a string.
@@ -112,8 +114,8 @@ public:
      *
      * @param expression The stringified failed assertion expression.
      * @param file The file in which the assertion failed.
-     * @param line The line on which the assertion failed.
      * @param function The function in which the assertion failed.
+     * @param line The line on which the assertion failed.
      * @param capture_names The stringified names of any captured values.
      */
     Assertion(
@@ -121,7 +123,7 @@ public:
         std::string_view file,
         std::string_view function,
         std::uint32_t line,
-        std::span<std::string_view const> capture_names);
+        std::span<std::string_view const> capture_names) noexcept;
 
     /**
      * Log a failed assertion and any captured values.
@@ -162,7 +164,7 @@ private:
 
 //==================================================================================================
 template <typename CaptureType>
-Capture::Capture(CaptureType const &capture) :
+Capture::Capture(CaptureType const &capture) noexcept :
     m_value(static_cast<void const *>(&capture)),
     m_format(format_capture<CaptureType>)
 {
@@ -197,4 +199,4 @@ void Assertion::assertion_failed(char const (&message)[N], CaptureTypes &&...cap
     log_assertion({message, N}, parameters);
 }
 
-} // namespace fly::detail
+} // namespace fly::assert::detail

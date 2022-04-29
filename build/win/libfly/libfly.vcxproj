@@ -259,6 +259,7 @@
     <ClInclude Include="..\..\..\fly\types\string\string.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\fly\assert\assert.cpp" />
     <ClCompile Include="..\..\..\fly\assert\detail\assert_enabled.cpp" />
     <ClCompile Include="..\..\..\fly\coders\base64\base64_coder.cpp" />
     <ClCompile Include="..\..\..\fly\coders\coder.cpp" />

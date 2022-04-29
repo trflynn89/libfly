@@ -1,6 +1,6 @@
 #pragma once
 
-namespace fly::detail {
+namespace fly::assert::detail {
 
 /**
  * Helper to ensure all captured values are referenced but not evaluated.
@@ -10,7 +10,7 @@ constexpr void ignore_arguments(Args &&...)
 {
 }
 
-} // namespace fly::detail
+} // namespace fly::assert::detail
 
-#define FLY_ASSERT_IMPL(handler, ...)                                                              \
-    true ? static_cast<void>(0) : fly::detail::ignore_arguments(__VA_ARGS__)
+#define FLY_ASSERT_IMPL(...)                                                                       \
+    true ? static_cast<void>(0) : fly::assert::detail::ignore_arguments(__VA_ARGS__)
