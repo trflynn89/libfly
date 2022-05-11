@@ -604,12 +604,15 @@ auto BasicUnicode<CharType>::codepoint_from_string(IteratorType &it, IteratorTyp
     codepoint_type const leading_byte = next_encoded_byte(it, end);
 
     // First find the codepoint length by finding which leading byte matches the first encoded byte.
-    auto utf8_it = std::find_if(
-        s_utf8_leading_bytes.begin(),
-        s_utf8_leading_bytes.end(),
-        [&leading_byte](auto const &candidate) {
-            return (leading_byte & candidate.m_encoding_mask) == candidate.m_leading_byte;
-        });
+    auto utf8_it = s_utf8_leading_bytes.begin();
+
+    for (; utf8_it != s_utf8_leading_bytes.end(); ++utf8_it)
+    {
+        if ((leading_byte & utf8_it->m_encoding_mask) == utf8_it->m_leading_byte)
+        {
+            break;
+        }
+    }
 
     if (utf8_it == s_utf8_leading_bytes.end())
     {
