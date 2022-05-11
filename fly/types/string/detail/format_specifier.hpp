@@ -925,16 +925,15 @@ BasicFormatSpecifier<CharType>::resolve_parameter_type(FormatParseContext &conte
 template <fly::StandardCharacter CharType>
 constexpr auto BasicFormatSpecifier<CharType>::type_of(CharType ch) -> std::optional<Type>
 {
-    auto it = std::find_if(s_type_map.begin(), s_type_map.end(), [&ch](auto const &item) {
-        return item.first == ch;
-    });
-
-    if (it == s_type_map.end())
+    for (auto it = s_type_map.begin(); it != s_type_map.end(); ++it)
     {
-        return std::nullopt;
+        if (it->first == ch)
+        {
+            return it->second;
+        }
     }
 
-    return it->second;
+    return std::nullopt;
 }
 
 //==================================================================================================
