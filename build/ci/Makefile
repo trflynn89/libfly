@@ -19,8 +19,8 @@ BASE := $(shell grep -oP "(?<=FROM )(\S+)" Dockerfile)
 
 # Toolchain versions.
 CLANG_VERSION := 14
-GCC_VERSION := 11
-JDK_VERSION := 15
+GCC_VERSION := 12
+JDK_VERSION := 18
 
 # Form the tag for the container.
 ifeq ($(JDK_VERSION),)
