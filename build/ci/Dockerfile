@@ -14,13 +14,16 @@ RUN apt-get update && \
         git \
         lcov \
         make \
+        software-properties-common \
         sudo \
     && \
     \
     echo "Set disable_coredump false" >> /etc/sudo.conf
 
 # Install gcc
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN add-apt-repository -y ppa:ubuntu-toolchain-r/ppa \
+    && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
         gcc-$GCC_VERSION \
         gcc-$GCC_VERSION-multilib \
         g++-$GCC_VERSION \
