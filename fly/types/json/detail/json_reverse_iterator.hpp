@@ -213,7 +213,7 @@ public:
      * @throws JsonIteratorException If the Json instance is not an object.
      * @throws NullJsonException If the iterator is empty or past-the-end.
      */
-    const typename json_object_type::key_type &key() const;
+    typename json_object_type::key_type const &key() const;
 
     /**
      * Retrieve a reference to the Json instance pointed to by this iterator.
@@ -357,7 +357,7 @@ auto JsonReverseIterator<JsonIterator>::operator-(JsonReverseIterator const &oth
 
 //==================================================================================================
 template <typename JsonIterator>
-const typename json_object_type::key_type &JsonReverseIterator<JsonIterator>::key() const
+typename json_object_type::key_type const &JsonReverseIterator<JsonIterator>::key() const
 {
     try
     {
