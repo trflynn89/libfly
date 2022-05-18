@@ -15,6 +15,7 @@ SRC_$(d) := \
     $(d)/Catch2/src/catch2/catch_version.cpp \
     $(d)/Catch2/src/catch2/generators/internal/catch_generators_combined_tu.cpp \
     $(d)/Catch2/src/catch2/interfaces/catch_interfaces_combined_tu.cpp \
+    $(d)/Catch2/src/catch2/interfaces/catch_interfaces_generatortracker.cpp \
     $(d)/Catch2/src/catch2/interfaces/catch_interfaces_reporter.cpp \
     $(d)/Catch2/src/catch2/internal/catch_assertion_handler.cpp \
     $(d)/Catch2/src/catch2/internal/catch_case_insensitive_comparisons.cpp \
@@ -30,20 +31,24 @@ SRC_$(d) := \
     $(d)/Catch2/src/catch2/internal/catch_exception_translator_registry.cpp \
     $(d)/Catch2/src/catch2/internal/catch_fatal_condition_handler.cpp \
     $(d)/Catch2/src/catch2/internal/catch_floating_point_helpers.cpp \
+    $(d)/Catch2/src/catch2/internal/catch_istream.cpp \
     $(d)/Catch2/src/catch2/internal/catch_list.cpp \
     $(d)/Catch2/src/catch2/internal/catch_output_redirect.cpp \
     $(d)/Catch2/src/catch2/internal/catch_random_number_generator.cpp \
     $(d)/Catch2/src/catch2/internal/catch_random_seed_generation.cpp \
     $(d)/Catch2/src/catch2/internal/catch_reporter_registry.cpp \
+    $(d)/Catch2/src/catch2/internal/catch_reporter_spec_parser.cpp \
     $(d)/Catch2/src/catch2/internal/catch_result_type.cpp \
+    $(d)/Catch2/src/catch2/internal/catch_reusable_string_stream.cpp \
     $(d)/Catch2/src/catch2/internal/catch_run_context.cpp \
     $(d)/Catch2/src/catch2/internal/catch_section.cpp \
     $(d)/Catch2/src/catch2/internal/catch_singletons.cpp \
     $(d)/Catch2/src/catch2/internal/catch_source_line_info.cpp \
-    $(d)/Catch2/src/catch2/internal/catch_stream.cpp \
+    $(d)/Catch2/src/catch2/internal/catch_stdstreams.cpp \
     $(d)/Catch2/src/catch2/internal/catch_string_manip.cpp \
     $(d)/Catch2/src/catch2/internal/catch_stringref.cpp \
     $(d)/Catch2/src/catch2/internal/catch_tag_alias_registry.cpp \
+    $(d)/Catch2/src/catch2/internal/catch_test_case_info_hasher.cpp \
     $(d)/Catch2/src/catch2/internal/catch_test_case_registry_impl.cpp \
     $(d)/Catch2/src/catch2/internal/catch_test_case_tracker.cpp \
     $(d)/Catch2/src/catch2/internal/catch_test_registry.cpp \
@@ -57,11 +62,13 @@ SRC_$(d) := \
     $(d)/Catch2/src/catch2/matchers/internal/catch_matchers_combined_tu.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_automake.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_combined_tu.cpp \
+    $(d)/Catch2/src/catch2/reporters/catch_reporter_common_base.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_compact.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_console.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_cumulative_base.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_junit.cpp \
-    $(d)/Catch2/src/catch2/reporters/catch_reporter_listening.cpp \
+    $(d)/Catch2/src/catch2/reporters/catch_reporter_multi.cpp \
+    $(d)/Catch2/src/catch2/reporters/catch_reporter_registrars.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_sonarqube.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_streaming_base.cpp \
     $(d)/Catch2/src/catch2/reporters/catch_reporter_tap.cpp \

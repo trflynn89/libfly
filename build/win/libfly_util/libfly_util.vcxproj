@@ -76,33 +76,33 @@
     <OutDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)d.$(PlatformTarget)</TargetName>
-    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir)\extern\catchorg\config;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName).$(PlatformTarget)</TargetName>
-    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir)\extern\catchorg\config;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)d.$(PlatformTarget)</TargetName>
-    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir)\extern\catchorg\config;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName).$(PlatformTarget)</TargetName>
-    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir)\extern\catchorg\config;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_NO_WINDOWS_SEH;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -120,7 +120,7 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_NO_WINDOWS_SEH;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -138,7 +138,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_NO_WINDOWS_SEH;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -156,7 +156,7 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_NO_WINDOWS_SEH;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>

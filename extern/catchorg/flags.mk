@@ -1,6 +1,3 @@
 CXXFLAGS_$(d) += \
     -isystem $(SOURCE_ROOT)/extern/catchorg/Catch2/src \
-    -DCATCH_CONFIG_PREFIX_ALL \
-    -DCATCH_CONFIG_FAST_COMPILE \
-    -DCATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER \
-    -DCATCH_CONFIG_DEFAULT_REPORTER=\"libfly\"
+    -isystem $(SOURCE_ROOT)/extern/catchorg/config

@@ -34,35 +34,43 @@ public:
 class SilentReporter final : public Catch::StreamingReporterBase
 {
 public:
-    explicit SilentReporter(Catch::ReporterConfig const &config) :
-        StreamingReporterBase(config)
-    {
-    }
-
+    using Catch::StreamingReporterBase::StreamingReporterBase;
     ~SilentReporter() final = default;
 
-    static std::string getDescription()
-    {
-        return "Catch2 silent reporter for libfly benchmarking";
-    }
+    static std::string getDescription();
 
-    void assertionStarting(Catch::AssertionInfo const &) override
-    {
-    }
-
-    void assertionEnded(Catch::AssertionStats const &) override
-    {
-    }
-
-    void testCaseStarting(Catch::TestCaseInfo const &info) override
-    {
-        auto const style = fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Cyan);
-        m_stream << style << fly::string::format("[{:=>13}{}{:=<13}]\n\n", ' ', info.name, ' ');
-    }
+    void assertionStarting(Catch::AssertionInfo const &) override;
+    void assertionEnded(Catch::AssertionStats const &) override;
+    void testCaseStarting(Catch::TestCaseInfo const &info) override;
 };
 
+//==================================================================================================
+std::string SilentReporter::getDescription()
+{
+    return "Catch2 silent reporter for libfly benchmarking";
+}
+
+//==================================================================================================
+void SilentReporter::assertionStarting(Catch::AssertionInfo const &)
+{
+}
+
+//==================================================================================================
+void SilentReporter::assertionEnded(Catch::AssertionStats const &)
+{
+}
+
+//==================================================================================================
+void SilentReporter::testCaseStarting(Catch::TestCaseInfo const &info)
+{
+    auto const style = fly::logger::Styler(fly::logger::Style::Bold, fly::logger::Color::Cyan);
+    m_stream << style << fly::string::format("[{:=>13}{}{:=<13}]\n\n", ' ', info.name, ' ');
+}
+
+//==================================================================================================
 CATCH_REGISTER_REPORTER("libfly", SilentReporter)
 
+//==================================================================================================
 int main(int argc, char **argv)
 {
     fly::logger::Logger::set_default_logger(fly::logger::Logger::create(

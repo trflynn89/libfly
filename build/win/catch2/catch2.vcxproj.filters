@@ -15,6 +15,7 @@
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\catch_version.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\generators\internal\catch_generators_combined_tu.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\interfaces\catch_interfaces_combined_tu.cpp" />
+    <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\interfaces\catch_interfaces_generatortracker.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\interfaces\catch_interfaces_reporter.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_assertion_handler.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_case_insensitive_comparisons.cpp" />
@@ -30,20 +31,24 @@
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_exception_translator_registry.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_fatal_condition_handler.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_floating_point_helpers.cpp" />
+    <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_istream.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_list.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_output_redirect.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_random_number_generator.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_random_seed_generation.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_reporter_registry.cpp" />
+    <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_reporter_spec_parser.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_result_type.cpp" />
+    <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_reusable_string_stream.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_run_context.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_section.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_singletons.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_source_line_info.cpp" />
-    <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_stream.cpp" />
+    <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_stdstreams.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_string_manip.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_stringref.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_tag_alias_registry.cpp" />
+    <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_test_case_info_hasher.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_test_case_registry_impl.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_test_case_tracker.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\internal\catch_test_registry.cpp" />
@@ -57,15 +62,20 @@
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\matchers\internal\catch_matchers_combined_tu.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_automake.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_combined_tu.cpp" />
+    <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_common_base.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_compact.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_console.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_cumulative_base.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_junit.cpp" />
-    <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_listening.cpp" />
+    <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_multi.cpp" />
+    <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_registrars.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_sonarqube.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_streaming_base.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_tap.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_teamcity.cpp" />
     <ClCompile Include="..\..\..\extern\catchorg\Catch2\src\catch2\reporters\catch_reporter_xml.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\extern\catchorg\config\catch2\catch_user_config.hpp" />
   </ItemGroup>
 </Project>
