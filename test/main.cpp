@@ -21,7 +21,7 @@ using namespace fly::literals::numeric_literals;
 class FlyReporter final : public Catch::StreamingReporterBase
 {
 public:
-    explicit FlyReporter(Catch::ReporterConfig const &config);
+    using Catch::StreamingReporterBase::StreamingReporterBase;
     ~FlyReporter() override = default;
 
     static std::string getDescription();
@@ -63,12 +63,6 @@ private:
     std::vector<Catch::MessageInfo> const &m_messages;
     std::string_view m_label;
 };
-
-//==================================================================================================
-FlyReporter::FlyReporter(Catch::ReporterConfig const &config) :
-    Catch::StreamingReporterBase(config)
-{
-}
 
 //==================================================================================================
 std::string FlyReporter::getDescription()

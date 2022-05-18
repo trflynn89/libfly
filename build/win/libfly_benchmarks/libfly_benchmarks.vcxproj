@@ -75,30 +75,30 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir)\extern\boostorg\json\include;$(SolutionDir)\extern\nlohmann\json\single_include;$(SolutionDir)\extern\fmtlib\fmt\include;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir)\extern\catchorg\config;$(SolutionDir)\extern\boostorg\json\include;$(SolutionDir)\extern\nlohmann\json\single_include;$(SolutionDir)\extern\fmtlib\fmt\include;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir)\extern\boostorg\json\include;$(SolutionDir)\extern\nlohmann\json\single_include;$(SolutionDir)\extern\fmtlib\fmt\include;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir)\extern\catchorg\config;$(SolutionDir)\extern\boostorg\json\include;$(SolutionDir)\extern\nlohmann\json\single_include;$(SolutionDir)\extern\fmtlib\fmt\include;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir)\extern\boostorg\json\include;$(SolutionDir)\extern\nlohmann\json\single_include;$(SolutionDir)\extern\fmtlib\fmt\include;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir)\extern\catchorg\config;$(SolutionDir)\extern\boostorg\json\include;$(SolutionDir)\extern\nlohmann\json\single_include;$(SolutionDir)\extern\fmtlib\fmt\include;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)\build\$(Configuration)\msvc\$(PlatformTarget)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir)\extern\boostorg\json\include;$(SolutionDir)\extern\nlohmann\json\single_include;$(SolutionDir)\extern\fmtlib\fmt\include;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\extern\catchorg\Catch2\src;$(SolutionDir)\extern\catchorg\config;$(SolutionDir)\extern\boostorg\json\include;$(SolutionDir)\extern\nlohmann\json\single_include;$(SolutionDir)\extern\fmtlib\fmt\include;$(SolutionDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_NO_WINDOWS_SEH;BOOST_JSON_STANDALONE;FMT_HEADER_ONLY;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_JSON_STANDALONE;FMT_HEADER_ONLY;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -117,7 +117,7 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_NO_WINDOWS_SEH;BOOST_JSON_STANDALONE;FMT_HEADER_ONLY;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_JSON_STANDALONE;FMT_HEADER_ONLY;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -135,7 +135,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_NO_WINDOWS_SEH;BOOST_JSON_STANDALONE;FMT_HEADER_ONLY;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_JSON_STANDALONE;FMT_HEADER_ONLY;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -154,7 +154,7 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CATCH_CONFIG_PREFIX_ALL;CATCH_CONFIG_FAST_COMPILE;CATCH_CONFIG_ENABLE_OPTIONAL_STRINGMAKER;CATCH_CONFIG_NO_WINDOWS_SEH;BOOST_JSON_STANDALONE;FMT_HEADER_ONLY;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_JSON_STANDALONE;FMT_HEADER_ONLY;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
