@@ -11,7 +11,7 @@ jobs:
       value: $(Build.SourcesDirectory)/ccache
 
     pool:
-      vmImage: macOS-11
+      vmImage: macOS-12
 
     steps:
     - script: |
