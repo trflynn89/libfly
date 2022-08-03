@@ -15,25 +15,27 @@ could use some work :)
 
 | Parser   | Duration (ms) | Speed (MB/s) |
 | :--      |           --: |          --: |
-| libfly   |       236.902 |       31.073 |
-| boost    |        67.010 |      109.854 |
-| nlohmann |       197.665 |       37.242 |
+| libfly   |       141.364 |       52.074 |
+| boost    |        30.795 |      239.044 |
+| nlohmann |        80.322 |       91.648 |
+
 
 ### [canada.json](/bench/json/data/canada.json)
 
 | Parser   | Duration (ms) | Speed (MB/s) |
 | :--      |           --: |          --: |
-| libfly   |        88.977 |       24.127 |
-| boost    |        11.938 |      179.822 |
-| nlohmann |        54.969 |       39.054 |
+| libfly   |        36.768 |       58.386 |
+| boost    |         4.725 |      454.373 |
+| nlohmann |        22.047 |       97.373 |
+
 
 ### [gsoc-2018.json](/bench/json/data/gsoc-2018.json)
 
 | Parser   | Duration (ms) | Speed (MB/s) |
 | :--      |           --: |          --: |
-| libfly   |        41.520 |       76.437 |
-| boost    |        14.111 |      224.903 |
-| nlohmann |        32.927 |       96.386 |
+| libfly   |        18.626 |      170.385 |
+| boost    |         4.298 |      738.387 |
+| nlohmann |        15.411 |      205.941 |
 
 ## Profile
 
@@ -44,16 +46,22 @@ constructor.
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total
  time   seconds   seconds    calls  ms/call  ms/call  name
- 27.59      0.08     0.08  3209218     0.00     0.00  fly::Json::Json(fly::Json&&)
- 13.79      0.12     0.04  1112064     0.00     0.00  fly::JsonParser::parse_quoted_string[abi:cxx11]()
- 13.79      0.16     0.04  1112064     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > fly::Json::convert_to_string<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, false>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >)
- 10.34      0.19     0.03  4321279     0.00     0.00  std::__detail::__variant::__gen_vtable_impl<std::__detail::__variant::_Multi_array<void (*)(std::__detail::__variant::_Variant_storage<false, decltype(nullptr), std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, fly::Json, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, fly::Json> > >, std::vector<fly::Json, std::allocator<fly::Json> >, bool, long, unsigned long, long double>::_M_reset()::{lambda(auto:1&&)#1}&&, std::variant<decltype(nullptr), std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, fly::Json, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, fly::Json> > >, std::vector<fly::Json, std::allocator<fly::Json> >, bool, long, unsigned long, long double>&)>, std::integer_sequence<unsigned long, 1ul> >::__visit_invoke(std::__detail::__variant::_Variant_storage<false, decltype(nullptr), std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, fly::Json, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, fly::Json> > >, std::vector<fly::Json, std::allocator<fly::Json> >, bool, long, unsigned long, long double>::_M_reset()::{lambda(auto:1&&)#1}, std::variant<decltype(nullptr), std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, fly::Json, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, fly::Json> > >, std::vector<fly::Json, std::allocator<fly::Json> >, bool, long, unsigned long, long double>)
-  6.90      0.21     0.02  5560321     0.00     0.00  fly::JsonParser::consume_whitespace()
-  6.90      0.23     0.02  1112092     0.00     0.00  fly::Json::push_back(fly::Json&&)
-  6.90      0.25     0.02  1112064     0.00     0.00  fly::Json::validate_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)
-  3.45      0.26     0.01  4321284     0.00     0.00  std::__detail::__variant::__gen_vtable_impl<std::__detail::__variant::_Multi_array<void (*)(std::__detail::__variant::_Variant_storage<false, decltype(nullptr), std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, fly::Json, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, fly::Json> > >, std::vector<fly::Json, std::allocator<fly::Json> >, bool, long, unsigned long, long double>::_M_reset()::{lambda(auto:1&&)#1}&&, std::variant<decltype(nullptr), std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, fly::Json, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, fly::Json> > >, std::vector<fly::Json, std::allocator<fly::Json> >, bool, long, unsigned long, long double>&)>, std::integer_sequence<unsigned long, 0ul> >::__visit_invoke(std::__detail::__variant::_Variant_storage<false, decltype(nullptr), std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, fly::Json, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, fly::Json> > >, std::vector<fly::Json, std::allocator<fly::Json> >, bool, long, unsigned long, long double>::_M_reset()::{lambda(auto:1&&)#1}, std::variant<decltype(nullptr), std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, fly::Json, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, fly::Json> > >, std::vector<fly::Json, std::allocator<fly::Json> >, bool, long, unsigned long, long double>)
-  3.45      0.27     0.01  3336194     0.00     0.00  fly::JsonParser::consume_whitespace_and_comments()
-  3.45      0.28     0.01  1112065     0.00     0.00  fly::JsonParser::parse_json()
+ 37.32      0.53     0.53 35301398     0.00     0.00  fly::Json::Json(fly::Json&&)
+ 11.97      0.70     0.17 12232704     0.00     0.00  fly::parser::JsonParser::parse_quoted_string[abi:cxx11]()
+  9.86      0.84     0.14 70602796     0.00     0.00  std::__detail::__variant::_Variant_storage<false, decltype(nullptr), std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::map<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, fly::Json, std::less<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::allocator<std::pair<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const, fly::Json> > >, std::vector<fly::Json, std::allocator<fly::Json> >, bool, long, unsigned long, long double>::_M_reset()
+  7.04      0.94     0.10 12234321     0.00     0.00  unsigned int fly::detail::BasicUnicode<char>::codepoint_from_string<char const*>(char const*&, char const* const&)
+  5.63      1.02     0.08 36698134     0.00     0.00  fly::parser::JsonParser::consume_whitespace_and_comments()
+  5.63      1.10     0.08 12232704     0.00     0.00  fly::Json::validate_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&&)
+  4.93      1.17     0.07 61163531     0.00     0.00  fly::parser::JsonParser::consume_whitespace()
+  3.52      1.22     0.05 24465397     0.00     0.00  fly::parser::JsonParser::consume_token(fly::parser::JsonParser::Token)
+  3.52      1.27     0.05 12232693     0.00     0.00  fly::parser::JsonParser::consume_comma(fly::parser::JsonParser::Token)
+  2.11      1.30     0.03 12232715     0.00     0.00  fly::parser::JsonParser::parse_json()
+  2.11      1.33     0.03 12232704     0.00     0.00  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > fly::Json::convert_to_string<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >)
+  2.11      1.36     0.03 12232704     0.00     0.00  fly::Json::push_back(fly::Json&&)
+  1.41      1.38     0.02 24465408     0.00     0.00  fly::parser::JsonParser::state_for_object_or_array(fly::parser::JsonParser::Token)
+  0.70      1.41     0.01 61163542     0.00     0.00  fly::parser::JsonParser::is_whitespace(fly::parser::JsonParser::Token) const
+  0.70      1.42     0.01       11     0.00     0.08  fly::parser::JsonParser::parse_array()
+  0.00      1.42     0.00      385     0.00     0.00  fly::Json::read_escaped_character(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, __gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >&)
 ```
 
 The move constructor is about as simple as it gets:
