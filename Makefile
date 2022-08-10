@@ -3,6 +3,9 @@ VERSION := $(shell cat $(SOURCE_ROOT)/VERSION.md)
 
 include $(SOURCE_ROOT)/extern/trflynn89/flymake/src/api.mk
 
+$(eval $(call ADD_SCRIPT, download_bench_data, build/scripts/download_build_data.py, bench))
+$(eval $(call ADD_SCRIPT, download_test_data, build/scripts/download_build_data.py, test))
+
 # Main targets.
 $(eval $(call ADD_TARGET, libfly, fly, LIB))
 
