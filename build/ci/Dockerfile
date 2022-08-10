@@ -14,6 +14,8 @@ RUN apt-get update && \
         git \
         lcov \
         make \
+        python3 \
+        python3-pip \
         software-properties-common \
         sudo \
     && \
@@ -53,6 +55,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
 RUN if test ! -z "$JDK_VERSION" ; then \
         DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-$JDK_VERSION-jdk; \
     fi
+
+# Install Python dependencies
+RUN pip3 install requests
 
 # Cleanup
 RUN apt-get clean -y && \
