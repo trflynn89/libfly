@@ -11,7 +11,7 @@ Benchmark of the libfly JSON parser against a couple of popular C++ JSON librari
 All results below are the median of 11 iterations of the indicated JSON file. Obviously, libfly
 could use some work :)
 
-### [all_unicode.json](/test/parser/json/unicode/all_unicode.json)
+### [all_unicode.json](https://github.com/nlohmann/json_test_data/blob/master/json_nlohmann_tests/all_unicode.json)
 
 | Parser   | Duration (ms) | Speed (MB/s) |
 | :--      |           --: |          --: |
@@ -20,7 +20,7 @@ could use some work :)
 | nlohmann |        80.322 |       91.648 |
 
 
-### [canada.json](/bench/json/data/canada.json)
+### [canada.json](https://github.com/miloyip/nativejson-benchmark/blob/master/data/canada.json)
 
 | Parser   | Duration (ms) | Speed (MB/s) |
 | :--      |           --: |          --: |
@@ -28,14 +28,6 @@ could use some work :)
 | boost    |         4.725 |      454.373 |
 | nlohmann |        22.047 |       97.373 |
 
-
-### [gsoc-2018.json](/bench/json/data/gsoc-2018.json)
-
-| Parser   | Duration (ms) | Speed (MB/s) |
-| :--      |           --: |          --: |
-| libfly   |        18.626 |      170.385 |
-| boost    |         4.298 |      738.387 |
-| nlohmann |        15.411 |      205.941 |
 
 ## Profile
 

@@ -111,6 +111,10 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>python "$(SolutionDir)build\scripts\download_build_data.py" "$(SolutionDir)build\$(Configuration)\msvc\$(PlatformTarget)\gen" "$(SolutionDir)build\data" "test"
+python "$(SolutionDir)build\scripts\download_build_data.py" "$(SolutionDir)build\$(Configuration)\msvc\$(PlatformTarget)\gen" "$(SolutionDir)build\data" "bench"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -131,6 +135,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>python "$(SolutionDir)build\scripts\download_build_data.py" "$(SolutionDir)build\$(Configuration)\msvc\$(PlatformTarget)\gen" "$(SolutionDir)build\data" "test"
+python "$(SolutionDir)build\scripts\download_build_data.py" "$(SolutionDir)build\$(Configuration)\msvc\$(PlatformTarget)\gen" "$(SolutionDir)build\data" "bench"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -148,6 +156,10 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>python "$(SolutionDir)build\scripts\download_build_data.py" "$(SolutionDir)build\$(Configuration)\msvc\$(PlatformTarget)\gen" "$(SolutionDir)build\data" "test"
+python "$(SolutionDir)build\scripts\download_build_data.py" "$(SolutionDir)build\$(Configuration)\msvc\$(PlatformTarget)\gen" "$(SolutionDir)build\data" "bench"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -168,6 +180,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>python "$(SolutionDir)build\scripts\download_build_data.py" "$(SolutionDir)build\$(Configuration)\msvc\$(PlatformTarget)\gen" "$(SolutionDir)build\data" "test"
+python "$(SolutionDir)build\scripts\download_build_data.py" "$(SolutionDir)build\$(Configuration)\msvc\$(PlatformTarget)\gen" "$(SolutionDir)build\data" "bench"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\bench\coders\benchmark_coders.cpp" />
