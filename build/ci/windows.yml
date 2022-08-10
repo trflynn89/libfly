@@ -10,6 +10,10 @@ jobs:
       vmImage: windows-2022
 
     steps:
+    - script: |
+        pip3 install requests
+      displayName: 'Dependencies'
+
     - template: setup.yml
 
     - ${{ if eq(parameters.mode, 'Debug') }}:

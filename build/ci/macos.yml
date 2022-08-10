@@ -16,6 +16,7 @@ jobs:
     steps:
     - script: |
         brew install ccache
+        pip3 install requests
       displayName: 'Dependencies'
 
     - template: setup.yml
