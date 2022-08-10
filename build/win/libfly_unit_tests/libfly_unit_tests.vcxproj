@@ -131,6 +131,9 @@
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <StackReserveSize>4194304</StackReserveSize>
     </Link>
+    <PreBuildEvent>
+      <Command>python "$(SolutionDir)build\scripts\download_build_data.py" "$(SolutionDir)build\$(Configuration)\msvc\$(PlatformTarget)\gen" "$(SolutionDir)build\data" "test"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -155,6 +158,9 @@
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <StackReserveSize>4194304</StackReserveSize>
     </Link>
+    <PreBuildEvent>
+      <Command>python "$(SolutionDir)build\scripts\download_build_data.py" "$(SolutionDir)build\$(Configuration)\msvc\$(PlatformTarget)\gen" "$(SolutionDir)build\data" "test"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -181,6 +187,9 @@
       <AdditionalDependencies>pdh.lib;ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>python "$(SolutionDir)build\scripts\download_build_data.py" "$(SolutionDir)build\$(Configuration)\msvc\$(PlatformTarget)\gen" "$(SolutionDir)build\data" "test"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -207,6 +216,9 @@
       <AdditionalDependencies>pdh.lib;ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>python "$(SolutionDir)build\scripts\download_build_data.py" "$(SolutionDir)build\$(Configuration)\msvc\$(PlatformTarget)\gen" "$(SolutionDir)build\data" "test"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\catch2\catch2.vcxproj">

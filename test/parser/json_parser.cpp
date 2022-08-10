@@ -7,9 +7,30 @@
 #include "catch2/catch_approx.hpp"
 #include "catch2/catch_test_macros.hpp"
 
+#include <array>
 #include <filesystem>
 #include <memory>
-#include <vector>
+#include <string>
+
+using namespace std::literals::string_view_literals;
+
+namespace {
+
+std::filesystem::path const &root_data_path()
+{
+    static auto const path =
+        std::filesystem::path(__FILE__).parent_path().parent_path().parent_path() / "build" /
+        "data" / "json";
+    return path;
+}
+
+std::filesystem::path const &unicode_data_path()
+{
+    static auto const path = std::filesystem::path(__FILE__).parent_path() / "unicode";
+    return path;
+}
+
+} // namespace
 
 CATCH_TEST_CASE("JsonParser", "[parser]")
 {
@@ -50,21 +71,23 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         validate_pass_raw(fly::string::format("{{ \"a\" : {} }}", test), "a", expected);
     };
 
-    // https://www.json.org/JSON_checker/
-    CATCH_SECTION("JSON_checker test suite")
+    CATCH_SECTION("JSON checker test suite")
     {
-        // The following files are excluded from this test:
-        // - fail18.json: The parser has no max-depth
+        static auto const path = root_data_path() / "json_checker" / "test";
 
-        // Get the path to the JSON checker directory.
-        auto const here = std::filesystem::path(__FILE__);
-        auto const path = here.parent_path() / "json" / "json_checker";
+        static constexpr std::array exclusions {
+            "fail18.json"sv, // The parser has no max-depth.
+        };
 
-        // Validate each JSON file in the JSON checker directory.
         for (auto const &it : std::filesystem::directory_iterator(path))
         {
             auto const file = it.path().filename();
             CATCH_CAPTURE(file);
+
+            if (std::find(exclusions.begin(), exclusions.end(), file) != exclusions.end())
+            {
+                continue;
+            }
 
             if (file.string().starts_with("pass"))
             {
@@ -74,49 +97,43 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
             {
                 CATCH_CHECK_FALSE(parser.parse_file(it.path()).has_value());
             }
-            else
-            {
-                CATCH_FAIL("Unrecognized JSON file: " << file);
-            }
         }
     }
 
-    // https://code.google.com/archive/p/json-test-suite/
     CATCH_SECTION("Google's json-test-suite")
     {
-        auto const here = std::filesystem::path(__FILE__);
-        auto const path = here.parent_path() / "json" / "google_json_test_suite";
-
-        CATCH_CHECK(parser.parse_file(path / "sample.json").has_value());
+        static auto const path = root_data_path() / "google_json_test_suite" / "sample.json";
+        CATCH_CHECK(parser.parse_file(path).has_value());
     }
 
-    // https://github.com/nst/JSONTestSuite
     CATCH_SECTION("JSON Parsing Test Suite for RFC-8259 compliance")
     {
-        // The following files are excluded from this test:
-        // - n_structure_100000_opening_arrays.json: Causes stack overflow
-        // - n_structure_open_array_object.json: Causes stack overflow
-        // - i_number_double_huge_neg_exp.json: Platform dependent (fails Windows)
+        static auto const path = root_data_path() / "nst_json_test_suite";
 
-        // Indeterminate files expected to pass
-        std::vector<std::string> i_pass = {
-            "i_structure_500_nested_arrays.json", // No enforced depth limit
-            "i_structure_UTF-8_BOM_empty_object.json", // Byte order mark is handled
-            "i_string_UTF-16LE_with_BOM.json", // Byte order mark is handled
+        static constexpr std::array exclusions {
+            "n_structure_100000_opening_arrays.json"sv, // Causes stack overflow.
+            "n_structure_open_array_object.json"sv, // Causes stack overflow.
+            "i_number_double_huge_neg_exp.json"sv, // Platform dependent (fails Windows).
+        };
+
+        static constexpr std::array i_pass {
+            "i_structure_500_nested_arrays.json"sv, // No enforced depth limit.
+            "i_structure_UTF-8_BOM_empty_object.json"sv, // Byte order mark is handled.
+            "i_string_UTF-16LE_with_BOM.json"sv, // Byte order mark is handled.
         };
 
         // JSONTestSuite contains test files that aren't only objects or arrays.
         fly::parser::JsonParser type_parser(fly::parser::JsonParser::Features::AllowAnyType);
 
-        // Get the path to the JSONTestSuite directory.
-        auto const here = std::filesystem::path(__FILE__);
-        auto const path = here.parent_path() / "json" / "nst_json_test_suite";
-
-        // Validate each JSON file in the JSONTestSuite directory.
         for (auto const &it : std::filesystem::directory_iterator(path))
         {
             auto const file = it.path().filename();
             CATCH_CAPTURE(file);
+
+            if (std::find(exclusions.begin(), exclusions.end(), file) != exclusions.end())
+            {
+                continue;
+            }
 
             if (file.string().starts_with('y'))
             {
@@ -137,24 +154,18 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
                     CATCH_CHECK_FALSE(type_parser.parse_file(it.path()).has_value());
                 }
             }
-            else
-            {
-                CATCH_FAIL("Unrecognized JSON file: " << file);
-            }
         }
     }
 
-    // https://github.com/minimaxir/big-list-of-naughty-strings
     CATCH_SECTION("Big List of Naughty Strings")
     {
-        auto const here = std::filesystem::path(__FILE__);
-        auto const path = here.parent_path() / "json" / "big_list_of_naughty_strings";
+        static auto const path = root_data_path() / "blns.json";
 
-        auto parsed = parser.parse_file(path / "blns.json");
+        auto parsed = parser.parse_file(path);
         CATCH_REQUIRE(parsed.has_value());
 
         fly::Json values = *std::move(parsed);
-        CATCH_CHECK(values.size() == 507);
+        CATCH_CHECK(values.size() == 515);
 
         for (std::size_t i = 0; i < values.size(); ++i)
         {
@@ -164,14 +175,13 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("All Unicode characters")
     {
-        auto const here = std::filesystem::path(__FILE__);
-        auto const path = here.parent_path() / "json" / "unicode";
+        static auto const path = root_data_path() / "all_unicode.json";
 
-        auto parsed = parser.parse_file(path / "all_unicode.json");
+        auto parsed = parser.parse_file(path);
         CATCH_REQUIRE(parsed.has_value());
 
         fly::Json values = *std::move(parsed);
-        CATCH_CHECK(values.size() == 1'112'064);
+        CATCH_CHECK(values.size() == 1'112'065); // 1,112,064 code points + 1 terminating null value
     }
 
     CATCH_SECTION("String with UTF-8 encoding (std::string)")
@@ -204,10 +214,9 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("File with UTF-8 byte order mark")
     {
-        auto const here = std::filesystem::path(__FILE__);
-        auto const path = here.parent_path() / "json" / "unicode";
+        static auto const path = unicode_data_path() / "utf_8.json";
 
-        auto parsed = parser.parse_file(path / "utf_8.json");
+        auto parsed = parser.parse_file(path);
         CATCH_REQUIRE(parsed.has_value());
 
         fly::Json values = *std::move(parsed);
@@ -236,10 +245,10 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("File with UTF-16 big endian byte order mark")
     {
-        auto const here = std::filesystem::path(__FILE__);
-        auto const path = here.parent_path() / "json" / "unicode";
+        static auto const success_path = unicode_data_path() / "utf_16_big_endian.json";
+        static auto const invalid_path = unicode_data_path() / "utf_16_big_endian_invalid.json";
 
-        auto parsed = parser.parse_file(path / "utf_16_big_endian.json");
+        auto parsed = parser.parse_file(success_path);
         CATCH_REQUIRE(parsed.has_value());
 
         fly::Json values = *std::move(parsed);
@@ -248,16 +257,16 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         fly::Json encoded_encoding = values["encoding"];
         CATCH_CHECK(encoded_encoding == "UTF-16 BE");
 
-        parsed = parser.parse_file(path / "utf_16_big_endian_invalid.json");
+        parsed = parser.parse_file(invalid_path);
         CATCH_CHECK_FALSE(parsed.has_value());
     }
 
     CATCH_SECTION("File with UTF-16 little endian byte order mark")
     {
-        auto const here = std::filesystem::path(__FILE__);
-        auto const path = here.parent_path() / "json" / "unicode";
+        static auto const success_path = unicode_data_path() / "utf_16_little_endian.json";
+        static auto const invalid_path = unicode_data_path() / "utf_16_little_endian_invalid.json";
 
-        auto parsed = parser.parse_file(path / "utf_16_little_endian.json");
+        auto parsed = parser.parse_file(success_path);
         CATCH_REQUIRE(parsed.has_value());
 
         fly::Json values = *std::move(parsed);
@@ -266,7 +275,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         fly::Json encoded_encoding = values["encoding"];
         CATCH_CHECK(encoded_encoding == "UTF-16 LE");
 
-        parsed = parser.parse_file(path / "utf_16_little_endian_invalid.json");
+        parsed = parser.parse_file(invalid_path);
         CATCH_CHECK_FALSE(parsed.has_value());
     }
 
@@ -289,10 +298,10 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
 
     CATCH_SECTION("File with UTF-32 big endian byte order mark")
     {
-        auto const here = std::filesystem::path(__FILE__);
-        auto const path = here.parent_path() / "json" / "unicode";
+        static auto const success_path = unicode_data_path() / "utf_32_big_endian.json";
+        static auto const invalid_path = unicode_data_path() / "utf_32_big_endian_invalid.json";
 
-        auto parsed = parser.parse_file(path / "utf_32_big_endian.json");
+        auto parsed = parser.parse_file(success_path);
         CATCH_REQUIRE(parsed.has_value());
 
         fly::Json values = *std::move(parsed);
@@ -301,16 +310,16 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         fly::Json encoded_encoding = values["encoding"];
         CATCH_CHECK(encoded_encoding == "UTF-32 BE");
 
-        parsed = parser.parse_file(path / "utf_32_big_endian_invalid.json");
+        parsed = parser.parse_file(invalid_path);
         CATCH_CHECK_FALSE(parsed.has_value());
     }
 
     CATCH_SECTION("File with UTF-32 little endian byte order mark")
     {
-        auto const here = std::filesystem::path(__FILE__);
-        auto const path = here.parent_path() / "json" / "unicode";
+        static auto const success_path = unicode_data_path() / "utf_32_little_endian.json";
+        static auto const invalid_path = unicode_data_path() / "utf_32_big_endian_invalid.json";
 
-        auto parsed = parser.parse_file(path / "utf_32_little_endian.json");
+        auto parsed = parser.parse_file(success_path);
         CATCH_REQUIRE(parsed.has_value());
 
         fly::Json values = *std::move(parsed);
@@ -319,7 +328,7 @@ CATCH_TEST_CASE("JsonParser", "[parser]")
         fly::Json encoded_encoding = values["encoding"];
         CATCH_CHECK(encoded_encoding == "UTF-32 LE");
 
-        parsed = parser.parse_file(path / "utf_32_big_endian_invalid.json");
+        parsed = parser.parse_file(invalid_path);
         CATCH_CHECK_FALSE(parsed.has_value());
     }
 
