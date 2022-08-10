@@ -77,13 +77,12 @@ CATCH_TEST_CASE("JSON", "[bench]")
 {
     static constexpr std::size_t s_iterations = 11;
 
-    auto const here = std::filesystem::path(__FILE__).parent_path();
-    auto const root = here.parent_path().parent_path();
+    static auto const root =
+        std::filesystem::path(__FILE__).parent_path().parent_path().parent_path();
 
     static std::vector<std::filesystem::path> s_test_files {
-        root / "test" / "parser" / "json" / "unicode" / "all_unicode.json",
-        here / "data" / "canada.json",
-        here / "data" / "gsoc-2018.json",
+        root / "build" / "data" / "json" / "all_unicode.json",
+        root / "build" / "data" / "json" / "canada.json",
     };
 
     std::map<std::string, std::unique_ptr<JsonParserBase>> parsers;

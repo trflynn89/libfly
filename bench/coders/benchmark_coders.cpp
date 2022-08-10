@@ -135,14 +135,9 @@ void run_enwik8_test(std::string &&name, std::filesystem::path const &file)
 
 CATCH_TEST_CASE("Coders", "[bench]")
 {
-    auto const here = std::filesystem::path(__FILE__).parent_path();
-    auto const file = here / "data" / "enwik8";
-
-    if (!std::filesystem::exists(file))
-    {
-        std::cerr << "Download and unzip http://mattmahoney.net/dc/enwik8.zip to: " << file << '\n';
-        return;
-    }
+    static auto const root =
+        std::filesystem::path(__FILE__).parent_path().parent_path().parent_path();
+    static auto const file = root / "build" / "data" / "coders" / "enwik8";
 
     run_enwik8_test<Huffman>("Huffman", file);
     run_enwik8_test<Base64>("Base64", file);
