@@ -1,8 +1,9 @@
 #### Build
 
-debug/
-release/
-profile/
+build/data/
+build/debug/
+build/release/
+build/profile/
 
 #### General
 
