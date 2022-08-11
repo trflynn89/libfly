@@ -25,6 +25,7 @@ jobs:
 
     - template: cache.yml
       parameters:
+        platform: 'Linux'
         toolchain: ${{ parameters.toolchain }}
         mode: ${{ parameters.mode }}
         arch: ${{ parameters.arch }}

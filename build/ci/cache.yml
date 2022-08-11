@@ -1,4 +1,5 @@
 parameters:
+  platform: 'Linux'
   toolchain: 'clang'
   mode: 'debug'
   arch: 'x64'
@@ -8,15 +9,23 @@ steps:
       echo "##vso[task.setvariable variable=timestamp]$(date -u +"%Y%m%d%H%M_%S")"
     displayName: 'Stamp'
 
-  - task: Cache@2
-    inputs:
-      key: '"ccache" | "$(Agent.OS)" | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}" | "$(timestamp)"'
-      restoreKeys: |
-        "ccache" | "$(Agent.OS)" | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}"
-      path: $(CCACHE_DIR)
-    displayName: 'Compiler Cache'
+  - ${{ if eq(lower(parameters.mode), 'debug') }}:
+    - task: Cache@2
+      inputs:
+        key: '"remote_data_cache" | "$(Agent.OS)" | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}" | build/scripts/download_build_data.py'
+        path: build/data
+      displayName: 'Remote Data Cache'
 
-  - script: |
-      ccache -M 5G
-      ccache -s
-    displayName: 'Configure Compiler Cache'
+  - ${{ if ne(lower(parameters.platform), 'Windows') }}:
+    - task: Cache@2
+      inputs:
+        key: '"ccache" | "$(Agent.OS)" | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}" | "$(timestamp)"'
+        restoreKeys: |
+          "ccache" | "$(Agent.OS)" | "${{ parameters.toolchain }}" | "${{ parameters.mode }}" | "${{ parameters.arch }}"
+        path: $(CCACHE_DIR)
+      displayName: 'Compiler Cache'
+
+    - script: |
+        ccache -M 1G
+        ccache -s
+      displayName: 'Configure Compiler Cache'

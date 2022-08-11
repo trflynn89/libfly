@@ -16,6 +16,13 @@ jobs:
 
     - template: setup.yml
 
+    - template: cache.yml
+      parameters:
+        platform: 'Windows'
+        toolchain: 'msvc'
+        mode: ${{ parameters.mode }}
+        arch: ${{ parameters.arch }}
+
     - ${{ if eq(parameters.mode, 'Debug') }}:
       - task: VSBuild@1
         inputs:
