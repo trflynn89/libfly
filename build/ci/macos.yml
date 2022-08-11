@@ -23,6 +23,7 @@ jobs:
 
     - template: cache.yml
       parameters:
+        platform: 'macOS'
         mode: ${{ parameters.mode }}
 
     - script: |
