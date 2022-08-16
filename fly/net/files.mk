@@ -1,6 +1,6 @@
 SRC_DIRS_$(d) := \
-    $(d)/socket \
-    $(d)/socket/detail \
-    $(d)/socket/detail/nix
+    $(d)/socket
 
-$(eval $(call WILDCARD_SOURCES, CPP))
+SRC_$(d) := \
+    $(d)/network_config.cpp
+
