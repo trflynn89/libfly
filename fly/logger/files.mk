@@ -1,5 +1,8 @@
 SRC_DIRS_$(d) := \
-    $(d)/detail \
-    $(d)/detail/nix
+    $(d)/detail
 
-$(eval $(call WILDCARD_SOURCES, CPP))
+SRC_$(d) := \
+    $(d)/log.cpp \
+    $(d)/logger.cpp \
+    $(d)/logger_config.cpp \
+    $(d)/styler.cpp
